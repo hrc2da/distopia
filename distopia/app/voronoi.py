@@ -849,13 +849,22 @@ class VoronoiApp(App):
             if self.show_precinct_id:
                 self.show_precinct_labels(widget)
         self._profiler = widget._profiler = cProfile.Profile()
-        widget.size_hint = None, None
+
+        size = list(map(dp, self.screen_size))
+        size = [v / self.scale for v in size]
+
         scatter = Scatter(
             do_rotation=False, do_scale=False, do_translation_y=False,
-            do_translation_x=False, scale=self.scale)
+            do_translation_x=False, scale=self.scale,
+            do_collide_after_children=False)
         scatter.add_widget(widget)
+
+        widget.size_hint = None, None
+        scatter.size_hint = None, None
         scatter.fbind('pos', lambda *l: setattr(scatter, 'pos', (0, 0)))
         scatter.pos = 0, 0
+        scatter.size = size
+        widget.size = size
         return scatter
 
 

@@ -139,6 +139,7 @@ class RosBridge(object):
             fh = self.create_log_file()
             fh.write('[')
 
+        logging.info('Running ros-bridge thread')
         try:
             while True:
                 item, val = queue.get(block=True)
@@ -193,3 +194,4 @@ class RosBridge(object):
             if fh is not None:
                 fh.write('\n]')
                 fh.close()
+            logging.info('Ros-bridge thread exited')
