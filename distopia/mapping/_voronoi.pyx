@@ -55,6 +55,43 @@ def fill_voronoi_diagram(
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
+def locate_region(
+        np.ndarray[np.uint8_t, ndim=2] pixels, int w, int h,
+        unsigned char region, int start_x, int start_y):
+    cdef int x = start_x
+    cdef int y = start_y
+    cdef int count = 0
+    cdef int spiral_len = 0
+    cdef int i
+
+    if pixels[x, y] == region:
+        return x, y
+
+    while count < 25:
+        spiral_len += 1
+        for i in range(spiral_len):
+            x += 1
+            if 0 <= x < w and 0 <= y < h and pixels[x, y] == region:
+                return x, y
+        for i in range(spiral_len):
+            y += 1
+            if 0 <= x < w and 0 <= y < h and pixels[x, y] == region:
+                return x, y
+
+        spiral_len += 1
+        for i in range(spiral_len):
+            x -= 1
+            if 0 <= x < w and 0 <= y < h and pixels[x, y] == region:
+                return x, y
+        for i in range(spiral_len):
+            y -= 1
+            if 0 <= x < w and 0 <= y < h and pixels[x, y] == region:
+                return x, y
+
+    raise Exception('Could not locate region in pixels')
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def get_region_vertices(
         np.ndarray[np.uint8_t, ndim=2] pixels, int w, int h,
         set regions, int start_x, int start_y):

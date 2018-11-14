@@ -166,7 +166,28 @@ class VoronoiWidget(Widget):
         self.n_focus_rows = rows = int(screen_size[1] // focus_metric_height)
         self.n_focus_cols = cols = int(math.ceil(len(focus_metrics) / rows))
         self.focus_region_width = cols * focus_metric_width
+        self.show_focus_region()
 
+        self.fiducial_graphics = {}
+        self.fiducials_color = {}
+        self.colors = cycle(plt.get_cmap('tab10').colors)
+
+        self.table_mode = table_mode
+        self.align_mat = align_mat
+        self.district_graphics = []
+        self.district_metrics_fn = district_metrics_fn
+        self.state_metrics_fn = state_metrics_fn
+        self.screen_offset = screen_offset
+        self.touches = {}
+
+        with self.canvas.before:
+            PushMatrix()
+            Translate(*[v * Metrics.density for v in screen_offset])
+        with self.canvas.after:
+            PopMatrix()
+        self.show_precincts()
+
+    def show_focus_region(self):
         if not self.table_mode:
             h = 34 * len(self.district_blocks_fid) + 5 * (
                 len(self.district_blocks_fid) - 1)
@@ -198,8 +219,11 @@ class VoronoiWidget(Widget):
             self.add_widget(box)
 
         i = 0
-        for col in range(cols):
-            for row in range(rows):
+        focus_metrics = self.focus_metrics
+        focus_metric_width = self.focus_metric_width
+        focus_metric_height = self.focus_metric_height
+        for col in range(self.n_focus_cols):
+            for row in range(self.n_focus_rows):
                 name = focus_metrics[i]
                 x0 = col * focus_metric_width
                 x1 = x0 + focus_metric_width
@@ -216,25 +240,6 @@ class VoronoiWidget(Widget):
                     break
             if i >= len(focus_metrics):
                 break
-
-        self.fiducial_graphics = {}
-        self.fiducials_color = {}
-        self.colors = cycle(plt.get_cmap('tab10').colors)
-
-        self.table_mode = table_mode
-        self.align_mat = align_mat
-        self.district_graphics = []
-        self.district_metrics_fn = district_metrics_fn
-        self.state_metrics_fn = state_metrics_fn
-        self.screen_offset = screen_offset
-        self.touches = {}
-
-        with self.canvas.before:
-            PushMatrix()
-            Translate(*[v * Metrics.density for v in screen_offset])
-        with self.canvas.after:
-            PopMatrix()
-        self.show_precincts()
 
     def show_precincts(self):
         precinct_graphics = self.precinct_graphics = {}
@@ -636,6 +641,9 @@ class VoronoiWidget(Widget):
                 Scale(Metrics.density)
                 self.district_graphics.append(Color(1, 1, 0, 1))
                 for district in districts:
+                    if not district.boundary:
+                        continue
+
                     self.district_graphics.append(
                         Line(points=district.boundary + district.boundary[:2],
                              width=2))
@@ -823,7 +831,8 @@ class VoronoiApp(App):
             district_metrics_fn=self.metric_data.compute_district_metrics,
             state_metrics_fn=self.metric_data.create_state_metrics,
             show_voronoi_boundaries=self.show_voronoi_boundaries,
-            focus_metrics=self.focus_metrics, screen_size=list(map(dp, self.screen_size)),
+            focus_metrics=self.focus_metrics,
+            screen_size=list(map(dp, self.screen_size)),
             focus_metric_height=dp(self.focus_metric_height),
             focus_metric_width=dp(self.focus_metric_width),
             max_fiducials_per_district=self.max_fiducials_per_district)
@@ -881,8 +890,3 @@ if __name__ == '__main__':
         app.voronoi_mapping.stop_thread()
         if app.ros_bridge:
             app.ros_bridge.stop_threads()
-
-    # s = io.StringIO()
-    # ps = pstats.Stats(app._profiler, stream=s).sort_stats('cumulative')
-    # ps.print_stats()
-    # print(s.getvalue())

@@ -317,6 +317,10 @@ class MetricData(object):
                 metric = district.metrics['compactness'] = \
                     DistrictScalarMetric(district=district, name='compactness')
 
+                if not district.boundary or district.collider is None:
+                    metric.set_value(-1., 'compactness')
+                    continue
+
                 perimeter = len(district.boundary) / 2.
                 area = district.collider.get_area()
                 r = perimeter / (2 * math.pi)

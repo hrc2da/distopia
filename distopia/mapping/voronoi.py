@@ -5,14 +5,12 @@ Voronoi Mapping
 from scipy.spatial import Voronoi
 from distopia.district import District
 from distopia.precinct import Precinct
-from distopia.mapping._voronoi import PolygonCollider, get_region_vertices
+from distopia.mapping._voronoi import \
+    PolygonCollider, get_region_vertices, locate_region
 import numpy as np
 from collections import defaultdict
 import logging
-import time
 from threading import Thread, Lock
-import math
-import cProfile, pstats, io
 try:
     from queue import Queue
 except ImportError:
@@ -67,13 +65,10 @@ class VoronoiMapping(object):
 
     _thread_queue = None
 
-    _profiler = None
-
     thread_lock = None
 
     def __init__(self, **kwargs):
         super(VoronoiMapping, self).__init__(**kwargs)
-        self._profiler = cProfile.Profile()
         self.sites = []
         self.precincts = []
         self.districts = []
@@ -139,14 +134,6 @@ class VoronoiMapping(object):
         while True:
             item = queue.get(block=True)
             if item == 'eof':
-                s = io.StringIO()
-                try:
-                    ps = pstats.Stats(
-                        self._profiler, stream=s).sort_stats('cumulative')
-                    ps.print_stats()
-                    print(s.getvalue())
-                except TypeError:  # in case nothing was profiled yet
-                    pass
                 return
 
             callback, callback_if_old, fiducials, fiducial_ids = item
@@ -168,7 +155,6 @@ class VoronoiMapping(object):
                 fiducial_pos[fiducial_identity.index(id_)]
                 for id_ in unique_ids]
 
-            self._profiler.enable()
             try:
                 pixel_district_map = self.compute_district_pixels(
                     np.asarray(fiducial_pos), fiducial_identity, unique_ids)
@@ -194,19 +180,15 @@ class VoronoiMapping(object):
                 logging.exception(e)
                 callback([], [], [])
                 continue
-            finally:
-                self._profiler.disable()
 
             qsize = queue.qsize()
             if not callback_if_old and qsize:
-                self._profiler.disable()
                 continue
 
             callback(
                 districts, fiducial_identity, fiducial_pos, [], post_callback,
                 (districts, precinct_assignment, pixel_district_map),
                 bool(qsize))
-            self._profiler.disable()
 
     def stop_thread(self):
         if self._thread is not None:
@@ -362,7 +344,17 @@ class VoronoiMapping(object):
         for district, precincts, pos in zip(
                 districts, precinct_assignment, ids_fiducial_pos):
             regions = {p.identity for p in precincts}
-            pos = map(int, map(round, pos))
+            if not precincts:
+                continue
+
+            x, y = pos = list(map(int, map(round, pos)))
+            if pixel_precinct_map[x, y] not in regions:
+                start_pos = precincts[0].boundary[:2]
+                start_pos = list(map(int, map(round, start_pos)))
+                pos = locate_region(
+                    pixel_precinct_map, *self.screen_size,
+                    precincts[0].identity, *start_pos)
+
             vertices = get_region_vertices(
                 pixel_precinct_map, *self.screen_size, regions, *pos)
 
