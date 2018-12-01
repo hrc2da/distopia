@@ -67,6 +67,8 @@ class VoronoiMapping(object):
 
     thread_lock = None
 
+    verify_adjacency = True
+
     def __init__(self, **kwargs):
         super(VoronoiMapping, self).__init__(**kwargs)
         self.sites = []
@@ -222,10 +224,8 @@ class VoronoiMapping(object):
         precincts = self.precincts = list(precincts)
         if len(precincts) < 2 ** 8 - 1:
             dtype = np.uint8
-            f = 'mark_pixels_u8'
         elif len(precincts) < 2 ** 16 - 1:
             dtype = np.uint16
-            f = 'mark_pixels_u16'
         else:
             raise ValueError('Too many precincts')
 
@@ -236,7 +236,7 @@ class VoronoiMapping(object):
         for i, precinct in enumerate(precincts):
             collider = precinct.collider = PolygonCollider(
                 points=precinct.boundary, cache=True, rect=(0, 0, w, h))
-            getattr(collider, f)(pixel_precinct_map, w, h, i)
+            collider.mark_pixels(pixel_precinct_map, w, h, i)
 
             x1, y1, x2, y2 = collider.bounding_box()
             precinct_values = np.zeros(
@@ -311,8 +311,8 @@ class VoronoiMapping(object):
 
         return self.districts[d_i]
 
-    @staticmethod
-    def create_districts_from_assignment(precinct_assignment, unique_ids):
+    def create_districts_from_assignment(
+            self, precinct_assignment, unique_ids):
         districts = []
         for i in range(len(precinct_assignment)):
             district = District()
@@ -324,6 +324,9 @@ class VoronoiMapping(object):
         for i, precincts in enumerate(precinct_assignment):
             for precinct in precincts:
                 district_map[precinct] = i
+
+        if not self.verify_adjacency:
+            return districts, []
 
         disconnected = []
         for precincts in precinct_assignment:
@@ -410,7 +413,7 @@ class VoronoiMapping(object):
                 points=poly, cache=True, rect=(0, 0, w, h))
 
             idx = unique_ids.index(fiducials_identity[i])
-            collider.mark_pixels_u8(pixel_district_map, w, h, idx)
+            collider.mark_pixels(pixel_district_map, w, h, idx)
 
         return pixel_district_map
 

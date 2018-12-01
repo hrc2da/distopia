@@ -1,5 +1,12 @@
 {
   "alignment_filename": "alignment.txt",
+  "county_containing_rect": [
+    -10340383.044547472,
+    5234960.877240755,
+    -9663065.961545676,
+    5955268.550424832
+  ],
+  "display_landmarks": true,
   "district_blocks_fid": [
     0,
     1,
@@ -35,6 +42,12 @@
     "race",
     "pvi"
   ],
+  "precinct_2017_containing_rect": [
+    0,
+    0,
+    0,
+    0
+  ],
   "ros_host": "localhost",
   "ros_port": 9090,
   "screen_offset": [
@@ -46,7 +59,7 @@
     1080
   ],
   "show_precinct_id": false,
-  "show_voronoi_boundaries": false,
+  "show_voronoi_boundaries": true,
   "table_mode": false,
   "use_county_dataset": true,
   "use_ros": false

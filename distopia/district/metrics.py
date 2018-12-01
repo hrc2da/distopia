@@ -44,6 +44,9 @@ class DistrictAggregateMetric(DistrictMetric):
     def compute(self):
         raise NotImplementedError
 
+    def get_data(self):
+        raise NotImplementedError
+
 
 class DistrictHistogramAggregateMetric(DistrictAggregateMetric):
 

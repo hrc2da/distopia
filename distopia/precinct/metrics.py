@@ -31,6 +31,9 @@ class PrecinctMetric(object):
         self.scalar_maximum = scalar_maximum
         self.scalar_label = scalar_label
 
+    def get_data(self):
+        raise NotImplementedError
+
 
 class PrecinctHistogram(PrecinctMetric):
 

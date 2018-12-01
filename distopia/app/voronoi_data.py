@@ -28,11 +28,12 @@ import distopia
 from distopia.precinct.metrics import PrecinctHistogram
 from distopia.district.metrics import DistrictHistogramAggregateMetric, \
     DistrictScalarMetric
+from distopia.metrics import MeanStateMetric
 
-__all__ = ('GeoData', 'MetricData')
+__all__ = ('GeoDataCounty', 'GeoDataPrecinct2017', 'MetricData')
 
 
-class GeoData(object):
+class GeoDataBase(object):
     """Represents the census data and the polygons associated with the data.
     """
 
@@ -44,11 +45,13 @@ class GeoData(object):
 
     fields = None
 
-    source_coordinates = 'epsg:3071'
+    source_coordinates = ''
 
-    target_coordinates = 'epsg:3857'
+    source_coordinates_landmark = ''
 
-    dataset_name = 'WI_Election_Data_with_2017_Wards'
+    target_coordinates = ''
+
+    dataset_name = ''
 
     screen_size = (1920, 1080)
 
@@ -57,6 +60,10 @@ class GeoData(object):
     
     ``(min_x, min_y, max_x, max_y)``
     """
+
+    landmarks = []
+
+    metric_data = None
 
     @property
     def data_path(self):
@@ -77,6 +84,37 @@ class GeoData(object):
 
         assert len(records)
         assert len(records[0]) == len(fields)
+
+    def load_landmarks(self):
+        from pyproj import Proj, transform
+        src, target = self.source_coordinates_landmark, self.target_coordinates
+        if not src or not target:
+            trans = lambda _0, _1, lon, lat: (lon, lat)
+            crs_src = crs_target = None
+        else:
+            trans = transform
+            crs_src = Proj(init=src)
+            crs_target = Proj(init=target)
+
+        data_path = os.path.join(self.data_path, 'landmarks.csv')
+        landmarks = self.landmarks = []
+        if not os.path.exists(data_path):
+            return
+
+        min_x, min_y, ratio = self.get_scale_factors()
+        with open(data_path) as fh:
+            it = csv.reader(fh)
+            next(it)
+            for row in it:
+                x, y, size = row[:3]
+                name = row[3] if len(row) > 3 else ''
+                label = row[4] if len(row) > 4 else ''
+                x, y = trans(crs_src, crs_target, float(y), float(x))
+
+                x = (x - min_x) * ratio
+                y = (y - min_y) * ratio
+
+                landmarks.append((x, y, float(size), name, label))
 
     def load_npz_data(self):
         data = np.load(os.path.join(self.data_path, 'data.npz'))
@@ -148,8 +186,8 @@ class GeoData(object):
             crs_src = crs_target = None
         else:
             trans = transform
-            crs_src = Proj(init='epsg:3071')
-            crs_target = Proj(init='epsg:3857')
+            crs_src = Proj(init=src)
+            crs_target = Proj(init=target)
 
         self.polygons = polygons = []
         min_x = min_y = float('inf')
@@ -209,9 +247,7 @@ class GeoData(object):
 
                 shape_polygons[i] = np.array(filtered_poly)
 
-    def scale_to_screen(self):
-        """Scales the polygons to the screen size.
-        """
+    def get_scale_factors(self):
         if self.screen_size is None:
             raise TypeError('A screen size was not given')
 
@@ -224,12 +260,83 @@ class GeoData(object):
         y_ratio = height / (max_y - min_y)
         ratio = min(x_ratio, y_ratio)
 
+        return min_x, min_y, ratio
+
+    def scale_to_screen(self):
+        """Scales the polygons to the screen size.
+        """
+        min_x, min_y, ratio = self.get_scale_factors()
+
         for precinct_polygons in self.polygons:
             for polygon in precinct_polygons:
                 polygon[:, 0] -= min_x
                 polygon[:, 0] *= ratio
                 polygon[:, 1] -= min_y
                 polygon[:, 1] *= ratio
+
+    def set_precinct_adjacency(self, precincts):
+        fname = os.path.join(self.data_path, 'adjacency.json')
+        if not os.path.exists(fname):
+            return False
+
+        with open(fname, 'r') as fh:
+            precinct_adj = json.load(fh)
+
+        for i, neighbours in precinct_adj.items():
+            precincts[int(i)].neighbours = [precincts[p] for p in neighbours]
+        return True
+
+    def load_metrics(self, metrics, precincts):
+        raise NotImplementedError
+
+    def get_ordered_record_names(self):
+        raise NotImplementedError
+
+
+class GeoDataCounty(GeoDataBase):
+
+    source_coordinates = 'epsg:3071'
+
+    source_coordinates_landmark = 'epsg:4326'
+
+    target_coordinates = 'epsg:3857'
+
+    dataset_name = 'County_Boundaries_24K'
+
+    def load_metrics(self, metrics, precincts):
+        names = {'Saint Croix': 'St. Croix'}
+        root = os.path.join(self.data_path, 'aggregate')
+
+        metric_data = self.metric_data = MetricData(
+            root_path=root, metrics=metrics, precinct_names_map=names,
+            precincts=precincts)
+        return metric_data
+
+    def get_ordered_record_names(self):
+        return [record[3] for record in self.records]
+
+
+class GeoDataPrecinct2017(GeoDataBase):
+
+    source_coordinates = ''
+
+    source_coordinates_landmark = ''
+
+    target_coordinates = ''
+
+    dataset_name = 'WI_Election_Data_with_2017_Wards'
+
+    def load_metrics(self, metrics, precincts):
+        names = {'Saint Croix': 'St. Croix'}
+        root = os.path.join(self.data_path, 'aggregate')
+
+        metric_data = self.metric_data = MetricData(
+            root_path=root, metrics=metrics, precinct_names_map=names,
+            precincts=precincts)
+        return metric_data
+
+    def get_ordered_record_names(self):
+        return list(map(str, range(1, len(self.records) + 1)))
 
 
 class MetricData(object):
@@ -329,4 +436,9 @@ class MetricData(object):
                 metric.set_value(area / circle_area, 'compactness')
 
     def create_state_metrics(self, districts):
-        return []
+        metrics = []
+        for metric_name in self.metrics:
+            m = MeanStateMetric(name=metric_name, districts=districts)
+            m.compute()
+            metrics.append(m)
+        return m

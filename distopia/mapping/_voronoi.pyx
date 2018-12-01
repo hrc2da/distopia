@@ -28,12 +28,20 @@ cdef extern from "math.h":
     double sqrt(double x)
     double abs(double x)
 
+ctypedef fused np_uints_array:
+    np.ndarray[np.uint16_t, ndim=2]
+    np.ndarray[np.uint8_t, ndim=2]
+
+ctypedef fused np_uints:
+    np.uint16_t
+    np.uint8_t
+
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def fill_voronoi_diagram(
-    np.ndarray[np.uint8_t, ndim=2] pixels, int w, int h,
-    np.ndarray[np.float64_t, ndim=2] sites, np.ndarray[np.uint8_t] site_ids):
+    np_uints_array pixels, int w, int h,
+    np.ndarray[np.float64_t, ndim=2] sites, np_uints_array site_ids):
     cdef int x, y, i, i_min
     cdef double dist, dist_min
     if not len(site_ids):
@@ -56,7 +64,7 @@ def fill_voronoi_diagram(
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def locate_region(
-        np.ndarray[np.uint8_t, ndim=2] pixels, int w, int h,
+        np_uints_array pixels, int w, int h,
         unsigned char region, int start_x, int start_y):
     cdef int x = start_x
     cdef int y = start_y
@@ -93,7 +101,7 @@ def locate_region(
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def get_region_vertices(
-        np.ndarray[np.uint8_t, ndim=2] pixels, int w, int h,
+        np_uints_array pixels, int w, int h,
         set regions, int start_x, int start_y):
     cdef list vertices = []
     cdef int x = start_x
@@ -386,37 +394,7 @@ cdef class PolygonCollider(object):
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def mark_pixels_u8(self, np.ndarray[np.uint8_t, ndim=2] table, int w, int h,
-                       np.uint8_t value):
-        cdef int x, y, x_offset, y_offset
-        if self.cspace is NULL:
-            raise TypeError('This method can only be called if cache was True')
-        if self.empty:
-            return
-        if self.rect is None:
-            raise ValueError('Can only be called if rect was specified')
-        if w != self.rect[2] or h != self.rect[3]:
-            raise ValueError('The w,h does not match the w/h provided in rect')
-
-        if self.x_offset >= 0:
-            x_offset = 0
-        else:
-            x_offset = -self.x_offset
-
-        if self.y_offset >= 0:
-            y_offset = 0
-        else:
-            y_offset = -self.y_offset
-
-        for x in range(self.width):
-            for y in range(self.height):
-                if self.cspace[y * self.width + x]:
-                    table[x + x_offset, y + y_offset] = value
-
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    def mark_pixels_u16(
-            self, np.ndarray[np.uint16_t, ndim=2] table, int w, int h, np.uint16_t value):
+    def mark_pixels(self, np_uints_array table, int w, int h, np_uints value):
         cdef int x, y, x_offset, y_offset
         if self.cspace is NULL:
             raise TypeError('This method can only be called if cache was True')
@@ -446,8 +424,8 @@ cdef class PolygonCollider(object):
     @cython.boundscheck(False)
     @cython.wraparound(False)
     def get_arg_max_count(
-            np.ndarray[np.uint8_t, ndim=2] table,
-            np.ndarray[np.uint8_t, ndim=2] mask,
+            np_uints_array table,
+            np_uints_array mask,
             np.ndarray[np.uint64_t, ndim=1] bins, int num_bins, int w, int h,
             unsigned char none_val):
         cdef int x, y, i, best_i

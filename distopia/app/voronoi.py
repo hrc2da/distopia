@@ -11,7 +11,6 @@ install_twisted_reactor()
 from itertools import cycle
 import logging
 import os
-import cProfile, pstats, io
 import numpy as np
 import json
 import csv
@@ -24,7 +23,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.togglebutton import ToggleButton
 from kivy.lang import Builder
 from kivy.app import App
-from kivy.graphics.vertex_instructions import Line, Point, Mesh
+from kivy.graphics.vertex_instructions import Line, Point, Mesh, Ellipse, \
+    Rectangle
 from kivy.graphics.tesselator import Tesselator, WINDING_ODD, TYPE_POLYGONS
 from kivy.graphics import Color
 import matplotlib.pyplot as plt
@@ -36,46 +36,15 @@ from kivy.graphics.context_instructions import \
     PushMatrix, PopMatrix, Rotate, Translate, Scale, MatrixInstruction
 from kivy.uix.spinner import Spinner
 from kivy.uix.scatter import Scatter
+from kivy.resources import resource_find, resource_add_path
 
 import distopia
-from distopia.app.voronoi_data import GeoData, MetricData
+from distopia.app.voronoi_data import GeoDataCounty, GeoDataPrecinct2017
 from distopia.precinct import Precinct
 from distopia.mapping.voronoi import VoronoiMapping
 from distopia.app.ros import RosBridge
 
 __all__ = ('VoronoiWidget', 'VoronoiApp')
-
-
-class GuiTouchClassSpinner(Spinner):
-
-    district_blocks_fid = []
-
-    focus_block_logical_id = 0
-
-    fid_id = NumericProperty(0)
-
-    def __init__(self, district_blocks_fid=[], focus_block_logical_id=0,
-                 **kwargs):
-        super(GuiTouchClassSpinner, self).__init__(**kwargs)
-        self.district_blocks_fid = district_blocks_fid
-        self.focus_block_logical_id = focus_block_logical_id
-
-        values = []
-        for district in district_blocks_fid:
-            values.append('District {}'.format(district))
-        values.append('Focus')
-
-        self.values = values
-        self.text = values[0]
-        self.fbind('text', self.process_selection)
-        self.process_selection()
-
-    def process_selection(self, *largs):
-        text = self.text
-        if text == 'Focus':
-            self.fid_id = self.focus_block_logical_id
-        else:
-            self.fid_id = int(text.split(' ')[-1])
 
 
 class VoronoiWidget(Widget):
@@ -95,8 +64,6 @@ class VoronoiWidget(Widget):
     fiducials_color = {}
 
     table_mode = False
-
-    _profiler = None
 
     align_mat = None
 
@@ -166,6 +133,7 @@ class VoronoiWidget(Widget):
         self.n_focus_rows = rows = int(screen_size[1] // focus_metric_height)
         self.n_focus_cols = cols = int(math.ceil(len(focus_metrics) / rows))
         self.focus_region_width = cols * focus_metric_width
+        self.show_district_selection()
         self.show_focus_region()
 
         self.fiducial_graphics = {}
@@ -187,7 +155,7 @@ class VoronoiWidget(Widget):
             PopMatrix()
         self.show_precincts()
 
-    def show_focus_region(self):
+    def show_district_selection(self):
         if not self.table_mode:
             h = 34 * len(self.district_blocks_fid) + 5 * (
                 len(self.district_blocks_fid) - 1)
@@ -205,21 +173,25 @@ class VoronoiWidget(Widget):
                     if button.state == 'down':
                         self.current_fid_id = value
                 btn.fbind('state', update_current_fid)
+            box.children[-1].state = 'down'
+            self.add_widget(box)
 
+    def show_focus_region(self):
+        focus_metrics = self.focus_metrics
+        if not focus_metrics:
+            return
+
+        if not self.table_mode:
             btn = ToggleButton(
                 text='Focus', group='focus', allow_no_selection=False)
-            box.add_widget(btn)
+            self.gui_touch_focus_buttons.add_widget(btn)
 
             def update_current_fid(*largs, button=btn):
                 if button.state == 'down':
                     self.current_fid_id = self.focus_block_logical_id
             btn.fbind('state', update_current_fid)
 
-            box.children[-1].state = 'down'
-            self.add_widget(box)
-
         i = 0
-        focus_metrics = self.focus_metrics
         focus_metric_width = self.focus_metric_width
         focus_metric_height = self.focus_metric_height
         for col in range(self.n_focus_cols):
@@ -357,6 +329,7 @@ class VoronoiWidget(Widget):
         """Only called in table mode and if the touch has been seen before
         and it is a focus block.
         """
+        assert self.focus_metrics
         info = self.touches[touch.uid]
         info['last_pos'] = pos
         info['graphics'][1].points = pos
@@ -368,6 +341,7 @@ class VoronoiWidget(Widget):
         """Only called in table mode and if the touch has been seen before
         and it is a focus block.
         """
+        assert self.focus_metrics
         info = self.touches[touch.uid]
         for item in info['graphics']:
             self.canvas.remove(item)
@@ -459,6 +433,7 @@ class VoronoiWidget(Widget):
 
         # are we near the focus touch?
         if self.focus_gui_pos:
+            assert self.focus_metrics
             x2, y2 = self.focus_gui_pos
             if ((x - x2) ** 2 + (y - y2) ** 2) ** .5 < 10:
                 info['focus'] = True
@@ -668,8 +643,6 @@ class VoronoiApp(App):
 
     table_mode = False
 
-    _profiler = None
-
     alignment_filename = 'alignment.txt'
 
     screen_offset = 0, 0
@@ -706,37 +679,21 @@ class VoronoiApp(App):
 
     scale = 1.
 
-    def load_metrics(self):
-        assert self.use_county_dataset
-        names = {'Saint Croix': 'St. Croix'}
-        root = os.path.join(
-            os.path.dirname(distopia.__file__), 'data', 'aggregate')
+    county_containing_rect = [0, 0, 0, 0]
 
-        self.metric_data = MetricData(
-            root_path=root, metrics=self.metrics, precinct_names_map=names,
-            precincts=self.precincts)
+    precinct_2017_containing_rect = [0, 0, 0, 0]
 
-    def load_precinct_adjacency(self):
-        assert self.use_county_dataset
-        fname = os.path.join(
-            os.path.dirname(distopia.__file__), 'data', 'county_adjacency.json')
+    display_landmarks = True
 
-        with open(fname, 'r') as fh:
-            counties = json.load(fh)
-
-        precincts = self.precincts
-        for i, neighbours in counties.items():
-            precincts[int(i)].neighbours = [precincts[p] for p in neighbours]
-
-    def create_voronoi(self):
+    def load_data_create_voronoi(self):
         """Loads and initializes all the data and voronoi mapping.
         """
-        self.geo_data = geo_data = GeoData()
         if self.use_county_dataset:
-            geo_data.dataset_name = 'County_Boundaries_24K'
+            geo_data = self.geo_data = GeoDataCounty()
+            geo_data.containing_rect = self.county_containing_rect
         else:
-            geo_data.dataset_name = 'WI_Election_Data_with_2017_Wards'
-            geo_data.source_coordinates = ''
+            geo_data = self.geo_data = GeoDataPrecinct2017()
+            geo_data.containing_rect = self.precinct_2017_containing_rect
 
         geo_data.screen_size = self.screen_size
         try:
@@ -752,14 +709,39 @@ class VoronoiApp(App):
         vor.screen_size = self.screen_size
         self.precincts = precincts = []
 
-        for i, (record, polygons) in enumerate(
-                zip(geo_data.records, geo_data.polygons)):
+        for i, (name, polygons) in enumerate(
+                zip(geo_data.get_ordered_record_names(), geo_data.polygons)):
             precinct = Precinct(
-                name=record[3], boundary=polygons[0].reshape(-1).tolist(),
+                name=name, boundary=polygons[0].reshape(-1).tolist(),
                 identity=i, location=polygons[0].mean(axis=0).tolist())
             precincts.append(precinct)
 
         vor.set_precincts(precincts)
+
+    def show_landmarks(self, widget):
+        if not self.display_landmarks:
+            return
+
+        offset = widget.focus_region_width
+        landmarks = self.geo_data.landmarks
+        if not landmarks:
+            return
+
+        with widget.canvas:
+            for x, y, size, name, label in landmarks:
+                x, y = dp(x), dp(y)
+                size = dp(size)
+                x += offset
+
+                if name:
+                    Color(1, 1, 1, .6)
+                    Rectangle(
+                        pos=(x - size / 2., y - size / 2.), size=(size, size),
+                        source=resource_find('{}.png'.format(name)))
+                if label:
+                    widget.add_widget(Label(
+                        text=label, pos=(x - size / 2., y + size / 2.),
+                        font_size=dp(15)))
 
     def show_precinct_labels(self, widget):
         offset = widget.focus_region_width
@@ -778,7 +760,9 @@ class VoronoiApp(App):
                 'focus_block_logical_id', 'district_blocks_fid', 'use_ros',
                 'metrics', 'ros_host', 'ros_port', 'show_voronoi_boundaries',
                 'focus_metrics', 'focus_metric_width', 'focus_metric_height',
-                'log_data', 'max_fiducials_per_district', 'scale']
+                'log_data', 'max_fiducials_per_district', 'scale',
+                'county_containing_rect', 'precinct_2017_containing_rect',
+                'display_landmarks']
 
         fname = os.path.join(
             os.path.dirname(distopia.__file__), 'data', 'config.json')
@@ -804,6 +788,8 @@ class VoronoiApp(App):
     def build(self):
         """Builds the GUI.
         """
+        resource_add_path(
+            os.path.join(os.path.dirname(distopia.__file__), 'data', 'media'))
         self.load_config()
 
         mat = None
@@ -816,9 +802,12 @@ class VoronoiApp(App):
             except Exception as e:
                 logging.exception("Not using alignment: {}".format(e))
 
-        self.create_voronoi()
-        self.load_metrics()
-        self.load_precinct_adjacency()
+        self.load_data_create_voronoi()
+        self.metric_data = self.geo_data.load_metrics(
+            self.metrics, self.precincts)
+        self.voronoi_mapping.verify_adjacency = \
+            self.geo_data.set_precinct_adjacency(self.precincts)
+        self.geo_data.load_landmarks()
 
         widget = VoronoiWidget(
             voronoi_mapping=self.voronoi_mapping,
@@ -850,6 +839,7 @@ class VoronoiApp(App):
                 voronoi_widget.ros_bridge = self.ros_bridge
                 if self.show_precinct_id:
                     self.show_precinct_labels(voronoi_widget)
+                self.show_landmarks(voronoi_widget)
 
             self.ros_bridge = RosBridge(
                 host=self.ros_host, port=self.ros_port,
@@ -857,7 +847,7 @@ class VoronoiApp(App):
         else:
             if self.show_precinct_id:
                 self.show_precinct_labels(widget)
-        self._profiler = widget._profiler = cProfile.Profile()
+            self.show_landmarks(widget)
 
         size = list(map(dp, self.screen_size))
         size = [v / self.scale for v in size]
