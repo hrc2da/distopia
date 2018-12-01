@@ -739,9 +739,15 @@ class VoronoiApp(App):
                         pos=(x - size / 2., y - size / 2.), size=(size, size),
                         source=resource_find('{}.png'.format(name)))
                 if label:
-                    widget.add_widget(Label(
+                    label_wid = Label(
                         text=label, pos=(x - size / 2., y + size / 2.),
-                        font_size=dp(15)))
+                        font_size=dp(15))
+                    widget.add_widget(label_wid)
+
+                    def set_size(*largs, obj=label_wid, center=x):
+                        obj.size = obj.texture_size
+                        obj.center_x = center
+                    label_wid.fbind('texture_size', set_size)
 
     def show_precinct_labels(self, widget):
         offset = widget.focus_region_width
