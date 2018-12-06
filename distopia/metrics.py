@@ -53,7 +53,7 @@ class MeanStateMetric(StateMetric):
         else:
             self.scalar_value = sum(
                 (m.scalar_value for m in metrics)) / float(len(metrics))
-        self.scalar_maximum = max((m.scalar_maximum for m in metrics))
+            self.scalar_maximum = max((m.scalar_maximum for m in metrics))
         self.scalar_label = name
 
     def get_data(self):

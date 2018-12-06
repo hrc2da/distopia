@@ -19,6 +19,7 @@ __all__ = ('PolygonCollider', 'fill_voronoi_diagram')
 
 cimport cython
 cimport numpy as np
+import numpy as py_np
 from libc.stdlib cimport malloc, free
 cdef extern from "math.h":
     double round(double val)
@@ -29,12 +30,12 @@ cdef extern from "math.h":
     double abs(double x)
 
 ctypedef fused np_uints_array:
-    np.ndarray[np.uint16_t, ndim=2]
     np.ndarray[np.uint8_t, ndim=2]
+    np.ndarray[np.uint16_t, ndim=2]
 
 ctypedef fused np_uints:
-    np.uint16_t
     np.uint8_t
+    np.uint16_t
 
 
 @cython.boundscheck(False)

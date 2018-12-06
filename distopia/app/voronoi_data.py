@@ -441,4 +441,4 @@ class MetricData(object):
             m = MeanStateMetric(name=metric_name, districts=districts)
             m.compute()
             metrics.append(m)
-        return m
+        return metrics
