@@ -62,5 +62,6 @@
   "show_voronoi_boundaries": true,
   "table_mode": false,
   "use_county_dataset": true,
-  "use_ros": false
+  "use_ros": false,
+  "visualize_metric_data": true
 }

@@ -107,7 +107,11 @@ class VoronoiWidget(Widget):
 
     gui_touch_focus_buttons = None
 
+    current_focus_metric = ''
+
     max_fiducials_per_district = 5
+
+    visualize_metric_data = True
 
     def __init__(
         self, voronoi_mapping=None, table_mode=False, align_mat=None,
@@ -116,7 +120,8 @@ class VoronoiWidget(Widget):
         state_metrics_fn=None,
         show_voronoi_boundaries=False, focus_metrics=[],
         focus_metric_width=100, focus_metric_height=100,
-            screen_size=(1920, 1080), max_fiducials_per_district=5, **kwargs):
+            screen_size=(1920, 1080), max_fiducials_per_district=5,
+            visualize_metric_data=True, **kwargs):
         super(VoronoiWidget, self).__init__(**kwargs)
         self.voronoi_mapping = voronoi_mapping
         self.ros_bridge = ros_bridge
@@ -125,6 +130,7 @@ class VoronoiWidget(Widget):
         self.focus_block_logical_id = focus_block_logical_id
         self.show_voronoi_boundaries = show_voronoi_boundaries
         self.max_fiducials_per_district = max_fiducials_per_district
+        self.visualize_metric_data = visualize_metric_data
 
         self.focus_metrics = focus_metrics
         self.focus_metric_width = focus_metric_width
@@ -163,9 +169,9 @@ class VoronoiWidget(Widget):
                 orientation='vertical', size=(dp(100), dp(h)),
                 spacing=dp(5), pos=(self.focus_region_width, 0))
 
-            for val in self.district_blocks_fid:
+            for i, val in enumerate(self.district_blocks_fid):
                 btn = ToggleButton(
-                    text='District {}'.format(val), group='focus',
+                    text='District {}'.format(i + 1), group='focus',
                     allow_no_selection=False)
                 box.add_widget(btn)
 
@@ -280,7 +286,13 @@ class VoronoiWidget(Widget):
 
     def handle_focus_block(self, pos):
         assert self.focus_metrics
-        if self.ros_bridge is None:
+
+        if pos is None:
+            self.current_focus_metric = ''
+            if self.visualize_metric_data:
+                self.paint_precinct_by_district(clear_error=False)
+            if self.ros_bridge is not None:
+                self.ros_bridge.update_tuio_focus(False, '')
             return
 
         x, y = pos
@@ -294,19 +306,33 @@ class VoronoiWidget(Widget):
                 row = int(y / self.focus_metric_height)
                 col = int(x / self.focus_metric_width)
                 metric = self.focus_metrics[col * rows + row]
-            self.ros_bridge.update_tuio_focus(False, metric)
+
+            self.current_focus_metric = metric
+            if self.visualize_metric_data:
+                if metric:
+                    self.paint_precinct_by_metric()
+                else:
+                    self.paint_precinct_by_district(clear_error=False)
+
+            if self.ros_bridge is not None:
+                self.ros_bridge.update_tuio_focus(False, metric)
         else:
+            self.current_focus_metric = ''
+            if self.visualize_metric_data:
+                self.paint_precinct_by_district(clear_error=False)
+
             try:
                 district = self.voronoi_mapping.get_pos_district(
                     (x_, y_))
             except (IndexError, TypeError):
                 district = None
 
-            # it's not on any district, send a no block present signal
-            if district is None:
-                self.ros_bridge.update_tuio_focus(False, '')
-            else:
-                self.ros_bridge.update_tuio_focus(True, district.identity)
+            if self.ros_bridge is not None:
+                # it's not on any district, send a no block present signal
+                if district is None:
+                    self.ros_bridge.update_tuio_focus(False, '')
+                else:
+                    self.ros_bridge.update_tuio_focus(True, district.identity)
 
     def focus_block_down(self, touch, pos):
         # there's already a focus block on the table
@@ -349,8 +375,7 @@ class VoronoiWidget(Widget):
         del self.touches[touch.uid]
         self._has_focus = None
 
-        if self.ros_bridge is not None:
-            self.ros_bridge.update_tuio_focus(False, '')
+        self.handle_focus_block(None)
         return True
 
     def fiducial_down(self, touch):
@@ -473,7 +498,7 @@ class VoronoiWidget(Widget):
         key = self.add_fiducial((x_, y_), current_id)
 
         label = self.fiducial_graphics[key] = Label(
-            text=str(self.current_fid_id),
+            text=str(self.current_fid_id + 1),
             center=tuple(map(float, pos)),
             font_size='20dp')
         self.add_widget(label)
@@ -530,8 +555,7 @@ class VoronoiWidget(Widget):
             del self.fiducial_graphics['focus']
 
             self.focus_gui_pos = None
-            if self.ros_bridge is not None:
-                self.ros_bridge.update_tuio_focus(False, '')
+            self.handle_focus_block(None)
             return True
 
         key = info['fiducial_key']
@@ -567,13 +591,48 @@ class VoronoiWidget(Widget):
         Clock.schedule_once(_callback)
 
     def clear_voronoi(self):
-        for district in self.voronoi_mapping.districts:
-            for precinct in district.precincts:
-                self.precinct_graphics[precinct][0].rgba = (0, 0, 0, 1)
+        for graphics in self.precinct_graphics.values():
+            graphics[0].rgba = 0, 0, 0, 1
 
         for item in self.district_graphics:
             self.canvas.remove(item)
         self.district_graphics = []
+
+    def paint_precinct_by_district(self, clear_error=True):
+        colors = self.fiducials_color
+        if not self.voronoi_mapping.districts:
+            if clear_error:
+                for graphics in self.precinct_graphics.values():
+                    graphics[0].rgba = 0, 0, 0, 1
+            else:
+                for graphics in self.precinct_graphics.values():
+                    graphics[0].rgba = 0, 0, 0, graphics[0].a
+            return
+
+        for district in self.voronoi_mapping.districts:
+            color = colors[district.identity]
+            for precinct in district.precincts:
+                p_color = self.precinct_graphics[precinct][0]
+                if clear_error:
+                    p_color.rgba = color + [1., ]
+                else:
+                    p_color.rgba = color + [p_color.a]
+
+    def paint_precinct_by_metric(self):
+        metric_name = self.current_focus_metric
+        assert metric_name
+        assert self.visualize_metric_data
+        metrics = [
+            precinct.metrics[metric_name].scalar_value for
+            precinct in self.voronoi_mapping.precincts]
+        min_ = min(metrics)
+        range_ = max(metrics) - min_
+
+        graphics = self.precinct_graphics
+        for precinct, metric in zip(self.voronoi_mapping.precincts, metrics):
+            val = (metric - min_) / range_
+            color = graphics[precinct][0]
+            color.rgba = 0, val * .333 + .176, val * .314 + .392, color.a
 
     def process_voronoi_output(
             self, districts, fiducial_identity, fiducial_pos, error=[],
@@ -591,19 +650,19 @@ class VoronoiWidget(Widget):
                 self.ros_bridge.update_voronoi(
                     fiducial_pos, fid_ids, fiducial_identity, districts,
                     self.district_metrics_fn, self.state_metrics_fn)
+
+        if self.visualize_metric_data and self.current_focus_metric:
+            for graphics in self.precinct_graphics.values():
+                graphics[0].a = 1.  # undo possible previous error display
+        else:
             if not districts:
                 self.clear_voronoi()
-                return
-
-        colors = self.fiducials_color
-        for district in districts:
-            color = colors[district.identity]
-            for precinct in district.precincts:
-                self.precinct_graphics[precinct][0].rgba = color + [1., ]
+            else:
+                self.paint_precinct_by_district()
 
         if error:
             for precinct in error:
-                self.precinct_graphics[precinct][0].a = .3
+                self.precinct_graphics[precinct][0].a = 0
 
         for item in self.district_graphics:
             self.canvas.remove(item)
@@ -685,6 +744,8 @@ class VoronoiApp(App):
 
     display_landmarks = True
 
+    visualize_metric_data = True
+
     def load_data_create_voronoi(self):
         """Loads and initializes all the data and voronoi mapping.
         """
@@ -760,15 +821,17 @@ class VoronoiApp(App):
             widget.add_widget(label)
 
     def load_config(self):
-        keys = ['use_county_dataset', 'screen_size',
-                'table_mode', 'alignment_filename', 'screen_offset',
-                'show_precinct_id', 'focus_block_fid',
-                'focus_block_logical_id', 'district_blocks_fid', 'use_ros',
-                'metrics', 'ros_host', 'ros_port', 'show_voronoi_boundaries',
-                'focus_metrics', 'focus_metric_width', 'focus_metric_height',
-                'log_data', 'max_fiducials_per_district', 'scale',
-                'county_containing_rect', 'precinct_2017_containing_rect',
-                'display_landmarks']
+        keys = [
+            'use_county_dataset', 'screen_size',
+            'table_mode', 'alignment_filename', 'screen_offset',
+            'show_precinct_id', 'focus_block_fid',
+            'focus_block_logical_id', 'district_blocks_fid', 'use_ros',
+            'metrics', 'ros_host', 'ros_port', 'show_voronoi_boundaries',
+            'focus_metrics', 'focus_metric_width', 'focus_metric_height',
+            'log_data', 'max_fiducials_per_district', 'scale',
+            'county_containing_rect', 'precinct_2017_containing_rect',
+            'display_landmarks', 'visualize_metric_data'
+        ]
 
         fname = os.path.join(
             os.path.dirname(distopia.__file__), 'data', 'config.json')
@@ -830,7 +893,9 @@ class VoronoiApp(App):
             screen_size=list(map(dp, self.screen_size)),
             focus_metric_height=dp(self.focus_metric_height),
             focus_metric_width=dp(self.focus_metric_width),
-            max_fiducials_per_district=self.max_fiducials_per_district)
+            max_fiducials_per_district=self.max_fiducials_per_district,
+            visualize_metric_data=self.visualize_metric_data
+        )
 
         if self.use_ros:
             box = BoxLayout()
@@ -839,7 +904,7 @@ class VoronoiApp(App):
             widget = box
             box.add_widget(err)
 
-            def enable_widget():
+            def enable_widget(*largs):
                 box.remove_widget(err)
                 box.add_widget(voronoi_widget)
                 voronoi_widget.ros_bridge = self.ros_bridge
@@ -849,7 +914,8 @@ class VoronoiApp(App):
 
             self.ros_bridge = RosBridge(
                 host=self.ros_host, port=self.ros_port,
-                ready_callback=enable_widget, log_data=self.log_data)
+                ready_callback=Clock.create_trigger(enable_widget),
+                log_data=self.log_data)
         else:
             if self.show_precinct_id:
                 self.show_precinct_labels(widget)
