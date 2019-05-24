@@ -117,7 +117,7 @@ class GeoDataBase(object):
                 landmarks.append((x, y, float(size), name, label))
 
     def load_npz_data(self):
-        data = np.load(os.path.join(self.data_path, 'data.npz'))
+        data = np.load(os.path.join(self.data_path, 'data.npz'), allow_pickle=True)
         self.fields = data['fields'].tolist()
         self.polygons = data['polygons'].tolist()
         self.records = data['records'].tolist()
