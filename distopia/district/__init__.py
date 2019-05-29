@@ -78,3 +78,12 @@ class District(object):
     def compute_metrics(self):
         for metric in self.metrics.values():
             metric.compute()
+
+
+    def compute_scalar_sum(self):
+        for metric in self.metrics.values():
+            metric.compute_scalar_sum()
+
+    def compute_scalar_mean(self):
+        for metric in self.metrics.values():
+            metric.compute_scalar_mean()

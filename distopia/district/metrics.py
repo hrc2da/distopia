@@ -74,7 +74,6 @@ class DistrictHistogramAggregateMetric(DistrictAggregateMetric):
     def compute_scalar_sum(self):
         if not self.district.precincts:
             return
-
         precinct_metrics = self.precinct_metrics
         self.scalar_maximum = float(
             np.sum([m.scalar_maximum for m in precinct_metrics]))
