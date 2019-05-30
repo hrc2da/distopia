@@ -1,4 +1,8 @@
 *.pyc
+venv
+*.egg-info
+*.pkl
+.vscode
 .git/
 .idea/
 *.c

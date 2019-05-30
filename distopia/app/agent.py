@@ -153,6 +153,8 @@ class VoronoiAgent(object):
         with open(fname, 'r') as fp:
             for key, val in json.load(fp).items():
                 setattr(self, key, val)
+        if self.metrics:
+            self.metrics.sort() # just paranoia but fix the metric order
 
     def load_data(self):
         """Builds the GUI.
@@ -207,7 +209,7 @@ if __name__ == '__main__':
     print('data loaded')
 
     w, h = agent.screen_size
-    t = [0, ] * 10
+    t = [0, ] * 1
     for i in range(len(t)):
         ts = time.clock()
         fids = {i: [(random.random() * w, random.random() * h)] for i in range(4)}
