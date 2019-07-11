@@ -170,10 +170,11 @@ class VoronoiAgent(object):
         for fid_id, locations in fiducials.items():
             for location in locations:
                 keys.append(vor.add_fiducial(location, fid_id))
-
-        districts = vor.apply_voronoi()
-        for key in keys:
-            vor.remove_fiducial(key)
+        try:
+            districts = vor.apply_voronoi()
+        finally:
+            for key in keys:
+                vor.remove_fiducial(key)
 
         if not districts:
             return [], []
