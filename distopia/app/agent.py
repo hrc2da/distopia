@@ -164,7 +164,7 @@ class VoronoiAgent(object):
         self.load_precinct_metrics()
         self.load_precinct_adjacency()
 
-    def compute_voronoi_metrics(self, fiducials):
+    def get_voronoi_districts(self, fiducials):
         vor = self.voronoi_mapping
         keys = []
         for fid_id, locations in fiducials.items():
@@ -177,8 +177,12 @@ class VoronoiAgent(object):
                 vor.remove_fiducial(key)
 
         if not districts:
-            return [], []
+            return []
 
+    def compute_voronoi_metrics(self, districts):
+        
+        if not districts:
+            return [], []
 
 
         self.create_district_metrics(districts)
