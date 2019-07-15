@@ -178,6 +178,8 @@ class VoronoiAgent(object):
 
         if not districts:
             return []
+        else:
+            return districts
 
     def compute_voronoi_metrics(self, districts):
         
