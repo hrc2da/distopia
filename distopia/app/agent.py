@@ -167,16 +167,19 @@ class VoronoiAgent(object):
     def get_voronoi_districts(self, fiducials):
         vor = self.voronoi_mapping
         keys = []
+        districts = None
         for fid_id, locations in fiducials.items():
             for location in locations:
                 keys.append(vor.add_fiducial(location, fid_id))
         try:
             districts = vor.apply_voronoi()
+        except Exception as e:
+            print("Voronoi failed")
         finally:
             for key in keys:
                 vor.remove_fiducial(key)
 
-        if not districts:
+        if districts is None:
             return []
         else:
             return districts

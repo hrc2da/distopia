@@ -456,9 +456,6 @@ class VoronoiMapping(object):
         assert len(points) == len(point_region)
         # list of lists, each is indices in orig_vertices making the polygon
         regions = vor.regions
-        if len(points) != len([r for r in regions if r]):
-            import pdb
-            pdb.set_trace()
         assert len(points) == len([r for r in regions if r])
 
         center = vor.points.mean(axis=0)
