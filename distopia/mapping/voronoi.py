@@ -336,6 +336,8 @@ class VoronoiMapping(object):
             disconnected = Precinct.find_disconnected_precincts(
                 precincts, district_map)
             if disconnected:
+                raise ValueError("Disconnected")
+                print("Disconnected!")
                 break
 
         return districts, disconnected

@@ -164,7 +164,7 @@ class VoronoiAgent(object):
         self.load_precinct_metrics()
         self.load_precinct_adjacency()
 
-    def get_voronoi_districts(self, fiducials):
+    def get_voronoi_districts(self, fiducials, throw_exceptions = False):
         vor = self.voronoi_mapping
         keys = []
         districts = None
@@ -174,7 +174,13 @@ class VoronoiAgent(object):
         try:
             districts = vor.apply_voronoi()
         except Exception as e:
-            print("Voronoi failed")
+            if throw_exceptions == True:
+                # when running simulations, we may want to 
+                # handle exceptions via an empty result
+                # but if we choose we can re-raise caught exceptions
+                raise e
+            else:
+                print("Voronoi failed, {}".format(e))
         finally:
             for key in keys:
                 vor.remove_fiducial(key)
