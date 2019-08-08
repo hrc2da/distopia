@@ -14,7 +14,7 @@ containing collider.pyx and::
     python setup.py build_ext --inplace
 '''
 
-__all__ = ('PolygonCollider', 'fill_voronoi_diagram')
+__all__ = ('PolygonCollider', 'fill_voronoi_diagram', 'ColliderException')
 
 
 cimport cython
@@ -36,6 +36,10 @@ ctypedef fused np_uints_array:
 ctypedef fused np_uints:
     np.uint8_t
     np.uint16_t
+
+
+class ColliderException(Exception):
+    pass
 
 
 @cython.boundscheck(False)
@@ -97,7 +101,7 @@ def locate_region(
             if 0 <= x < w and 0 <= y < h and pixels[x, y] == region:
                 return x, y
 
-    raise Exception('Could not locate region in pixels')
+    raise ColliderException('Could not locate region in pixels')
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -113,7 +117,7 @@ def get_region_vertices(
     cdef int no_move = 0
 
     if pixels[x, y] not in regions:
-        raise ValueError(
+        raise ColliderException(
             "The start position region doesn't match the provided region")
 
     # go down until the next is the edge or outside
@@ -137,7 +141,7 @@ def get_region_vertices(
                 wall = 'r'
                 no_move += 1
                 if no_move > 5:
-                    raise Exception('Found a pixel island at ({}, {})'.format(x, y))
+                    raise ColliderException('Found a pixel island at ({}, {})'.format(x, y))
                 continue
         elif wall == 'r':
             # wall is to the right, so check if we can move up
@@ -154,7 +158,7 @@ def get_region_vertices(
                 wall = 'a'
                 no_move += 1
                 if no_move > 5:
-                    raise Exception('Found a pixel island at ({}, {})'.format(x, y))
+                    raise ColliderException('Found a pixel island at ({}, {})'.format(x, y))
                 continue
         elif wall == 'a':
             # wall is above, so check if we can move to the left
@@ -171,7 +175,7 @@ def get_region_vertices(
                 wall = 'l'
                 no_move += 1
                 if no_move > 5:
-                    raise Exception('Found a pixel island at ({}, {})'.format(x, y))
+                    raise ColliderException('Found a pixel island at ({}, {})'.format(x, y))
                 continue
         else:  # wall is 'l'
             assert wall == 'l'
@@ -189,7 +193,7 @@ def get_region_vertices(
                 wall = 'b'
                 no_move += 1
                 if no_move > 5:
-                    raise Exception('Found a pixel island at ({}, {})'.format(x, y))
+                    raise ColliderException('Found a pixel island at ({}, {})'.format(x, y))
                 continue
 
         if x == start_x and y == start_y:
