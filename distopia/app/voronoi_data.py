@@ -415,6 +415,8 @@ class MetricData(object):
             for district in districts:
                 metric = district.metrics['pvi'] = DistrictScalarMetric(
                     district=district, name='pvi')
+                if len(district.precincts) == 0:
+                    continue
                 vote1, vote2 = district.metrics['projected_votes'].data
 
                 if vote1 < vote2:

@@ -1,0 +1,17 @@
+{0: [(1185.9044611643546, 362.44997555058615)], 1: [(138.5129459740628, 121.18788316870284)], 2: [(840.0045346781594, 679.3763287361269)], 3: [(139.70370074405787, 387.16829966782166)], 4: [(24.55272954928084, 1053.1652433377906)], 5: [(1078.7554744855936, 1037.3101408753637)], 6: [(33.56401788674766, 634.2624382161463)], 7: [(1362.6884816379766, 242.86002908628802)]}
+Voronoi failed, Found a pixel island at (359, 985)
+Found a pixel island at (359, 985)
+Traceback (most recent call last):
+  File "distopia/app/agent.py", line 130, in <module>
+    raise(e)
+  File "distopia/app/agent.py", line 119, in <module>
+    districts = agent.get_voronoi_districts(fids)
+  File "distopia/app/agent.py", line 86, in get_voronoi_districts
+    districts = vor.apply_voronoi()
+  File "/home/dev/research/distopia/distopia/distopia/mapping/voronoi.py", line 113, in apply_voronoi
+    districts, precinct_assignment, ids_fiducial_pos)
+  File "/home/dev/research/distopia/distopia/distopia/mapping/voronoi.py", line 362, in set_districts_boundary
+    pixel_precinct_map, *self.screen_size, regions, *pos)
+  File "distopia/mapping/_voronoi.pyx", line 157, in distopia.mapping._voronoi.get_region_vertices
+    raise Exception('Found a pixel island at ({}, {})'.format(x, y))
+Exception: Found a pixel island at (359, 985)

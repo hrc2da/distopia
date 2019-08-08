@@ -118,14 +118,15 @@ if __name__ == '__main__':
         try:
             districts = agent.get_voronoi_districts(fids)
             state_metrics, districts = agent.compute_voronoi_metrics(districts)
-            assert len(districts) == len(fids)
+            assert len(districts) == len(fids) or len(districts) == 0
             for district in districts:
                 print("District {}:".format(district))
             #     for name, metric in district.metrics.items():
             #         print("{}\t{}".format(name, metric.get_data()))
             # for metric in state_metrics:
             #     print("\n\n{}\t{}".format(metric.name, metric.get_data()))
-        except Exception:
+        except Exception as e:
+            raise(e)
             print("Couldn't compute Vornoi for {}".format(fids))
             # raise
         t[i] = time.clock() - ts
