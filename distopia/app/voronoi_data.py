@@ -399,8 +399,10 @@ class MetricData(object):
                 continue
 
             fn_name = 'compute_scalar_sum'
-            if metric_name in ('age', 'income'):
+            if metric_name in ('age', ):
                 fn_name = 'compute_scalar_mean'
+            elif metric_name in ('income', 'education'):
+                fn_name = 'compute_scalar_variance'
 
             for district in districts:
                 metric = district.metrics[metric_name] = \
