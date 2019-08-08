@@ -28,88 +28,17 @@ class VoronoiAgent(object):
 
     data_loader = None
 
-    def create_district_metrics(self, districts):
-        for district in districts:
-            for name in self.metrics:
-                if name == 'income':
-                    continue
-                district.metrics[name] = \
-                    DistrictHistogramAggregateMetric(
-                        district=district, name=name)
-
-            name = 'income'
-            if name in self.metrics:
-                district.metrics[name] = \
-                    DistrictScalarAggregateMetric(district=district, name=name)
-
-    def load_precinct_metrics(self):
-        assert self.use_county_dataset
-
-        geo_data = self.geo_data
-        names = set(r[3] for r in geo_data.records)
-        names = {v: v for v in names}
-        names['Saint Croix'] = 'St. Croix'
-
-        root = os.path.join(
-            os.path.dirname(distopia.__file__), 'data', 'aggregate')
-        for name in self.metrics:
-            if name == 'income':
-                continue
-
-            fname = os.path.join(root, '{}.csv'.format(name))
-            with open(fname) as fh:
-                reader = csv.reader(fh, delimiter='\t')
-                header = next(reader)[1:]
-
-                data = {}
-                for row in reader:
-                    data[row[0]] = list(map(float, row[1:]))
-
-            for precinct, record in zip(self.precincts, geo_data.records):
-                precinct_name = names[record[3]]
-                precinct.metrics[name] = PrecinctHistogram(
-                    name=name, labels=header, data=data[precinct_name])
-
-        name = 'income'
-        if name in self.metrics:
-            fname = os.path.join(root, '{}.csv'.format(name))
-            with open(fname) as fh:
-                reader = csv.reader(fh, delimiter='\t')
-                _ = next(reader)[1:]  # header
-
-                data = {}
-                for row in reader:
-                    data[row[0]] = float(row[1])
-
-            for precinct, record in zip(self.precincts, geo_data.records):
-                precinct_name = names[record[3]]
-                precinct.metrics[name] = PrecinctScalar(
-                    name=name, value=data[precinct_name])
-
-    def load_precinct_adjacency(self):
-        assert self.use_county_dataset
-        fname = os.path.join(
-            os.path.dirname(distopia.__file__), 'data', 'county_adjacency.json')
-
-        with open(fname, 'r') as fh:
-            counties = json.load(fh)
-
-        precincts = self.precincts
-        for i, neighbours in counties.items():
-            precincts[int(i)].neighbours = [precincts[p] for p in neighbours]
-
-    def create_state_metrics(self, districts):
-        return []
+    metric_data = None
 
     def create_voronoi(self):
         """Loads and initializes all the data and voronoi mapping.
         """
-        self.geo_data = geo_data = GeoData()
         if self.use_county_dataset:
-            geo_data.dataset_name = 'County_Boundaries_24K'
+            geo_data = self.geo_data = GeoDataCounty()
+            geo_data.containing_rect = self.county_containing_rect
         else:
-            geo_data.dataset_name = 'WI_Election_Data_with_2017_Wards'
-            geo_data.source_coordinates = ''
+            geo_data = self.geo_data = GeoDataPrecinct2017()
+            geo_data.containing_rect = self.precinct_2017_containing_rect
 
         geo_data.screen_size = self.screen_size
         try:
@@ -124,10 +53,10 @@ class VoronoiAgent(object):
         vor.screen_size = self.screen_size
         self.precincts = precincts = []
 
-        for i, (record, polygons) in enumerate(
-                zip(geo_data.records, geo_data.polygons)):
+        for i, (name, polygons) in enumerate(
+                zip(geo_data.get_ordered_record_names(), geo_data.polygons)):
             precinct = Precinct(
-                name=str(record[0]), boundary=polygons[0].reshape(-1).tolist(),
+                name=name, boundary=polygons[0].reshape(-1).tolist(),
                 identity=i, location=polygons[0].mean(axis=0).tolist())
             precincts.append(precinct)
 
@@ -145,37 +74,34 @@ class VoronoiAgent(object):
         """
         self.load_config()
         self.create_voronoi()
-        self.load_precinct_metrics()
-        self.load_precinct_adjacency()
+        self.metric_data = self.geo_data.load_metrics(
+            self.metrics, self.precincts)
+        self.geo_data.set_precinct_adjacency(self.precincts)
 
-    def compute_voronoi_metrics(self, fiducials):
+    def get_voronoi_districts(self, fiducials):
         vor = self.voronoi_mapping
         keys = []
         for fid_id, locations in fiducials.items():
             for location in locations:
                 keys.append(vor.add_fiducial(location, fid_id))
+        try:
+            districts = vor.apply_voronoi()
+        except Exception as e:
+            print("Voronoi failed, {}".format(e))
+            raise
+        finally:
+            for key in keys:
+                vor.remove_fiducial(key)
 
-        districts = vor.apply_voronoi()
-        for key in keys:
-            vor.remove_fiducial(key)
+        return districts
 
+    def compute_voronoi_metrics(self, districts):
         if not districts:
             return [], []
+        self.metric_data.compute_district_metrics(districts)
+        state_metrics = self.metric_data.create_state_metrics(districts)
 
-        self.create_district_metrics(districts)
-        state_mets = self.create_state_metrics(districts)
-
-        state_metrics = []
-        for metric in state_mets:
-            metric.compute()
-            state_metrics.append(metric)
-
-        district_metrics = {}
-        for district in districts:
-            district.compute_metrics()
-            district_metrics[district.identity] = list(district.metrics.values())
-
-        return state_metrics, district_metrics
+        return state_metrics, districts
 
 
 if __name__ == '__main__':
@@ -186,14 +112,23 @@ if __name__ == '__main__':
     print('data loaded')
 
     w, h = agent.screen_size
-    t = [0, ] * 10
+    t = [0, ] * 100
     for i in range(len(t)):
         ts = time.clock()
-        fids = {i: [(random.random() * w, random.random() * h)] for i in range(4)}
+        fids = {i: [(random.random() * w, random.random() * h)] for i in range(8)}
+        print(fids)
         try:
-            agent.compute_voronoi_metrics(fids)
+            districts = agent.get_voronoi_districts(fids)
+            state_metrics, districts = agent.compute_voronoi_metrics(districts)
+            assert len(districts) == len(fids)
+            for district in districts:
+                print("District {}:".format(district))
+            #     for name, metric in district.metrics.items():
+            #         print("{}\t{}".format(name, metric.get_data()))
+            # for metric in state_metrics:
+            #     print("\n\n{}\t{}".format(metric.name, metric.get_data()))
         except Exception:
-            print(fids)
-            raise
+            print("Couldn't compute Vornoi for {}".format(fids))
+            # raise
         t[i] = time.clock() - ts
     print('done in {} - {}'.format(min(t), max(t)))

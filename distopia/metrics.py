@@ -21,6 +21,8 @@ class StateMetric(object):
 
     scalar_value = 0
 
+    scalar_std = 0
+
     scalar_maximum = 0
 
     scalar_label = ''
@@ -50,9 +52,12 @@ class MeanStateMetric(StateMetric):
 
         if not metrics:
             self.scalar_value = 0
+            self.scalar_maximum = 0
+            self.scalar_std = 0
         else:
             self.scalar_value = sum(
                 (m.scalar_value for m in metrics)) / float(len(metrics))
+            self.scalar_std = np.std([m.scalar_value for m in metrics])
             self.scalar_maximum = max((m.scalar_maximum for m in metrics))
         self.scalar_label = name
 
@@ -61,4 +66,5 @@ class MeanStateMetric(StateMetric):
             "name": self.name, "labels": self.labels, "data": self.data,
             "scalar_value": self.scalar_value,
             "scalar_maximum": self.scalar_maximum,
+            "scalar_std": self.scalar_std,
             "scalar_label": self.scalar_label}

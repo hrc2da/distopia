@@ -78,3 +78,9 @@ class District(object):
     def compute_metrics(self):
         for metric in self.metrics.values():
             metric.compute()
+
+    def __repr__(self):
+        return '<name={}, id={}, n_precincts={}, '\
+        'n_metrics={}>'.format(
+            self.name, self.identity, len(self.precincts),
+            len(self.metrics))
