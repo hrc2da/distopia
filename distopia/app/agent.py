@@ -4,12 +4,10 @@ import numpy as np
 import csv
 
 import distopia
-from distopia.app.voronoi_data import GeoData
+from distopia.app.voronoi_data import GeoDataCounty, GeoDataPrecinct2017
 from distopia.precinct import Precinct
 from distopia.mapping.voronoi import VoronoiMapping
-from distopia.precinct.metrics import PrecinctHistogram, PrecinctScalar
-from distopia.district.metrics import DistrictHistogramAggregateMetric, \
-    DistrictScalarAggregateMetric
+
 
 
 class VoronoiAgent(object):
