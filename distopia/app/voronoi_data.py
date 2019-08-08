@@ -395,7 +395,7 @@ class MetricData(object):
 
     def compute_district_metrics(self, districts):
         for metric_name in self.metrics:
-            if metric_name == 'pvi':
+            if metric_name == 'pvi' or metric_name == 'compactness':
                 continue
 
             fn_name = 'compute_scalar_sum'
