@@ -5,6 +5,7 @@ States Metrics
 Defines metrics that summarize the state based on the districts.
 """
 from distopia.district.metrics import DistrictAggregateMetric
+import numpy as np
 
 __all__ = ('StateMetric', )
 
