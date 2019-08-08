@@ -133,6 +133,7 @@ class VoronoiWidget(Widget):
         self.visualize_metric_data = visualize_metric_data
 
         self.focus_metrics = focus_metrics
+        self.focus_grid = {}
         self.focus_metric_width = focus_metric_width
         self.focus_metric_height = focus_metric_height
         self.screen_size = screen_size
@@ -160,6 +161,25 @@ class VoronoiWidget(Widget):
         with self.canvas.after:
             PopMatrix()
         self.show_precincts()
+        self.artificial_focus_block_down(len(self.focus_metrics)-1)
+        Clock.schedule_interval(self.check_ros_focus,2)
+
+    def rotate_focus(self,dt):
+        if not hasattr(self, "rotator"):
+            self.rotator = 0
+        if self.rotator >= len(self.focus_metrics):
+            self.rotator %= len(self.focus_metrics)
+        self.artificial_focus_block_move(self.rotator)
+        self.rotator += 1
+
+    def check_ros_focus(self,dt):
+        if self.ros_bridge is not None:
+            if not self.ros_bridge.focus_action_queue.empty():
+                action = self.ros_bridge.focus_action_queue.get()
+                if self.focus_gui_pos is None:
+                    self.artificial_focus_block_down(action)
+                else:
+                    self.artificial_focus_block_move(action)
 
     def show_district_selection(self):
         if not self.table_mode:
@@ -207,7 +227,8 @@ class VoronoiWidget(Widget):
                 x1 = x0 + focus_metric_width
                 y0 = row * focus_metric_height
                 y1 = y0 + focus_metric_height
-
+                # add the midpoint to our focus grid
+                self.focus_grid[i] = (x0+(x1-x0)/2,y0+(y1-y0)/2)
                 self.add_widget(
                     Factory.SizedLabel(text=name, pos=(x0, y0)))
                 with self.canvas:
@@ -333,6 +354,43 @@ class VoronoiWidget(Widget):
                     self.ros_bridge.update_tuio_focus(False, '')
                 else:
                     self.ros_bridge.update_tuio_focus(True, district.identity)
+    def artificial_focus_block_down(self,focus):
+        '''fake putting down a focus block
+        '''
+        if self.focus_gui_pos is not None:
+            return self.artificial_focus_block_move(focus)
+        else:
+            pos = self.focus_grid[focus]
+            #pos = (40,650)
+            #touch = FakeMouseEvent(uid=-1,pos=pos)
+            self.focus_gui_pos = pos
+
+            with self.canvas:
+                color = Color(rgba=(1, 0, 1, 1))
+                point = Point(points=pos, pointsize=7)
+            self.fiducial_graphics['focus'] = color, point
+            #info['focus'] = True
+            #info['moved'] = True
+
+            #self.touches[touch.uid] = info
+            self.handle_focus_block(pos)
+            return True
+
+    def artificial_focus_block_move(self,focus):
+        '''move the focus block to "focus".
+            If it's not down, then put it down.
+        '''
+        if self.focus_gui_pos is None:
+            return self.artificial_focus_block_down(focus)
+        else:
+            if self.focus_gui_pos == self.focus_grid[focus]:
+                return True
+
+            pos = self.focus_grid[focus]
+            if self.focus_gui_pos != pos:
+                self.handle_focus_block(pos)
+            self.focus_gui_pos = self.fiducial_graphics['focus'][1].points = pos
+            return True
 
     def focus_block_down(self, touch, pos):
         # there's already a focus block on the table

@@ -34,14 +34,20 @@ class RosBridge(object):
 
     log_data = False
 
+    focus_action_queue = None
+
     def __init__(self, host="localhost", port=9090, ready_callback=None,
                  log_data=False):
         self.ready_callback = ready_callback
         self.log_data = log_data
 
         self.ros = ros = roslibpy.Ros(host=host, port=port)
-        ros.on_ready(self.start_publisher_thread)
+        ros.on_ready(self.start_ros_threads)
         ros.connect()
+
+    def start_ros_threads(self):
+        self.start_publisher_thread()
+        self.start_focus_subscriber()
 
     def start_publisher_thread(self):
         logging.info('Connected to ros-bridge')
@@ -67,6 +73,16 @@ class RosBridge(object):
 
         if self.ready_callback:
             self.ready_callback()
+
+    def start_focus_subscriber(self):
+        # not threaded for now
+        self.focus_action_queue = Queue()
+        focus_action_subscriber_topic = roslibpy.Topic(
+            self.ros, '/focus_action', 'std_msgs/Int8'
+        )
+        focus_action_subscriber_topic.subscribe(
+            lambda message : self.focus_action_queue.put(int(message['data']))
+        )
 
     def stop_threads(self):
         if self._publisher_thread is not None:
