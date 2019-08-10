@@ -28,7 +28,10 @@
     "occupation",
     "population",
     "projected_votes",
-    "race"
+    "race",
+    "pvi",
+    "compactness",
+    "area"
   ],
   "log_data": true,
   "max_fiducials_per_district": 5,
@@ -40,7 +43,9 @@
     "population",
     "projected_votes",
     "race",
-    "pvi"
+    "pvi",
+    "compactness",
+    "area"
   ],
   "precinct_2017_containing_rect": [
     0,

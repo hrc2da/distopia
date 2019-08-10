@@ -92,6 +92,16 @@ class DistrictHistogramAggregateMetric(DistrictAggregateMetric):
             np.mean([m.scalar_value for m in precinct_metrics]))
         self.scalar_label = precinct_metrics[0].scalar_label
 
+    def compute_scalar_variance(self):
+        if not self.district.precincts:
+            return
+
+        precinct_metrics = self.precinct_metrics
+        self.scalar_maximum = float(precinct_metrics[0].scalar_maximum)
+        self.scalar_value = float(
+            np.std([m.scalar_value for m in precinct_metrics]))
+        self.scalar_label = precinct_metrics[0].scalar_label
+    
     def get_data(self):
         return {
             "name": self.name, "labels": self.labels, "data": self.data,

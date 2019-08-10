@@ -367,6 +367,9 @@ class MetricData(object):
                     raise ValueError(
                         'Cannot compute PVI without projected_votes')
                 continue
+            if metric_name == 'compactness' or metric_name == 'area':
+                # no data to load for compactness or area
+                continue
 
             fname = os.path.join(root, '{}.csv'.format(metric_name))
             with open(fname) as fh:
@@ -395,12 +398,14 @@ class MetricData(object):
 
     def compute_district_metrics(self, districts):
         for metric_name in self.metrics:
-            if metric_name == 'pvi' or metric_name == 'compactness':
+            if metric_name == 'pvi' or metric_name == 'compactness' or metric_name == 'area':
                 continue
 
             fn_name = 'compute_scalar_sum'
-            if metric_name in ('age', 'income'):
+            if metric_name in ('age', ):
                 fn_name = 'compute_scalar_mean'
+            elif metric_name in ('income', 'education'):
+                fn_name = 'compute_scalar_variance'
 
             for district in districts:
                 metric = district.metrics[metric_name] = \
@@ -413,6 +418,8 @@ class MetricData(object):
             for district in districts:
                 metric = district.metrics['pvi'] = DistrictScalarMetric(
                     district=district, name='pvi')
+                if len(district.precincts) == 0:
+                    continue
                 vote1, vote2 = district.metrics['projected_votes'].data
 
                 if vote1 < vote2:
@@ -434,6 +441,18 @@ class MetricData(object):
                 circle_area = math.pi * r ** 2
 
                 metric.set_value(area / circle_area, 'compactness')
+
+        if 'area' in self.metrics:
+            for district in districts:
+                metric = district.metrics['area'] = \
+                    DistrictScalarMetric(district=district, name='area')
+
+                if not district.boundary or district.collider is None:
+                    metric.set_value(-1, 'area')
+                    continue
+
+                area = district.collider.get_area()
+                metric.set_value(area, 'area')
 
     def create_state_metrics(self, districts):
         metrics = []
