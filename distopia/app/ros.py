@@ -47,7 +47,7 @@ class RosBridge(object):
 
     def start_ros_threads(self):
         self.start_publisher_thread()
-        self.start_focus_subscriber()
+        self.start_action_subscribers()
 
     def start_publisher_thread(self):
         logging.info('Connected to ros-bridge')
@@ -74,7 +74,7 @@ class RosBridge(object):
         if self.ready_callback:
             self.ready_callback()
 
-    def start_focus_subscriber(self):
+    def start_action_subscribers(self):
         # not threaded for now
         self.focus_action_queue = Queue()
         focus_action_subscriber_topic = roslibpy.Topic(
@@ -82,6 +82,14 @@ class RosBridge(object):
         )
         focus_action_subscriber_topic.subscribe(
             lambda message : self.focus_action_queue.put(int(message['data']))
+        )
+
+        self.fiducial_layout_queue = Queue()
+        fiducial_layout_subscriber_topic = roslibpy.Topic(
+            self.ros, '/fiducial_layout', 'std_msgs/String'
+        )
+        focus_action_subscriber_topic.subscribe(
+            lambda message : self.fiducial_layout_queue.put(json.loads(message['data']))
         )
 
     def stop_threads(self):
