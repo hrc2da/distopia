@@ -161,8 +161,9 @@ class VoronoiWidget(Widget):
         with self.canvas.after:
             PopMatrix()
         self.show_precincts()
-        self.artificial_focus_block_down(len(self.focus_metrics)-1)
+        self.artificial_focus_block_down(1)
         Clock.schedule_interval(self.check_ros_focus,2)
+        Clock.schedule_interval(self.check_ros_fiducials,2)
 
     def rotate_focus(self,dt):
         if not hasattr(self, "rotator"):
@@ -180,6 +181,45 @@ class VoronoiWidget(Widget):
                     self.artificial_focus_block_down(action)
                 else:
                     self.artificial_focus_block_move(action)
+
+    def check_ros_fiducials(self,dt):
+        if self.ros_bridge is not None:
+            if not self.ros_bridge.fiducial_layout_queue.empty():
+                new_layout = self.ros_bridge.fiducial_layout_queue.get()
+                # clear the current layout and fiducials
+                keys = list(self.fiducial_graphics.keys())
+                for key in keys:
+                    if key == 'focus':
+                        continue
+                    self.remove_widget(self.fiducial_graphics[key])
+                    # for item in self.fiducial_graphics[key]:
+                    #     self.canvas.remove(item)
+                    del self.fiducial_graphics[key]
+                    self.remove_fiducial(key, None) # function doesn't seem to use second arg
+
+                # loop the the new layout and add to both gui and fiducials
+                for district in new_layout:
+                    for pos in new_layout[district]:
+                        x,y = pos
+                        x_ = x * Metrics.density + self.focus_region_width #(x - self.focus_region_width) / Metrics.density
+                        y_ = y * Metrics.density #/ Metrics.density
+                        current_id = int(district)
+                        if len(
+                                [1 for val in self.voronoi_mapping.get_fiducial_ids().values()
+                                if val == current_id]) > self.max_fiducials_per_district:
+                            print("Too many blocks!")
+                            continue
+
+                        key = self.add_fiducial((x, y), current_id)
+
+                        label = self.fiducial_graphics[key] = Label(
+                            text=str(current_id + 1),
+                            center=tuple(map(float, (x_,y_))),
+                            font_size='20dp')
+                        self.add_widget(label)
+                
+                self.voronoi_mapping.request_reassignment(self.voronoi_callback)
+
 
     def show_district_selection(self):
         if not self.table_mode:

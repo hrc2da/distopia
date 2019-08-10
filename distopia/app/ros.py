@@ -83,12 +83,12 @@ class RosBridge(object):
         focus_action_subscriber_topic.subscribe(
             lambda message : self.focus_action_queue.put(int(message['data']))
         )
-
+        logging.info("subscribing")
         self.fiducial_layout_queue = Queue()
         fiducial_layout_subscriber_topic = roslibpy.Topic(
             self.ros, '/fiducial_layout', 'std_msgs/String'
         )
-        focus_action_subscriber_topic.subscribe(
+        fiducial_layout_subscriber_topic.subscribe(
             lambda message : self.fiducial_layout_queue.put(json.loads(message['data']))
         )
 
