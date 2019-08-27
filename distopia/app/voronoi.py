@@ -21,6 +21,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.togglebutton import ToggleButton
+from kivy.properties import StringProperty
 from kivy.lang import Builder
 from kivy.app import App
 from kivy.graphics.vertex_instructions import Line, Point, Mesh, Ellipse, \
@@ -43,7 +44,7 @@ from distopia.app.voronoi_data import GeoDataCounty, GeoDataPrecinct2017
 from distopia.precinct import Precinct
 from distopia.mapping.voronoi import VoronoiMapping
 from distopia.app.ros import RosBridge
-
+from distopia.app.tasks import TaskSwitcher
 __all__ = ('VoronoiWidget', 'VoronoiApp')
 
 
@@ -113,6 +114,12 @@ class VoronoiWidget(Widget):
 
     visualize_metric_data = True
 
+    task_arr = None
+
+    task_features = ['population', 'pvi', 'compactness', 'projected_votes', 'race']
+
+    task_description = StringProperty("Welcome to Distopia")
+
     def __init__(
         self, voronoi_mapping=None, table_mode=False, align_mat=None,
         screen_offset=(0, 0), ros_bridge=None, district_blocks_fid=None,
@@ -159,7 +166,18 @@ class VoronoiWidget(Widget):
             Translate(*[v * Metrics.density for v in screen_offset])
         with self.canvas.after:
             PopMatrix()
+        self.task_box = Label(text=self.task_description, halign="left", font_size='20sp', x=1350, y=400)
+        self.add_widget(self.task_box)
         self.show_precincts()
+        self.task_switcher = TaskSwitcher(self.task_features)
+        Clock.schedule_interval(self.update_task,60*2)
+
+    def update_task(self, dt):
+        self.task_arr = [np.random.choice([-1.0, 0.0, 1.0]) for i in range(len(self.task_features))]
+        self.task_description = self.task_switcher.get_task_text(self.task_arr)
+        self.task_box.text = self.task_description
+        if self.ros_bridge is not None:
+            self.ros_bridge.update_task(self.task_arr)
 
     def show_district_selection(self):
         if not self.table_mode:

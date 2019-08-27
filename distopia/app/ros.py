@@ -85,6 +85,11 @@ class RosBridge(object):
              (fiducials_locations, fiducial_ids, fiducial_logical_ids,
               districts, district_metrics_fn, state_metrics_fn)))
 
+    def update_task(self, task_array):
+        self._publisher_thread_queue.put(
+            ('task', task_array))
+
+
     @staticmethod
     def make_computation_packet(
             fiducials_locations, fiducial_ids, fiducial_logical_ids,
@@ -179,6 +184,11 @@ class RosBridge(object):
                     log_obj = {
                         'districts': districts_obj,
                         'fiducials': fiducials_obj,
+                        'utc_time': '{}'.format(datetime.datetime.utcnow())
+                    }
+                elif item == 'task':
+                    log_obj = {
+                        'task': val,
                         'utc_time': '{}'.format(datetime.datetime.utcnow())
                     }
                 else:

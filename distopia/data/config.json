@@ -22,30 +22,20 @@
   "focus_metric_height": 100,
   "focus_metric_width": 100,
   "focus_metrics": [
-    "age",
-    "education",
-    "income",
-    "occupation",
     "population",
     "projected_votes",
     "race",
     "pvi",
-    "compactness",
-    "area"
+    "compactness"
   ],
   "log_data": true,
   "max_fiducials_per_district": 5,
   "metrics": [
-    "age",
-    "education",
-    "income",
-    "occupation",
     "population",
     "projected_votes",
     "race",
     "pvi",
-    "compactness",
-    "area"
+    "compactness"
   ],
   "precinct_2017_containing_rect": [
     0,
@@ -55,6 +45,7 @@
   ],
   "ros_host": "localhost",
   "ros_port": 9090,
+  "scale": 1.0,
   "screen_offset": [
     0,
     0
@@ -67,6 +58,6 @@
   "show_voronoi_boundaries": true,
   "table_mode": false,
   "use_county_dataset": true,
-  "use_ros": false,
-  "visualize_metric_data": true
+  "use_ros": true,
+  "visualize_metric_data": false
 }
