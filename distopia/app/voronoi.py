@@ -170,10 +170,23 @@ class VoronoiWidget(Widget):
         self.add_widget(self.task_box)
         self.show_precincts()
         self.task_switcher = TaskSwitcher(self.task_features)
-        Clock.schedule_interval(self.update_task,60*2)
+        Clock.schedule_interval(self.update_task,60*5)
 
     def update_task(self, dt):
+        max_n_tasks = 3
         self.task_arr = [np.random.choice([-1.0, 0.0, 1.0]) for i in range(len(self.task_features))]
+        # choose two indices to zero out; this will keep the tasks <= 3
+        n_nonzeroes = np.linalg.norm(self.task_arr,1) # number of nonzero indices
+        if n_nonzeroes == 0:
+            idx = np.random.randint(len(self.task_arr))
+            self.task_arr[idx] = np.random.choice([-1.0,1.0])
+        else:
+            n_to_zero = int(n_nonzeroes - max_n_tasks)
+            if n_to_zero > 0:
+                zero_indices = np.random.choice(len(self.task_arr), 2, replace=False)
+                for zi in zero_indices:
+                    self.task_arr[zi] = 0.0
+        #self.task_arr = [-1.0, 0.0, 0.0, 0.0, 0.0]
         self.task_description = self.task_switcher.get_task_text(self.task_arr)
         self.task_box.text = self.task_description
         if self.ros_bridge is not None:
