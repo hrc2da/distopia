@@ -6,6 +6,7 @@ Runs the voronoi GUI app.
 """
 
 from kivy.support import install_twisted_reactor
+
 install_twisted_reactor()
 
 from itertools import cycle
@@ -19,6 +20,7 @@ from functools import cmp_to_key
 
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
+from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.togglebutton import ToggleButton
 from kivy.properties import StringProperty
@@ -45,6 +47,7 @@ from distopia.precinct import Precinct
 from distopia.mapping.voronoi import VoronoiMapping
 from distopia.app.ros import RosBridge
 from distopia.app.tasks import TaskSwitcher
+
 __all__ = ('VoronoiWidget', 'VoronoiApp')
 
 
@@ -118,15 +121,19 @@ class VoronoiWidget(Widget):
 
     task_features = ['population', 'pvi', 'compactness', 'projected_votes', 'race']
 
-    task_description = StringProperty("Welcome to Distopia")
+    task_description = StringProperty("Welcome to Distopia.\nPlease place 8 district markers.")
+
+    task_time = NumericProperty(0)
+
+    task_time_str = StringProperty('delete this')
 
     def __init__(
-        self, voronoi_mapping=None, table_mode=False, align_mat=None,
-        screen_offset=(0, 0), ros_bridge=None, district_blocks_fid=None,
-        focus_block_fid=0, focus_block_logical_id=0, district_metrics_fn=None,
-        state_metrics_fn=None,
-        show_voronoi_boundaries=False, focus_metrics=[],
-        focus_metric_width=100, focus_metric_height=100,
+            self, voronoi_mapping=None, table_mode=False, align_mat=None,
+            screen_offset=(0, 0), ros_bridge=None, district_blocks_fid=None,
+            focus_block_fid=0, focus_block_logical_id=0, district_metrics_fn=None,
+            state_metrics_fn=None,
+            show_voronoi_boundaries=False, focus_metrics=[],
+            focus_metric_width=100, focus_metric_height=100,
             screen_size=(1920, 1080), max_fiducials_per_district=5,
             visualize_metric_data=True, **kwargs):
         super(VoronoiWidget, self).__init__(**kwargs)
@@ -167,35 +174,71 @@ class VoronoiWidget(Widget):
         with self.canvas.after:
             PopMatrix()
         self.task_box = Label(text=self.task_description, halign="left", font_size='20sp', x=1350, y=400)
+        self.task_timer_clock = Label(text=self.task_time_str, halign="left", font_size='20sp', x=1300, y=225)
+        self.reset_task_timer_button = Button(text="Reset Timer",x=1250,y=200, size_hint=(None,None),size=(100,50))
+        #self.reset_task_timer_button.bind(on_press=self.reset_task_timer)
+        self.advance_task_button = Button(text="New Task",x=1350,y=200, size_hint=(None,None),size=(100,50))
+        #self.advance_task_button.bind(on_press=self.update_task)
         self.add_widget(self.task_box)
+        self.add_widget(self.task_timer_clock)
+        self.add_widget(self.advance_task_button)
+        self.add_widget(self.reset_task_timer_button)
         self.show_precincts()
         self.task_switcher = TaskSwitcher(self.task_features)
-        Clock.schedule_interval(self.update_task,60*5)
+        # self.task_timer = Clock.create_trigger(self.update_task, 60 * 5)
+        self.reset_task_timer(60*5)
+        self.task_clock = Clock.schedule_interval(self.update_task_clock, 1)
+
+    def advance_task_press(self):
+        self.update_task(None)
+        self.advance_task_button.trigger_action()
+
+    def advance_task_release(self):
+        self.advance_task_button.on_release()
+
+    def reset_task_press(self):
+        self.reset_task_timer()
+        self.reset_task_timer_button.trigger_action()
+
+    def reset_task_release(self):
+        self.reset_task_timer_button.on_release()
+
+    def update_task_clock(self, dt):
+        self.task_time -= 1
+        logging.info(self.task_time)
+        self.task_timer_clock.text = "Time Remaining: {} s".format(self.task_time)
+
+    def reset_task_timer(self, set_time=60*5):
+        if hasattr(self, 'task_timer') and self.task_timer is not None:
+            self.task_timer.cancel()
+        self.task_timer = Clock.create_trigger(self.update_task, set_time)
+        self.task_time = set_time
 
     def update_task(self, dt):
         max_n_tasks = 3
         self.task_arr = [np.random.choice([-1.0, 0.0, 1.0]) for i in range(len(self.task_features))]
         # choose two indices to zero out; this will keep the tasks <= 3
-        n_nonzeroes = np.linalg.norm(self.task_arr,1) # number of nonzero indices
+        n_nonzeroes = np.linalg.norm(self.task_arr, 1)  # number of nonzero indices
         if n_nonzeroes == 0:
             idx = np.random.randint(len(self.task_arr))
-            self.task_arr[idx] = np.random.choice([-1.0,1.0])
+            self.task_arr[idx] = np.random.choice([-1.0, 1.0])
         else:
             n_to_zero = int(n_nonzeroes - max_n_tasks)
             if n_to_zero > 0:
                 zero_indices = np.random.choice(len(self.task_arr), 2, replace=False)
                 for zi in zero_indices:
                     self.task_arr[zi] = 0.0
-        #self.task_arr = [-1.0, 0.0, 0.0, 0.0, 0.0]
+        # self.task_arr = [-1.0, 0.0, 0.0, 0.0, 0.0]
         self.task_description = self.task_switcher.get_task_text(self.task_arr)
         self.task_box.text = self.task_description
         if self.ros_bridge is not None:
             self.ros_bridge.update_task(self.task_arr)
+        self.reset_task_timer()
 
     def show_district_selection(self):
         if not self.table_mode:
             h = 34 * len(self.district_blocks_fid) + 5 * (
-                len(self.district_blocks_fid) - 1)
+                    len(self.district_blocks_fid) - 1)
             box = self.gui_touch_focus_buttons = BoxLayout(
                 orientation='vertical', size=(dp(100), dp(h)),
                 spacing=dp(5), pos=(self.focus_region_width, 0))
@@ -209,6 +252,7 @@ class VoronoiWidget(Widget):
                 def update_current_fid(*largs, button=btn, value=val):
                     if button.state == 'down':
                         self.current_fid_id = value
+
                 btn.fbind('state', update_current_fid)
             box.children[-1].state = 'down'
             self.add_widget(box)
@@ -226,6 +270,7 @@ class VoronoiWidget(Widget):
             def update_current_fid(*largs, button=btn):
                 if button.state == 'down':
                     self.current_fid_id = self.focus_block_logical_id
+
             btn.fbind('state', update_current_fid)
 
         i = 0
@@ -279,13 +324,21 @@ class VoronoiWidget(Widget):
         if not self.table_mode:
             if self.gui_touch_focus_buttons.collide_point(*touch.pos):
                 return self.gui_touch_focus_buttons.on_touch_down(touch)
+            elif self.advance_task_button.collide_point(*touch.pos):
+                return self.advance_task_press()
+            elif self.reset_task_timer_button.collide_point(*touch.pos):
+                return self.reset_task_press()
             return self.gui_touch_down(touch)
         return self.fiducial_down(touch)
 
     def on_touch_move(self, touch):
-        if not self.table_mode and \
-                self.gui_touch_focus_buttons.collide_point(*touch.pos):
-            return self.gui_touch_focus_buttons.on_touch_down(touch)
+        if not self.table_mode:
+            if self.gui_touch_focus_buttons.collide_point(*touch.pos):
+                return self.gui_touch_focus_buttons.on_touch_down(touch)
+            elif self.advance_task_button.collide_point(*touch.pos):
+                return
+            elif self.reset_task_timer_button.collide_point(*touch.pos):
+                return
 
         if touch.uid not in self.touches:
             return False
@@ -295,10 +348,13 @@ class VoronoiWidget(Widget):
         return self.gui_touch_move(touch)
 
     def on_touch_up(self, touch):
-        if not self.table_mode and \
-                self.gui_touch_focus_buttons.collide_point(*touch.pos):
-            return self.gui_touch_focus_buttons.on_touch_down(touch)
-
+        if not self.table_mode:
+            if self.gui_touch_focus_buttons.collide_point(*touch.pos):
+                return self.gui_touch_focus_buttons.on_touch_down(touch)
+            elif self.advance_task_button.collide_point(*touch.pos):
+                return
+            elif self.reset_task_timer_button.collide_point(*touch.pos):
+                return
         if touch.uid not in self.touches:
             return False
 
@@ -619,6 +675,7 @@ class VoronoiWidget(Widget):
     def voronoi_callback(self, *largs):
         def _callback(dt):
             self.process_voronoi_output(*largs)
+
         Clock.schedule_once(_callback)
 
     def clear_voronoi(self):
@@ -839,6 +896,7 @@ class VoronoiApp(App):
                     def set_size(*largs, obj=label_wid, center=x):
                         obj.size = obj.texture_size
                         obj.center_x = center
+
                     label_wid.fbind('texture_size', set_size)
 
     def show_precinct_labels(self, widget):
