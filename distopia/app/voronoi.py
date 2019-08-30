@@ -125,6 +125,8 @@ class VoronoiWidget(Widget):
 
     task_time = NumericProperty(0)
 
+    task_timer = None
+
     task_time_str = StringProperty('delete this')
 
     def __init__(
@@ -186,7 +188,7 @@ class VoronoiWidget(Widget):
         self.show_precincts()
         self.task_switcher = TaskSwitcher(self.task_features)
         # self.task_timer = Clock.create_trigger(self.update_task, 60 * 5)
-        self.reset_task_timer(60*5)
+        self.reset_task_timer()
         self.task_clock = Clock.schedule_interval(self.update_task_clock, 1)
 
     def advance_task_press(self):
@@ -205,16 +207,17 @@ class VoronoiWidget(Widget):
 
     def update_task_clock(self, dt):
         self.task_time -= 1
-        logging.info(self.task_time)
         self.task_timer_clock.text = "Time Remaining: {} s".format(self.task_time)
 
     def reset_task_timer(self, set_time=60*5):
-        if hasattr(self, 'task_timer') and self.task_timer is not None:
+        if self.task_timer is not None:
             self.task_timer.cancel()
         self.task_timer = Clock.create_trigger(self.update_task, set_time)
         self.task_time = set_time
+        self.task_timer()
 
     def update_task(self, dt):
+        logging.info("updating")
         max_n_tasks = 3
         self.task_arr = [np.random.choice([-1.0, 0.0, 1.0]) for i in range(len(self.task_features))]
         # choose two indices to zero out; this will keep the tasks <= 3
