@@ -8,12 +8,12 @@ provides switcher logic
 
 task_descriptions_dict = {
     "population": {
-        "max": "Try to maximize the differences between the number of people \n    each district has.\n\n",
+        "max": "Try to create districts that have very different population sizes.\n\n",
         "min": "Try to evenly balance the number of people each district has.\n\n"
     },
     "pvi": {
-        "max": "Try to make each district have a clear winner.\n\n",
-        "min": "Try to create districts that are as competitive as possible.\n\n"
+        "max": "Try to create districts that maximize the number of wasted votes.\n\n",
+        "min": "Try to create districts that minimize the number of wasted votes.\n\n"
     },
     "compactness": {
         "max": "Try to create districts that are round and regularly shaped.\n\n",
@@ -24,7 +24,7 @@ task_descriptions_dict = {
         "min": "Try to create districts that benefit the Republican Party.\n\n"
     },
     "race": {
-        "max": "Try to create a few districts that maximize the voting power \n    of demographic minorities.\n\n",
+        "max": "Try to create a few districts that are largely composed \n    of demographic minorities.\n\n",
         "min": "Try to create districts that evenly distribute demographic \n    minorities between districts.\n\n"
     }
 

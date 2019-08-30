@@ -121,7 +121,7 @@ class VoronoiWidget(Widget):
 
     task_features = ['population', 'pvi', 'compactness', 'projected_votes', 'race']
 
-    task_description = StringProperty("Welcome to Distopia.\nPlease place 8 district markers.")
+    task_description = StringProperty("Welcome to Distopia.\n\nPlease place 8 district markers on the map.\n\nWhen you are ready, hit 'New Task'.\n\n")
 
     task_time = NumericProperty(0)
 
@@ -175,12 +175,17 @@ class VoronoiWidget(Widget):
             Translate(*[v * Metrics.density for v in screen_offset])
         with self.canvas.after:
             PopMatrix()
-        self.task_box = Label(text=self.task_description, halign="left", font_size='20sp', x=1350, y=400)
+        self.task_header = Label(text="Your Task:", halign="left", font_size='40sp', x=1300, y=550)
+        with self.canvas:
+            self.task_container = Line(points=(1100,550,1700,550,1700,400,1100,400,1100,550))
+        self.task_box = Label(text=self.task_description, halign="left", valign="top", font_size='20sp', x=1350, y=400)
         self.task_timer_clock = Label(text=self.task_time_str, halign="left", font_size='20sp', x=1300, y=225)
         self.reset_task_timer_button = Button(text="Reset Timer",x=1250,y=200, size_hint=(None,None),size=(100,50))
         #self.reset_task_timer_button.bind(on_press=self.reset_task_timer)
         self.advance_task_button = Button(text="New Task",x=1350,y=200, size_hint=(None,None),size=(100,50))
         #self.advance_task_button.bind(on_press=self.update_task)
+
+        self.add_widget(self.task_header)
         self.add_widget(self.task_box)
         self.add_widget(self.task_timer_clock)
         self.add_widget(self.advance_task_button)
