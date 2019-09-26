@@ -176,10 +176,10 @@ class VoronoiWidget(Widget):
             Translate(*[v * Metrics.density for v in screen_offset])
         with self.canvas.after:
             PopMatrix()
-        self.task_header = Label(text="Your Task:", halign="left", font_size='40sp', x=1300, y=550)
+        self.task_header = Label(text="Your Task (intro):", halign="left", font_size='40sp', x=1300, y=550)
         with self.canvas:
             self.task_container = Line(points=(1100,550,1700,550,1700,400,1100,400,1100,550))
-
+        self.task_counter = 0
         self.task_generator = self.generate_tasks(3, start_idx = task_start, seed = task_seed)
         self.task_box = Label(text=self.task_description, halign="left", valign="top", font_size='20sp', x=1350, y=400)
         self.task_timer_clock = Label(text=self.task_time_str, halign="left", font_size='20sp', x=1300, y=225)
@@ -225,6 +225,8 @@ class VoronoiWidget(Widget):
         self.task_timer()
 
     def generate_tasks(self, n_features, task_list=None, start_idx=0, seed=0):
+        self.task_start_idx = start_idx
+        self.task_seed = seed
         if task_list is None:
             # generate a new set of tasks using n_features
             task_pool = [[-1.,0.,1.] for feature in range(n_features)]
@@ -243,7 +245,7 @@ class VoronoiWidget(Widget):
     def update_task(self, dt):
         logging.info("updating")
         max_n_tasks = 3
-        #self.task_arr = [np.random.choice([-1.0, 0.0, 1.0]) for i in range(len(self.task_features))]
+        # self.task_arr = [np.random.choice([-1.0, 0.0, 1.0]) for i in range(len(self.task_features))]
         self.task_arr = next(self.task_generator)
         # choose two indices to zero out; this will keep the tasks <= 3
         # n_nonzeroes = np.linalg.norm(self.task_arr, 1)  # number of nonzero indices
@@ -260,7 +262,9 @@ class VoronoiWidget(Widget):
         # self.task_arr = [-1.0, 0.0, 0.0, 0.0, 0.0]
         logging.info("next task: {}".format(self.task_arr))
         self.task_description = self.task_switcher.get_task_text(self.task_arr)
+        self.task_header.text = "Your Task (idx:{} seed:{}):".format(self.task_start_idx + self.task_counter, self.task_seed)
         self.task_box.text = self.task_description
+        self.task_counter += 1
         if self.ros_bridge is not None:
             self.ros_bridge.update_task(self.task_arr)
         self.reset_task_timer()
