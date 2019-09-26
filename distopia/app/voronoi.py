@@ -9,7 +9,7 @@ from kivy.support import install_twisted_reactor
 
 install_twisted_reactor()
 
-from itertools import cycle
+from itertools import cycle, product
 import logging
 import os
 import numpy as np
@@ -17,6 +17,7 @@ import json
 import csv
 import math
 from functools import cmp_to_key
+from argparse import ArgumentParser
 
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
@@ -119,7 +120,7 @@ class VoronoiWidget(Widget):
 
     task_arr = None
 
-    task_features = ['population', 'pvi', 'compactness', 'projected_votes', 'race']
+    task_features = ['population', 'pvi', 'compactness']
 
     task_description = StringProperty("Welcome to Distopia.\n\nPlease place 8 district markers on the map.\n\nWhen you are ready, hit 'New Task'.\n\n")
 
@@ -137,7 +138,7 @@ class VoronoiWidget(Widget):
             show_voronoi_boundaries=False, focus_metrics=[],
             focus_metric_width=100, focus_metric_height=100,
             screen_size=(1920, 1080), max_fiducials_per_district=5,
-            visualize_metric_data=True, **kwargs):
+            visualize_metric_data=True, task_start=0, task_seed=0, **kwargs):
         super(VoronoiWidget, self).__init__(**kwargs)
         self.voronoi_mapping = voronoi_mapping
         self.ros_bridge = ros_bridge
@@ -178,6 +179,8 @@ class VoronoiWidget(Widget):
         self.task_header = Label(text="Your Task:", halign="left", font_size='40sp', x=1300, y=550)
         with self.canvas:
             self.task_container = Line(points=(1100,550,1700,550,1700,400,1100,400,1100,550))
+
+        self.task_generator = self.generate_tasks(3, start_idx = task_start, seed = task_seed)
         self.task_box = Label(text=self.task_description, halign="left", valign="top", font_size='20sp', x=1350, y=400)
         self.task_timer_clock = Label(text=self.task_time_str, halign="left", font_size='20sp', x=1300, y=225)
         self.reset_task_timer_button = Button(text="Reset Timer",x=1250,y=200, size_hint=(None,None),size=(100,50))
@@ -221,21 +224,39 @@ class VoronoiWidget(Widget):
         self.task_time = set_time
         self.task_timer()
 
+    def generate_tasks(self, n_features, task_list=None, start_idx=0, seed = 0):
+        if task_list is None:
+            # generate a new set of tasks using n_features
+            task_pool = [[-1.,0.,1.] for feature in range(n_features)]
+            task_list = list(product(*task_pool))
+            task_list = [list(task) for task in task_list[start_idx:] if not np.array_equal(task, np.zeros(3))]
+            if seed > 0:
+                np.random.seed(seed)
+                np.random.shuffle(task_list)
+            logging.info("N_Tasks: {}".format(len(task_list)))
+            logging.info(task_list)
+        while len(task_list) > 0:
+            yield task_list.pop()
+        while True:
+            yield [0.,0.,0.]
+
     def update_task(self, dt):
         logging.info("updating")
         max_n_tasks = 3
-        self.task_arr = [np.random.choice([-1.0, 0.0, 1.0]) for i in range(len(self.task_features))]
+        #self.task_arr = [np.random.choice([-1.0, 0.0, 1.0]) for i in range(len(self.task_features))]
+        self.task_arr = next(self.task_generator)
         # choose two indices to zero out; this will keep the tasks <= 3
-        n_nonzeroes = np.linalg.norm(self.task_arr, 1)  # number of nonzero indices
-        if n_nonzeroes == 0:
-            idx = np.random.randint(len(self.task_arr))
-            self.task_arr[idx] = np.random.choice([-1.0, 1.0])
-        else:
-            n_to_zero = int(n_nonzeroes - max_n_tasks)
-            if n_to_zero > 0:
-                zero_indices = np.random.choice(len(self.task_arr), 2, replace=False)
-                for zi in zero_indices:
-                    self.task_arr[zi] = 0.0
+        # n_nonzeroes = np.linalg.norm(self.task_arr, 1)  # number of nonzero indices
+        # if n_nonzeroes == 0:
+        #     # don't allow empty tasks
+        #     idx = np.random.randint(len(self.task_arr))
+        #     self.task_arr[idx] = np.random.choice([-1.0, 1.0])
+        # else:
+        #     n_to_zero = int(n_nonzeroes - max_n_tasks)
+        #     if n_to_zero > 0:
+        #         zero_indices = np.random.choice(len(self.task_arr), 5-max_n_tasks, replace=False)
+        #         for zi in zero_indices:
+        #             self.task_arr[zi] = 0.0
         # self.task_arr = [-1.0, 0.0, 0.0, 0.0, 0.0]
         self.task_description = self.task_switcher.get_task_text(self.task_arr)
         self.task_box.text = self.task_description
@@ -991,7 +1012,9 @@ class VoronoiApp(App):
             focus_metric_height=dp(self.focus_metric_height),
             focus_metric_width=dp(self.focus_metric_width),
             max_fiducials_per_district=self.max_fiducials_per_district,
-            visualize_metric_data=self.visualize_metric_data
+            visualize_metric_data=self.visualize_metric_data,
+            # task_start = self.task_start,
+            # task_seed = self.task_seed
         )
 
         if self.use_ros:
@@ -1034,7 +1057,9 @@ class VoronoiApp(App):
         scatter.size = size
         widget.size = size
         return scatter
-
+    # def set_task_config(self,start,seed):
+    #     self.target_start = start
+    #     self.target_seed = seed
 
 Builder.load_string("""
 <SizedLabel@Label>:
@@ -1042,7 +1067,12 @@ Builder.load_string("""
 """)
 
 if __name__ == '__main__':
+    # argparser = ArgumentParser(description="Run the Distopia Application.")
+    # argparser.add_argument('-s','--start', type=int, default=0)
+    # argparser.add_argument('-r','--randomseed', type=int, default = 0)
+    # args = argparser.parse_args()
     app = VoronoiApp()
+    # app.set_task_config(task_start=args.start, task_seed=args.randomseed)
     try:
         app.run()
     finally:

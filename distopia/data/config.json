@@ -23,8 +23,6 @@
   "focus_metric_width": 100,
   "focus_metrics": [
     "population",
-    "projected_votes",
-    "race",
     "pvi",
     "compactness"
   ],
@@ -32,9 +30,8 @@
   "max_fiducials_per_district": 5,
   "metrics": [
     "population",
-    "projected_votes",
-    "race",
     "pvi",
+    "projected_votes",
     "compactness"
   ],
   "precinct_2017_containing_rect": [
