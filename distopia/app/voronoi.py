@@ -224,7 +224,7 @@ class VoronoiWidget(Widget):
         self.task_time = set_time
         self.task_timer()
 
-    def generate_tasks(self, n_features, task_list=None, start_idx=0, seed = 0):
+    def generate_tasks(self, n_features, task_list=None, start_idx=0, seed=0):
         if task_list is None:
             # generate a new set of tasks using n_features
             task_pool = [[-1.,0.,1.] for feature in range(n_features)]
@@ -236,9 +236,9 @@ class VoronoiWidget(Widget):
             logging.info("N_Tasks: {}".format(len(task_list)))
             logging.info(task_list)
         while len(task_list) > 0:
-            yield task_list.pop()
+            yield task_list.pop(0) # pop from the head so the start index makes sense
         while True:
-            yield [0.,0.,0.]
+            yield [0.0, 0.0, 0.0]
 
     def update_task(self, dt):
         logging.info("updating")
@@ -258,6 +258,7 @@ class VoronoiWidget(Widget):
         #         for zi in zero_indices:
         #             self.task_arr[zi] = 0.0
         # self.task_arr = [-1.0, 0.0, 0.0, 0.0, 0.0]
+        logging.info("next task: {}".format(self.task_arr))
         self.task_description = self.task_switcher.get_task_text(self.task_arr)
         self.task_box.text = self.task_description
         if self.ros_bridge is not None:
@@ -948,7 +949,8 @@ class VoronoiApp(App):
             'focus_metrics', 'focus_metric_width', 'focus_metric_height',
             'log_data', 'max_fiducials_per_district', 'scale',
             'county_containing_rect', 'precinct_2017_containing_rect',
-            'display_landmarks', 'visualize_metric_data'
+            'display_landmarks', 'visualize_metric_data',
+            'task_start_idx', 'task_seed'
         ]
 
         fname = os.path.join(
@@ -1013,8 +1015,8 @@ class VoronoiApp(App):
             focus_metric_width=dp(self.focus_metric_width),
             max_fiducials_per_district=self.max_fiducials_per_district,
             visualize_metric_data=self.visualize_metric_data,
-            # task_start = self.task_start,
-            # task_seed = self.task_seed
+            task_start = self.task_start_idx,
+            task_seed = self.task_seed
         )
 
         if self.use_ros:

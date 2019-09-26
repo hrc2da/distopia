@@ -54,6 +54,8 @@
   "show_precinct_id": false,
   "show_voronoi_boundaries": true,
   "table_mode": false,
+  "task_seed": 0,
+  "task_start_idx": 0,
   "use_county_dataset": true,
   "use_ros": true,
   "visualize_metric_data": false
