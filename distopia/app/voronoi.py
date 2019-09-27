@@ -18,7 +18,7 @@ import csv
 import math
 from functools import cmp_to_key
 from argparse import ArgumentParser
-
+from copy import deepcopy
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -27,6 +27,7 @@ from kivy.uix.togglebutton import ToggleButton
 from kivy.properties import StringProperty
 from kivy.lang import Builder
 from kivy.app import App
+from kivy.core.audio import SoundLoader
 from kivy.graphics.vertex_instructions import Line, Point, Mesh, Ellipse, \
     Rectangle
 from kivy.graphics.tesselator import Tesselator, WINDING_ODD, TYPE_POLYGONS
@@ -138,7 +139,7 @@ class VoronoiWidget(Widget):
             show_voronoi_boundaries=False, focus_metrics=[],
             focus_metric_width=100, focus_metric_height=100,
             screen_size=(1920, 1080), max_fiducials_per_district=5,
-            visualize_metric_data=True, task_start=0, task_seed=0, **kwargs):
+            visualize_metric_data=True, task_start=0, task_seed=0, task_sound=None, **kwargs):
         super(VoronoiWidget, self).__init__(**kwargs)
         self.voronoi_mapping = voronoi_mapping
         self.ros_bridge = ros_bridge
@@ -187,12 +188,14 @@ class VoronoiWidget(Widget):
         #self.reset_task_timer_button.bind(on_press=self.reset_task_timer)
         self.advance_task_button = Button(text="New Task",x=1350,y=200, size_hint=(None,None),size=(100,50))
         #self.advance_task_button.bind(on_press=self.update_task)
+        self.reset_map_button = Button(text="Reset Map\nUntested--\nPlease do not use.",x=1250,y=700,size_hint=(None,None),size=(200,100))
 
         self.add_widget(self.task_header)
         self.add_widget(self.task_box)
         self.add_widget(self.task_timer_clock)
         self.add_widget(self.advance_task_button)
         self.add_widget(self.reset_task_timer_button)
+        self.add_widget(self.reset_map_button)
         self.show_precincts()
         self.task_switcher = TaskSwitcher(self.task_features)
         # self.task_timer = Clock.create_trigger(self.update_task, 60 * 5)
@@ -212,6 +215,19 @@ class VoronoiWidget(Widget):
 
     def reset_task_release(self):
         self.reset_task_timer_button.on_release()
+
+    def reset_map_press(self):
+        self.reset_map()
+        self.reset_map_button.trigger_action()
+    def reset_map(self):
+        fiducials = deepcopy(self.voronoi_mapping.get_fiducials())
+        for fid in fiducials:
+            self.remove_fiducial(fid)
+        self.clear_voronoi()
+        fid_graphics = list(self.fiducial_graphics.values())
+        for fg in fid_graphics:
+            self.remove_widget(fg)
+        self.fid_graphics = {}
 
     def update_task_clock(self, dt):
         self.task_time -= 1
@@ -263,11 +279,14 @@ class VoronoiWidget(Widget):
         logging.info("next task: {}".format(self.task_arr))
         self.task_description = self.task_switcher.get_task_text(self.task_arr)
         self.task_header.text = "Your Task (idx:{} seed:{}):".format(self.task_start_idx + self.task_counter, self.task_seed)
+        self.task_header.text = "Your Task (idx:{} seed:{}):".format(self.task_start_idx + self.task_counter, self.task_seed)
         self.task_box.text = self.task_description
         self.task_counter += 1
         if self.ros_bridge is not None:
             self.ros_bridge.update_task(self.task_arr)
         self.reset_task_timer()
+        if self.task_sound:
+            self.task_sound.play()
 
     def show_district_selection(self):
         if not self.table_mode:
@@ -362,6 +381,8 @@ class VoronoiWidget(Widget):
                 return self.advance_task_press()
             elif self.reset_task_timer_button.collide_point(*touch.pos):
                 return self.reset_task_press()
+            elif self.reset_map_button.collide_point(*touch.pos):
+                return self.reset_map_press()
             return self.gui_touch_down(touch)
         return self.fiducial_down(touch)
 
@@ -372,6 +393,8 @@ class VoronoiWidget(Widget):
             elif self.advance_task_button.collide_point(*touch.pos):
                 return
             elif self.reset_task_timer_button.collide_point(*touch.pos):
+                return
+            elif self.reset_map_button.collide_point(*touch.pos):
                 return
 
         if touch.uid not in self.touches:
@@ -388,6 +411,8 @@ class VoronoiWidget(Widget):
             elif self.advance_task_button.collide_point(*touch.pos):
                 return
             elif self.reset_task_timer_button.collide_point(*touch.pos):
+                return
+            elif self.reset_map_button.collide_point(*touch.pos):
                 return
         if touch.uid not in self.touches:
             return False
@@ -703,7 +728,8 @@ class VoronoiWidget(Widget):
             self.fiducials_color[identity] = list(next(self.colors))
         return fiducial
 
-    def remove_fiducial(self, fiducial, location):
+    def remove_fiducial(self, fiducial, location=None):
+        # not sure why we are requiring location here, making it optional for now
         self.voronoi_mapping.remove_fiducial(fiducial)
 
     def voronoi_callback(self, *largs):

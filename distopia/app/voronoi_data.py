@@ -424,7 +424,9 @@ class MetricData(object):
 
                 if vote1 < vote2:
                     vote1, vote2 = vote2, vote1
-                metric.set_value(vote1 - (vote1 + vote2) / 2., 'pvi')
+                metric.set_value(vote1 - (vote1 + vote2) / 2., 'pvi') # margin over 50%
+                #metric.set_value((vote1+vote2) - (vote2+1)) # total number of voters minus the number needed to win
+
 
         if 'compactness' in self.metrics:
             for district in districts:

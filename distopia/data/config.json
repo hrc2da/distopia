@@ -24,6 +24,7 @@
   "focus_metrics": [
     "population",
     "pvi",
+    "projected_votes",
     "compactness"
   ],
   "log_data": true,
