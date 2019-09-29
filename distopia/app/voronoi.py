@@ -171,7 +171,12 @@ class VoronoiWidget(Widget):
         self.state_metrics_fn = state_metrics_fn
         self.screen_offset = screen_offset
         self.touches = {}
-
+        if task_sound is not None:
+            self.task_sound_players = [SoundLoader.load(os.path.join( os.path.dirname(distopia.__file__), 'data', task_sound)) for _ in range(2)]
+            self.task_sounds_idx = 0
+            self.n_task_sound_players = len(self.task_sound_players)
+        else:
+            self.task_sound_players == None
         with self.canvas.before:
             PushMatrix()
             Translate(*[v * Metrics.density for v in screen_offset])
@@ -285,8 +290,14 @@ class VoronoiWidget(Widget):
         if self.ros_bridge is not None:
             self.ros_bridge.update_task(self.task_arr)
         self.reset_task_timer()
-        if self.task_sound:
-            self.task_sound.play()
+        if self.task_sound_players:
+            logging.info("playing sound")
+            player = self.task_sound_players[self.task_sounds_idx % self.n_task_sound_players]
+            player.seek(0)
+            player.play()
+            player.play()
+
+            self.task_sounds_idx += 1
 
     def show_district_selection(self):
         if not self.table_mode:
@@ -980,7 +991,7 @@ class VoronoiApp(App):
             'log_data', 'max_fiducials_per_district', 'scale',
             'county_containing_rect', 'precinct_2017_containing_rect',
             'display_landmarks', 'visualize_metric_data',
-            'task_start_idx', 'task_seed'
+            'task_start_idx', 'task_seed', 'task_sound'
         ]
 
         fname = os.path.join(
@@ -1046,7 +1057,8 @@ class VoronoiApp(App):
             max_fiducials_per_district=self.max_fiducials_per_district,
             visualize_metric_data=self.visualize_metric_data,
             task_start = self.task_start_idx,
-            task_seed = self.task_seed
+            task_seed = self.task_seed,
+            task_sound = self.task_sound
         )
 
         if self.use_ros:
