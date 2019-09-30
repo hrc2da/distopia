@@ -252,10 +252,11 @@ class VoronoiWidget(Widget):
             # generate a new set of tasks using n_features
             task_pool = [[-1.,0.,1.] for feature in range(n_features)]
             task_list = list(product(*task_pool))
-            task_list = [list(task) for task in task_list[start_idx:] if not np.array_equal(task, np.zeros(3))]
+            task_list = [list(task) for task in task_list if not np.array_equal(task, np.zeros(3))]
             if seed > 0:
                 np.random.seed(seed)
                 np.random.shuffle(task_list)
+            task_list = task_list[start_idx:]
             logging.info("N_Tasks: {}".format(len(task_list)))
             logging.info(task_list)
         while len(task_list) > 0:
