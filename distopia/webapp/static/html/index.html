@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.js"></script>
+		<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+		<!-- Basic Page Needs
+		–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+		<meta charset="utf-8">
+		<title>Distopia Interface</title>
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<!-- Mobile Specific Metas
+		–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- FONT
+		–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+		<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+		<!-- CSS
+		–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+		<link rel="stylesheet" href="static/css/normalize.css">
+		<link rel="stylesheet" href="static/css/skeleton.css">
+		<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+		<link rel="stylesheet" type="text/css" href="static/css/style.css">
+	</head>
+	<body>
+		<div class="screen">
+			<div class="container" style="min-width: 98%">
+				<div class="row">
+					<div class="one-half column offset-by-three" style="text-align: center">
+						<h5>Wisconsin</h5>
+					</div>
+				</div>
+			</div>
+			<div class="container" id="state-view" style="min-width: 98%;">
+				<div class="row">
+					<div class="one-half column">
+						<div class="row" style="height: 8vh; margin-bottom: 1%;">
+							<svg id="label_area"></svg>
+						</div>
+						<div class="row" style="height: 70vh; margin-bottom: 1%;">
+							<svg id="state"></svg>
+						</div>
+						<div class="row" style="height: 13vh">
+							<svg id="scale"></svg>
+						</div>
+					</div>
+					<div class="one-half column" style="height: 90vh">
+						<div class="row" style="height: 8vh; margin-bottom: 1%;">
+							<svg id="hist_label"></svg>
+						</div>
+						<div class="row" style="height: 20vh; margin-bottom: 1%;">
+							<div class="one-half column">
+								<svg id="dist1"></svg>
+							</div>
+							<div class="one-half column">
+								<svg id="dist2"></svg>
+							</div>
+						</div>
+						<div class="row" style="height: 20vh; margin-bottom: 1%;">
+							<div class="one-half column">
+								<svg id="dist3"></svg>
+							</div>
+							<div class="one-half column">
+								<svg id="dist4"></svg>
+							</div>
+						</div>
+						<div class="row" style="height: 20vh; margin-bottom: 1%;">
+							<div class="one-half column">
+								<svg id="dist5"></svg>
+							</div>
+							<div class="one-half column">
+								<svg id="dist6"></svg>
+							</div>
+						</div>
+						<div class="row" style="height: 20vh; margin-bottom: 1%;">
+							<div class="one-half column">
+								<svg id="dist7"></svg>
+							</div>
+							<div class="one-half column">
+								<svg id="dist8"></svg>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="module" src="static/js/distopiaInterface.js"></script>
+		<script type="module" src="static/js/districtView.js"></script>
+		<script type="module" src="static/js/stateView.js"></script>
+		<script type="module" src="static/js/viz/histogram.js"></script>
+		<!--<script type="script" src="main.js"></script>-->
+	</body>
+</html>
