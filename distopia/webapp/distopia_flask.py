@@ -1,5 +1,7 @@
 from flask import Flask
 from flask import request
+import sys
+sys.path.append("../..")
 from distopia.app.agent import VoronoiAgent
 import os
 app = Flask(__name__)
