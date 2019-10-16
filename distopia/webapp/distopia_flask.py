@@ -1,5 +1,7 @@
 from flask import Flask
 from flask import request, jsonify
+import sys
+sys.path.append("../..")
 from distopia.app.agent import VoronoiAgent
 from distopia.app.ros import RosBridge
 import os
