@@ -193,6 +193,8 @@ export const STYLES = {
 
 var SELF;
 
+const isWebApp = true;
+
 export class DistopiaInterface{
 	/*
 		This class interfaces between the TUI and the HUD.$
@@ -204,9 +206,12 @@ export class DistopiaInterface{
 		this.counter = 0;
 		this.districts = [];
 		this.counties = [];
-		this.initRosBridge();
-		this.initDataListener();
-		this.initControlListener();
+		if (! isWebApp){
+			this.initRosBridge();
+			this.initDataListener();
+			this.initControlListener();
+		}
+
 		this.setupCounties();
 
 		SELF = this;
@@ -427,8 +432,6 @@ export const parseData = (labels, data) => {
 }
 
 export var distopia = new DistopiaInterface();
-distopia.initDataListener();
-distopia.initControlListener();
 
 $(".button").click(() =>{
 	distopia.toggleView();
