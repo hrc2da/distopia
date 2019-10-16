@@ -7,6 +7,31 @@
 import {DistrictView} from "./districtView.js";
 import {StateView} from "./stateView.js";
 
+d3.json('http://localhost:5000/evaluate', {
+      method:"POST",
+      body: JSON.stringify({
+		  "blocks": {
+			0: [[263,678],[261,330]],
+			1: [[603,206],[708,188]],
+			2: [[765,385],[588,430],[488,530]],
+			3: [[473,185],[383,530],[375,640],[505,356]],
+			4: [[755,576],[838,371]],
+			5: [[733,113],[483,46]],
+			6: [[818,26]],
+			7: [[823,135]]
+		  },
+		  "packet_count": 0
+		
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+	})
+	.then((data) =>{
+		console.log(data);
+	})
+
+
 var MIN_X, MIN_Y, MAX_X, MAX_Y;
 
 //These are global color scales for different metrics
