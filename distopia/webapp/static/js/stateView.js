@@ -4,7 +4,7 @@
 	A statewide view of a selected metric, with a heatmap and a set of histograms
 */
 import {parseData} from './distopiaInterface.js'
-import {DOMAIN, SCALE, METRICS, METRIC_TYPE, STYLES} from './distopiaElements.js'
+import {DOMAIN, SCALE, STYLES} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
 
 var SELF;
