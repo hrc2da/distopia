@@ -1,32 +1,33 @@
 
 
+/**
+ * @param {Array<Number>} domain
+ * @param {Array<String>} range
+ * @param {any} scaling_var
+ * @param {any} scaling_normalizer
+ */
+function simplifiedScale(domain,range, scaling_var){
+    let scale = d3.scaleLinear().domain(domain).range(range);
+    return scale(scaling_var);
+}
 //These are global color scales for different metrics
 //To invoke, scales.[NAME OF SCALE](VALUE) ex: scales.partisanFill(0.5)
 export var SCALE = {
 	//every scale, get scaleMax, scaleMin, scaleVale
-	"age": function([median_age,total_pop]){
-		let scale = d3.scaleLinear().domain([35,55]).range(["white","#C93FFF"]);
-		return scale(median_age);
-	},
+	"age": ([median_age,total_pop]) => simplifiedScale([35,55],["white","#C93FFF"], median_age),
 	"education": function([num_college, total_pop]){
 		//percentage with bachelor's degree or higher
 		let scale = d3.scaleLinear().domain([0, 1]).range(["white", "purple"]);
 		return scale(num_college/total_pop);
 	},
-	"income": function([median_income, tot_pop]){
-		let scale = d3.scaleLinear().domain([35000, 70000]).range(["white", "green"]);
-		return scale(median_income);
-	},
+	"income": ([median_income, tot_pop]) => {return simplifiedScale([35000,70000],["white","green"],median_income)},
 	"occupation": function([num_employed, total_pop]){
 		//percentage employed out of total population
 		let scale = d3.scaleLinear().domain([0.45,0.55]).range(["white", "pink"]);
 		return scale(num_employed/total_pop);
-	},
-	"population": function([pop_voting, total_pop]){
-		//voting population out of 3 million (or max which will be defined later)
-		let scale = d3.scaleLinear().domain([0,3000000]).range(["white", "orange"]);
-		return scale(pop_voting);
-	},
+    },
+    //voting population out of 3 million (or max which will be defined later)
+	"population": ([pop_voting, total_pop]) => simplifiedScale([0,3000000],["white","orange"],pop_voting),
 	"projected_votes": function([num_democrat, total_votes]){
 		//lean to either republican or democrat
 		// let scale = d3.scaleLinear().domain([-1, 0, 1]).range(["#D0021B","white", "#4A90E2"]);
