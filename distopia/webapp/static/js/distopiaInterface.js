@@ -9,6 +9,28 @@ import {StateView} from "./stateView.js";
 
 var MIN_X, MIN_Y, MAX_X, MAX_Y;
 
+// current State of the data - not to be confused with the state ex: Wisconsin
+/** 
+* @typedef {{
+	*		blocks: {Number: Array<Array<Number>>},
+	*		packet_count: Number,
+	*		metricFocus: string,
+	*	}}
+	*/
+var State = {"blocks": {
+	0: [[263,678],[261,330]],
+	1: [[603,206],[708,188]],
+	2: [[765,385],[588,430],[488,530]],
+	3: [[473,185],[383,530],[375,640],[505,356]],
+	4: [[755,576],[838,371]],
+	5: [[733,113],[483,46]],
+	6: [[818,26]],
+	7: [[823,135]]
+  },
+  "packet_count": 0
+  
+};
+
 var SELF;
 
 const isWebApp = true;
@@ -253,18 +275,8 @@ export var distopia = new DistopiaInterface();
 d3.json('http://localhost:5000/evaluate', {
       method:"POST",
       body: JSON.stringify({
-		  "blocks": {
-			0: [[263,678],[261,330]],
-			1: [[603,206],[708,188]],
-			2: [[765,385],[588,430],[488,530]],
-			3: [[473,185],[383,530],[375,640],[505,356]],
-			4: [[755,576],[838,371]],
-			5: [[733,113],[483,46]],
-			6: [[818,26]],
-			7: [[823,135]]
-		  },
-		  "packet_count": 0
-		
+		  "blocks": State.blocks,
+		  "packet_count": State.packet_count
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8"
@@ -276,6 +288,8 @@ d3.json('http://localhost:5000/evaluate', {
 	})
 // export var distopia = new DistopiaInterface();
 
+
+// TODO - figure out if this is needed
 $(".button").click(() =>{
 	distopia.toggleView();
 });
