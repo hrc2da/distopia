@@ -3,7 +3,6 @@
 	=============
 	Wrapper for the district level "baseball card" view
 */
-import {parseData} from './distopiaInterface.js'
 import {METRIC_TYPE} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
 

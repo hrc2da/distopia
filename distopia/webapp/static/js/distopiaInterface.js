@@ -10,10 +10,11 @@ import {StateView} from "./stateView.js";
 var MIN_X, MIN_Y, MAX_X, MAX_Y;
 
 // current State of the data - not to be confused with the state ex: Wisconsin
+// for metric Focus instead of string we want to type it as a union instead of any string
 /** 
 * @typedef {{
 	*		blocks: {Number: Array<Array<Number>>},
-	*		packet_count: Number,
+	*		packetCount: Number,
 	*		metricFocus: string,
 	*	}}
 	*/
@@ -27,12 +28,12 @@ var State = {"blocks": {
 	6: [[818,26]],
 	7: [[823,135]]
   },
-  "packet_count": 0
-  
+  "packetCount": 0,
+  "metricFocus": "population"
 };
-
+// used for autobinding
 var SELF;
-
+// used to toggle off TUI settings
 const isWebApp = true;
 
 export class DistopiaInterface{
@@ -51,14 +52,13 @@ export class DistopiaInterface{
 			this.initDataListener();
 			this.initControlListener();
 		}
-
 		this.setupCounties();
 
 		SELF = this;
 
 		//initializes stateView and districtView classes as null variables
 		//(easy way to check if they need to be initialized)
-		this.stateView = new StateView(null, "population", this.counties);
+		this.stateView = new StateView(null, State.metricFocus, this.counties);
 		//this.districtView = new DistrictView(null);
 
 		this.currentView = initialView;
@@ -265,18 +265,12 @@ export class DistopiaInterface{
 	}
 }
 
-export const parseData = (labels, data) => {
-	let objArray = [];
-	labels.forEach((label, i) => objArray.push({name: label, amount: data[i]}));
-	return objArray;
-}
-
 export var distopia = new DistopiaInterface();
 d3.json('http://localhost:5000/evaluate', {
       method:"POST",
       body: JSON.stringify({
 		  "blocks": State.blocks,
-		  "packet_count": State.packet_count
+		  "packet_count": State.packetCount
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8"

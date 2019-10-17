@@ -1,5 +1,11 @@
 
 
+export const parseData = (labels, data) => {
+	let objArray = [];
+	labels.forEach((label, i) => objArray.push({name: label, amount: data[i]}));
+	return objArray;
+}
+
 /**
  * @param {Array<Number>} domain
  * @param {Array<String>} range
