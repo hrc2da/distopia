@@ -18,19 +18,37 @@ var MIN_X, MIN_Y, MAX_X, MAX_Y;
 	*		metricFocus: string,
 	*	}}
 	*/
-var State = {"blocks": {
-	0: [[263,678],[261,330]],
-	1: [[603,206],[708,188]],
-	2: [[765,385],[588,430],[488,530]],
-	3: [[473,185],[383,530],[375,640],[505,356]],
-	4: [[755,576],[838,371]],
-	5: [[733,113],[483,46]],
-	6: [[818,26]],
-	7: [[823,135]]
-  },
-  "packetCount": 0,
-  "metricFocus": "population"
-};
+var State = {
+	"blocks": {},
+	"packetCount": null,
+	// TODO - figure out why this cannot be set to empty string
+ 	"metricFocus": "population"
+}
+
+
+function updateState(newState){
+	// need to add in some kind of hashing
+	console.log(newState);
+	console.log(State);
+	if (State != newState){
+		State = newState;
+		d3.json('http://localhost:5000/evaluate', {
+      	method:"POST",
+      	body: JSON.stringify({
+		  "blocks": State.blocks,
+		  "packet_count": State.packetCount
+      	}),
+      	headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      	}
+		})
+		.then((data) =>{
+			distopia.handleData({data: JSON.stringify(data)});
+			console.log(data);
+		})
+	}
+}
+
 // used for autobinding
 var SELF;
 // used to toggle off TUI settings
@@ -53,6 +71,7 @@ export class DistopiaInterface{
 			this.initControlListener();
 		}
 		this.setupCounties();
+		this.initInteractive();
 
 		SELF = this;
 
@@ -110,6 +129,11 @@ export class DistopiaInterface{
 			messageType : 'std_msgs/String'
 		});
 		this.controlListener.subscribe(this.handleCommand);
+	}
+
+	initInteractive(){
+		const updateButton = document.getElementById("test_button");
+		updateButton.onclick = () => this.listener();
 	}
 
 	updateView(data){
@@ -219,6 +243,26 @@ export class DistopiaInterface{
 		});
 	}
 
+	// callback function for interactive events
+	listener(){
+		// currently a hard-coded state update
+		const newState = {
+			"blocks": {
+			0: [[263,678],[261,330]],
+			1: [[603,206],[708,188]],
+			2: [[765,385],[588,430],[488,530]],
+			3: [[473,185],[383,530],[375,640],[505,356]],
+			4: [[755,576],[838,371]],
+			5: [[733,113],[483,46]],
+			6: [[818,26]],
+			7: [[823,135]]
+			},
+			"packetCount": 0,
+			"metricFocus": "population"
+			};
+		updateState(newState);
+	}
+
 	toggleView(){
 		if(this.currentView == "state"){
 			$("#district-view").hide();
@@ -266,22 +310,6 @@ export class DistopiaInterface{
 }
 
 export var distopia = new DistopiaInterface();
-d3.json('http://localhost:5000/evaluate', {
-      method:"POST",
-      body: JSON.stringify({
-		  "blocks": State.blocks,
-		  "packet_count": State.packetCount
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
-	})
-	.then((data) =>{
-		distopia.handleData({data: JSON.stringify(data)});
-		console.log(data);
-	})
-// export var distopia = new DistopiaInterface();
-
 
 // TODO - figure out if this is needed
 $(".button").click(() =>{
