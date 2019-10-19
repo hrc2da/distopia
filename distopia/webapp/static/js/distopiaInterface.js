@@ -6,6 +6,7 @@
 
 import {DistrictView} from "./districtView.js";
 import {StateView} from "./stateView.js";
+import {METRICS} from "./distopiaElements.js";
 
 var MIN_X, MIN_Y, MAX_X, MAX_Y;
 
@@ -44,7 +45,6 @@ function updateState(newState){
 		})
 		.then((data) =>{
 			distopia.handleData({data: JSON.stringify(data)});
-			console.log(data);
 		})
 	}
 }
@@ -134,13 +134,29 @@ export class DistopiaInterface{
 	initInteractive(){
 		const updateButton = document.getElementById("test_button");
 		updateButton.onclick = () => this.listener();
+
+		const metricSelector = document.getElementById("metric_selector");
+		metricSelector.onchange = () => {
+			const newSelectedMetric = document.getElementById("metric_selector").value;
+			console.log(newSelectedMetric);
+			updateState({
+				"blocks": State.blocks,
+				"packetCount": State.packetCount,
+				"metricFocus": newSelectedMetric,
+			})
+		}
+		for (let i = 0; i < METRICS.length; i++){
+			const option = document.createElement("option");
+			option.text = METRICS[i];
+			metricSelector.options.add(option, i);
+		}
 	}
 
 	updateView(data){
 		this.counter = messageData.counter;
 		this.districts = messageData.districts;
 		if(this.getView() == "state"){
-			//console.log("handling for state");
+
 			this.stateView.update(this.districts);
 		}
 		else{
