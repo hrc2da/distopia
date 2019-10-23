@@ -1,0 +1,29 @@
+Metadata-Version: 1.1
+Name: Distopia
+Version: 0.0.1
+Summary: Voting Districts UI Architecture.
+Home-page: http://hrc2da.github.io/distopia/
+Author: hrc2da
+Author-email: UNKNOWN
+License: MIT
+Description: [![Build Status](https://travis-ci.com/hrc2da/distopia.svg?branch=master)](https://travis-ci.com/hrc2da/distopia)
+        
+        Distopia
+        =========
+        
+        The backend for for district design.
+        
+        Installation
+        =============
+        
+        * Python 3.5+, (2.7?)
+        * Use pip
+        
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Scientific/Engineering
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Intended Audience :: Developers

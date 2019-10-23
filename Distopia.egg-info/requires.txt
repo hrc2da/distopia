@@ -1,0 +1,9 @@
+pytest
+scipy
+pyshp
+numpy
+pyproj
+oscpy
+matplotlib
+Cython
+roslibpy
