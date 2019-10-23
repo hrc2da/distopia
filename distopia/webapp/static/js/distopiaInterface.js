@@ -29,8 +29,6 @@ var State = {
 
 function updateState(newState){
 	// need to add in some kind of hashing
-	console.log(newState);
-	console.log(State);
 	if (State != newState){
 		State = newState;
 		d3.json('http://localhost:5000/evaluate', {
@@ -45,6 +43,7 @@ function updateState(newState){
 		})
 		.then((data) =>{
 			distopia.handleData({data: JSON.stringify(data)});
+			// distopia.stateView.update(data,State.metricFocus);
 		})
 	}
 }
@@ -137,13 +136,14 @@ export class DistopiaInterface{
 
 		const metricSelector = document.getElementById("metric_selector");
 		metricSelector.onchange = () => {
+			console.log('selector changed');
 			const newSelectedMetric = document.getElementById("metric_selector").value;
 			console.log(newSelectedMetric);
 			updateState({
 				"blocks": State.blocks,
 				"packetCount": State.packetCount,
 				"metricFocus": newSelectedMetric,
-			})
+			});
 		}
 		for (let i = 0; i < METRICS.length; i++){
 			const option = document.createElement("option");
@@ -173,7 +173,6 @@ export class DistopiaInterface{
 		}
 		SELF.counter = messageData.count;
 		SELF.districts = messageData.districts;
-		console.log(messageData);
 		if(SELF.getView() == "state"){
 			if(SELF.stateView == null){ SELF.stateView = new StateView(SELF.districts); }
 			else{ SELF.stateView.update(SELF.districts); }

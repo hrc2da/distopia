@@ -11,6 +11,7 @@ var SELF;
 export class StateView {
 	
 	constructor(initData, metricFocus = "population", counties){
+		console.log(metricFocus);
 		this.counties = counties;
 		this.metricFocus = metricFocus;
 		console.log("Initiating State View");
@@ -114,6 +115,7 @@ export class StateView {
 		d3.selectAll(".label").remove();
 		d3.selectAll(".key").remove();
 		//update the viz. Note that the
+		console.log(metric);
 		if(metric != undefined){
 			if(metric != this.metric){
 				this.setMetricFocus(metric);

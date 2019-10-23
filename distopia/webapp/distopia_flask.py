@@ -48,4 +48,4 @@ def evaluate():
         # return jsonify(log_obj) # this may choke as well
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug = True)
