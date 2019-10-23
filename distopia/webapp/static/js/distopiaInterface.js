@@ -6,7 +6,7 @@
 
 import {DistrictView} from "./districtView.js";
 import {StateView} from "./stateView.js";
-import {METRICS} from "./distopiaElements.js";
+import {METRICS, UI_CONSTANTS} from "./distopiaElements.js";
 
 var MIN_X, MIN_Y, MAX_X, MAX_Y;
 
@@ -184,7 +184,6 @@ export class DistopiaInterface{
 	}
 
 	handleCommand(message){
-		//console.log("Got Command:",message);
 		const messageData = JSON.parse(message.data);
 		if(messageData.cmd == "focus_state"){
 			if(SELF.stateView.getMetricFocus() != messageData.param){
@@ -323,10 +322,4 @@ export class DistopiaInterface{
 		return this.counties;
 	}
 }
-
 export var distopia = new DistopiaInterface();
-
-// TODO - figure out if this is needed
-$(".button").click(() =>{
-	distopia.toggleView();
-});

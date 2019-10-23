@@ -3,7 +3,7 @@
 	==========
 	A statewide view of a selected metric, with a heatmap and a set of histograms
 */
-import {DOMAIN,HIST_LABELS, SCALE, STYLES} from './distopiaElements.js'
+import {DOMAIN,HIST_LABELS, STYLES, UI_CONSTANTS} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
 
 var SELF;
@@ -161,7 +161,7 @@ export class StateView {
 
 		districtData.forEach((district, i) => {
 			let distX_min = 1000000, distX_max = 0, distY_min = 1000000, distY_max = 0;
-			let scale = SCALE[this.metricFocus];
+			let scale = UI_CONSTANTS[this.metricFocus]["scale"];
 			let f = scale([district.scalar_value, district.scalar_maximum]);
 			district.precincts.forEach((precinct) => {
 				this.counties[precinct].fill = f;
@@ -181,7 +181,7 @@ export class StateView {
 		let key_height = parseFloat(d3.select("#scale").style("height"));
 		let key_width = parseFloat(d3.select("#scale").style("width"));
 	
-		let scale = SCALE[this.metricFocus];
+		let scale = UI_CONSTANTS[this.metricFocus]["scale"];
 		let domain = DOMAIN[this.metricFocus].domain;
 		let step = (domain[domain.length-1] - domain[0])/5;
 

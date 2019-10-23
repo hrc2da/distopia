@@ -18,26 +18,81 @@ function simplifiedScale(domain,range, scaling_var){
 }
 //These are global color scales for different metrics
 //To invoke, scales.[NAME OF SCALE](VALUE) ex: scales.partisanFill(0.5)
-export var SCALE = {
-	//every scale, get scaleMax, scaleMin, scaleVale
-    "age": ([median_age,total_pop]) => simplifiedScale([35,55],["white","#C93FFF"], median_age),
-    //percentage with bachelor's degree or higher
-	"education": ([num_college, total_pop]) => simplifiedScale([0,1],["white","purple"], num_college/total_pop),
-    "income": ([median_income, tot_pop]) => simplifiedScale([35000,70000],["white","green"],median_income),
-    //percentage employed out of total population
-	"occupation": ([num_employed, total_pop]) => simplifiedScale([0.45,0.55],["white","pink"],num_employed/total_pop),
-    //voting population out of 3 million (or max which will be defined later)
-    "population": ([pop_voting, total_pop]) => simplifiedScale([0,3000000],["white","orange"],pop_voting),
-    //lean to either republican or democrat
-    // let scale = d3.scaleLinear().domain([-1, 0, 1]).range(["#D0021B","white", "#4A90E2"]);
-    // let prop_democrat = num_democrat/total_votes;
-    // let prop_republican = 1 - prop_democrat;
-    // return scale(prop_democrat - prop_republican);
-    "projected_votes": ([num_democrat, total_votes])=> simplifiedScale([0,0.5,1],["#D0021B","white","#4A90E2"], num_democrat/total_votes),
-    //number nonwhite divided by total population
-	"race": ([num_minorities, total_pop]) => simplifiedScale([0,1],["white","#102C42"], num_minorities/total_pop),
-	"pvi": ([wasted_votes,_]) => simplifiedScale([0,20000],["white","red"], wasted_votes),
-	"compactness": ([compactness,_]) => simplifiedScale([0,1],["white","green"], compactness)
+
+export var UI_CONSTANTS = {
+	"age": {
+		//every scale, get scaleMax, scaleMin, scaleVale
+		"scale": ([median_age,total_pop]) => simplifiedScale([35,55],["white","#C93FFF"], median_age),
+		"domain":[35,55],
+		"label":"years old",
+		"labelText": "Median Age per District",
+		"histLabel": "Age Distribution per District",
+	},
+	"education":{
+    	//percentage with bachelor's degree or higher
+		"scale": ([num_college, total_pop]) => simplifiedScale([0,1],["white","purple"], num_college/total_pop),
+		"domain":[0, 1],
+		"label":"years old",
+		"labelText": "College Educated",
+		"histLabel": "Educational Attainment per District",
+	},
+	"income": {
+		"scale": ([median_income, tot_pop]) => simplifiedScale([35000,70000],["white","green"],median_income),
+		"domain":[35000, 70000],
+		"label":"annual income",
+		"labelText": "Median Income per District",
+		"histLabel": "Income Distribution per District",
+	},
+	"occupation": {
+		//percentage employed out of total population
+		"scale": ([num_employed, total_pop]) => simplifiedScale([0.45,0.55],["white","pink"],num_employed/total_pop),
+		"domain": [0.45,0.55],
+		"label": "employed",
+		"labelText": "% Employed per District",
+		"histLabel": "Occupation Sector Distribution per District",
+	},
+	"population": {
+		//voting population out of 3 million (or max which will be defined later)
+		"scale": ([pop_voting, total_pop]) => simplifiedScale([0,3000000],["white","orange"],pop_voting),
+		"domain":[0,3000000],
+		"label": "voters",
+		"labelText": "Population per District",
+		"histLabel": "Total Population vs. Voting Population",
+	},
+	"projected_votes": {
+		//lean to either republican or democrat
+		// let scale = d3.scaleLinear().domain([-1, 0, 1]).range(["#D0021B","white", "#4A90E2"]);
+		// let prop_democrat = num_democrat/total_votes;
+		// let prop_republican = 1 - prop_democrat;
+		// return scale(prop_democrat - prop_republican);
+		"scale": ([num_democrat, total_votes])=> simplifiedScale([0,0.5,1],["#D0021B","white","#4A90E2"], num_democrat/total_votes),
+		"domain": [0, 1],
+		"label": "Democrat",
+		"labelText": "Partisan Lean per District",
+		"histLabel": "Partisan Breakdown per District",
+	},
+	"race": {
+		//number nonwhite divided by total population
+		"scale": ([num_minorities, total_pop]) => simplifiedScale([0,1],["white","#102C42"], num_minorities/total_pop),
+		"domain": [0,1],
+		"label": "Non-white",
+		"labelText": "% Minority population per District",
+		"histLabel": "Non-White Racial Distribution per District",
+	},
+	"pvi": {
+		"scale": ([wasted_votes,_]) => simplifiedScale([0,20000],["white","red"], wasted_votes),
+		"domain":[0,200000],
+		"label": "Wasted Votes",
+		"labelText": "# Wasted Votes",
+		"histLabel": "This Plot is Under Construction",
+	},
+	"compactness": {
+		"scale": ([compactness,_]) => simplifiedScale([0,1],["white","green"], compactness),
+		"domain": [0,1],
+		"label": "Compactness",
+		"labelText": "How Regular Shapes Are",
+		"histLabel": "This Plot is Under Construction"
+	}	
 }
 
 export var DOMAIN = {
