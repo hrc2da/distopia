@@ -3,7 +3,7 @@
 	==========
 	A statewide view of a selected metric, with a heatmap and a set of histograms
 */
-import {HIST_LABELS, STYLES, UI_CONSTANTS} from './distopiaElements.js'
+import {STYLES, UI_CONSTANTS} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
 
 var SELF;
@@ -143,8 +143,8 @@ export class StateView {
 		}
 		if(!this.drawn){ this.drawStatePolygons(); }
 
-		const labelText = HIST_LABELS[this.metricFocus]["labelText"];
-		const histLabel = HIST_LABELS[this.metricFocus]["histLabel"];
+		const labelText = UI_CONSTANTS[this.metricFocus].labelText;
+		const histLabel = UI_CONSTANTS[this.metricFocus].histLabel;
 		
 
 		d3.select("#label_area").append("text").text(labelText).attr("class", "label")

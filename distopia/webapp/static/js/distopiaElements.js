@@ -95,45 +95,6 @@ export var UI_CONSTANTS = {
 	}	
 }
 
-export var HIST_LABELS = {
-	"age": {
-		labelText: "Median Age per District",
-		histLabel: "Age Distribution per District",
-	},
-	"education": {
-		labelText: "% of Population with a Bachelor's Degree per District",
-		histLabel: "Educational Attainment per District",
-	},
-	"income": {
-		labelText: "Median Income per District",
-		histLabel: "Income Distribution per District",
-	},
-	"occupation": {
-		labelText: "% Employed per District",
-		histLabel: "Occupation Sector Distribution per District",
-	},
-	"population": {
-		labelText: "Population per District",
-		histLabel: "Total Population vs. Voting Population",
-	},
-	"projected_votes": {
-		labelText: "Partisan Lean per District",
-		histLabel: "Partisan Breakdown per District",
-	},
-	"race":{
-		labelText: "% Minority population per District",
-		histLabel: "Non-White Racial Distribution per District",
-	},
-	"pvi":{
-		labelText: "# Wasted Votes",
-		histLabel: "This Plot is Under Construction",
-	},
-	"compactness": {
-		labelText: "How Regular Shapes Are",
-		histLabel: "This Plot is Under Construction",
-	}
-}
-
 export const STYLES = {
 	"race": {
 		colors:{
