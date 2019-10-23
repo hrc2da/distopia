@@ -95,44 +95,6 @@ export var UI_CONSTANTS = {
 	}	
 }
 
-export var DOMAIN = {
-	"age": {
-		domain: [35,55],
-		label: "years old"
-	},
-	"education": {
-		domain: [0, 1],
-		label: "College Educated"
-	},
-	"income": {
-		domain: [35000, 70000],
-		label: "annual income"
-	},
-	"occupation": {
-		domain: [0.45,0.55],
-		label: "employed"
-	},
-	"population": {
-		domain: [0,3000000],
-		label: "voters"
-	},
-	"projected_votes": {
-		domain: [0, 1],
-		label: "Democrat"
-	},
-	"race":{
-		domain: [0,1],
-		label: "Non-white"
-	},
-	"pvi":{
-		domain: [0,200000],
-		label: "Wasted Votes"
-	},
-	"compactness": {
-		domain: [0,1],
-		label: "Compactness"
-	}
-}
 export var HIST_LABELS = {
 	"age": {
 		labelText: "Median Age per District",

@@ -3,7 +3,7 @@
 	==========
 	A statewide view of a selected metric, with a heatmap and a set of histograms
 */
-import {DOMAIN,HIST_LABELS, STYLES, UI_CONSTANTS} from './distopiaElements.js'
+import {HIST_LABELS, STYLES, UI_CONSTANTS} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
 
 var SELF;
@@ -161,7 +161,7 @@ export class StateView {
 
 		districtData.forEach((district, i) => {
 			let distX_min = 1000000, distX_max = 0, distY_min = 1000000, distY_max = 0;
-			let scale = UI_CONSTANTS[this.metricFocus]["scale"];
+			let scale = UI_CONSTANTS[this.metricFocus].scale;
 			let f = scale([district.scalar_value, district.scalar_maximum]);
 			district.precincts.forEach((precinct) => {
 				this.counties[precinct].fill = f;
@@ -181,8 +181,8 @@ export class StateView {
 		let key_height = parseFloat(d3.select("#scale").style("height"));
 		let key_width = parseFloat(d3.select("#scale").style("width"));
 	
-		let scale = UI_CONSTANTS[this.metricFocus]["scale"];
-		let domain = DOMAIN[this.metricFocus].domain;
+		let scale = UI_CONSTANTS[this.metricFocus].scale;
+		let domain = UI_CONSTANTS[this.metricFocus].domain;
 		let step = (domain[domain.length-1] - domain[0])/5;
 
 		key.append("rect").attr("width", 6 * (key_height - 40)).attr("height", key_height - 40)
@@ -191,26 +191,26 @@ export class StateView {
 		
 		if(domain[1] <= 1){
 			key.append("text").attr("x", (key_height - 40)/2).attr("y", key_height - 16)
-				.text(parseInt(domain[0] * 100) + "% " + DOMAIN[this.metricFocus].label)
+				.text(parseInt(domain[0] * 100) + "% " + UI_CONSTANTS[this.metricFocus].label)
 				.attr("text-anchor", "middle").attr("alignment-baseline", "middle");
 			key.append("text").attr("x", 5.5 * (key_height - 40)).attr("y", key_height - 16)
-				.text(parseInt(domain[domain.length-1] * 100) + "% " + DOMAIN[this.metricFocus].label)
+				.text(parseInt(domain[domain.length-1] * 100) + "% " + UI_CONSTANTS[this.metricFocus].label)
 				.attr("text-anchor", "middle").attr("alignment-baseline", "middle");
 		}
 		else if (domain[1] == 70000){
 			key.append("text").attr("x", (key_height - 40)/2).attr("y", key_height - 16)
-				.text("$" + parseInt(domain[0]) + " " + DOMAIN[this.metricFocus].label)
+				.text("$" + parseInt(domain[0]) + " " + UI_CONSTANTS[this.metricFocus].label)
 				.attr("text-anchor", "middle").attr("alignment-baseline", "middle");
 			key.append("text").attr("x", 5.5 * (key_height - 40)).attr("y", key_height - 16)
-				.text("$" + parseInt(domain[domain.length-1]) + " " + DOMAIN[this.metricFocus].label)
+				.text("$" + parseInt(domain[domain.length-1]) + " " + UI_CONSTANTS[this.metricFocus].label)
 				.attr("text-anchor", "middle").attr("alignment-baseline", "middle");
 		}
 		else{
 			key.append("text").attr("x", (key_height - 40)/2).attr("y", key_height - 16)
-				.text(parseInt(domain[0]) + " " + DOMAIN[this.metricFocus].label)
+				.text(parseInt(domain[0]) + " " + UI_CONSTANTS[this.metricFocus].label)
 				.attr("text-anchor", "middle").attr("alignment-baseline", "middle");
 			key.append("text").attr("x", 5.5 * (key_height - 40)).attr("y", key_height - 16)
-				.text(parseInt(domain[domain.length-1]) + " " + DOMAIN[this.metricFocus].label)
+				.text(parseInt(domain[domain.length-1]) + " " + UI_CONSTANTS[this.metricFocus].label)
 				.attr("text-anchor", "middle").attr("alignment-baseline", "middle");
 		}
 		
