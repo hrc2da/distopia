@@ -3,7 +3,7 @@
 	==========
 	A statewide view of a selected metric, with a heatmap and a set of histograms
 */
-import {DOMAIN, SCALE, STYLES} from './distopiaElements.js'
+import {DOMAIN,HIST_LABELS, SCALE, STYLES} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
 
 var SELF;
@@ -143,43 +143,9 @@ export class StateView {
 		}
 		if(!this.drawn){ this.drawStatePolygons(); }
 
-		let labelText = "", histLabel = "";
-		if(this.metricFocus == "age"){
-			labelText = "Median Age per District";
-			histLabel = "Age Distribution per District";
-		}
-		else if(this.metricFocus == "education"){
-			labelText = "% of Population with a Bachelor's Degree per District";
-			histLabel = "Educational Attainment per District";
-		}
-		else if(this.metricFocus == "income"){
-			labelText = "Median Income per District";
-			histLabel = "Income Distribution per District";
-		}
-		else if(this.metricFocus == "occupation"){
-			labelText = "% Employed per District";
-			histLabel = "Occupation Sector Distribution per District";
-		}
-		else if(this.metricFocus == "population"){
-			labelText = "Population per District";
-			histLabel = "Total Population vs. Voting Population";
-		}
-		else if(this.metricFocus == "projected_votes"){
-			labelText = "Partisan Lean per District";
-			histLabel = "Partisan Breakdown per District";
-		}
-		else if(this.metricFocus == "race"){
-			labelText = "% Minority population per District";
-			histLabel = "Non-White Racial Distribution per District";
-		}
-		else if(this.metricFocus == "pvi"){
-			labelText = "# Wasted Votes";
-			histLabel = "This Plot is Under Construction";
-		}
-		else if(this.metricFocus == "compactness"){
-			labelText = "How Regular Shapes Are";
-			histLabel = "This Plot is Under Construction";
-		}
+		const labelText = HIST_LABELS[this.metricFocus]["labelText"];
+		const histLabel = HIST_LABELS[this.metricFocus]["histLabel"];
+		
 
 		d3.select("#label_area").append("text").text(labelText).attr("class", "label")
 			.attr("x", parseFloat(d3.select("#label_area").style("width"))/2)
