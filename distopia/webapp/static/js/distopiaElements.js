@@ -134,10 +134,6 @@ export var HIST_LABELS = {
 	}
 }
 
-export const METRICS = ["age","education","income","occupation","population","projected_votes","race","sex"]
-
-export const METRIC_TYPE = ["histogram","histogram","histogram","histogram","histogram","histogram","histogram","histogram"]
-
 export const STYLES = {
 	"race": {
 		colors:{

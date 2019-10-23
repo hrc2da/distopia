@@ -6,7 +6,9 @@
 
 import {DistrictView} from "./districtView.js";
 import {StateView} from "./stateView.js";
-import {METRICS, UI_CONSTANTS} from "./distopiaElements.js";
+import {UI_CONSTANTS} from "./distopiaElements.js";
+
+const METRICS = Object.keys(UI_CONSTANTS);
 
 var MIN_X, MIN_Y, MAX_X, MAX_Y;
 

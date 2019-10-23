@@ -3,8 +3,9 @@
 	=============
 	Wrapper for the district level "baseball card" view
 */
-import {METRIC_TYPE} from './distopiaElements.js'
+
 import Histogram from "./viz/histogram.js";
+const METRIC_TYPE = ["histogram","histogram","histogram","histogram","histogram","histogram","histogram","histogram"]
 
 export class DistrictView {
 	constructor(districtId = 0){
