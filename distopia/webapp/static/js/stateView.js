@@ -3,7 +3,7 @@
 	==========
 	A statewide view of a selected metric, with a heatmap and a set of histograms
 */
-import {STYLES, UI_CONSTANTS} from './distopiaElements.js'
+import {UI_CONSTANTS} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
 
 var SELF;
@@ -40,7 +40,7 @@ export class StateView {
 			const focusedData = this.filterByFocusMetric(initData);
 			for(var i = 0; i < 8; i++){
 				d3.select("#" + "dist" + (i+1)).append("text").attr("x", 10).attr("y", 10).text("District " + i);
-				this.histograms.push(new Histogram("#" + "dist" + (i+1), focusedData[i].data, focusedData[i].labels, styles[this.metricFocus],max));
+				this.histograms.push(new Histogram("#" + "dist" + (i+1), focusedData[i].data, focusedData[i].labels, {colors: UI_CONSTANTS[this.metricFocus].colors}, max));
 			}
 		}
 	}
@@ -105,7 +105,7 @@ export class StateView {
 		console.log(this.metricFocus);
 		if(this.metricFocus == "population"){ max = 3000000; }
 		for(var i = 0; i < this.histograms.length; i++){
-			this.histograms[i].update(data[i].data, data[i].labels, STYLES[this.metricFocus], max);
+			this.histograms[i].update(data[i].data, data[i].labels, {colors:UI_CONSTANTS[this.metricFocus].colors}, max);
 		}
 	}
 
@@ -138,7 +138,7 @@ export class StateView {
 		if(this.histograms.length == 0){
 			for(var i = 0; i < 8; i++){
 				d3.select("#" + "dist" + (i+1)).append("text").attr("x", 10).attr("y", 15).text("District " + i);
-				this.histograms.push(new Histogram("#" + "dist" + (i+1), districtData[i].data, districtData[i].labels, STYLES[this.metricFocus], max));
+				this.histograms.push(new Histogram("#" + "dist" + (i+1), districtData[i].data, districtData[i].labels, {colors: UI_CONSTANTS[this.metricFocus].colors}, max));
 			}
 		}
 		if(!this.drawn){ this.drawStatePolygons(); }
