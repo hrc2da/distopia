@@ -30,9 +30,11 @@ var State = {
 
 
 function updateState(newState){
-	// need to add in some kind of hashing
-	if (State != newState){
-		State = newState;
+	if (State.metricFocus != newState.metricFocus){
+		// do something 
+		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
+	}
+	if (State.blocks != newState.blocks){
 		d3.json('http://localhost:5000/evaluate', {
       	method:"POST",
       	body: JSON.stringify({
@@ -48,6 +50,7 @@ function updateState(newState){
 			// distopia.stateView.update(data,State.metricFocus);
 		})
 	}
+	State = newState;
 }
 
 // used for autobinding
@@ -152,6 +155,7 @@ export class DistopiaInterface{
 			option.text = METRICS[i];
 			metricSelector.options.add(option, i);
 		}
+		metricSelector.value = "population";
 	}
 
 	updateView(data){
@@ -186,7 +190,13 @@ export class DistopiaInterface{
 	}
 
 	handleCommand(message){
-		const messageData = JSON.parse(message.data);
+		var messageData;
+		if (!isWebApp){
+			messageData = JSON.parse(message.data);
+		}
+		else{
+			messageData = message;
+		}
 		if(messageData.cmd == "focus_state"){
 			if(SELF.stateView.getMetricFocus() != messageData.param){
 				SELF.stateView.update(SELF.districts,messageData.param);	
