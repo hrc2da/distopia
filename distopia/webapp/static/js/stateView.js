@@ -5,7 +5,6 @@
 */
 import {UI_CONSTANTS} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
-import {dragElement1} from "./distopiaInterface.js"
 
 var SELF;
 
@@ -178,9 +177,6 @@ export class StateView {
 				.text(i+1)
 				.call(d3.drag().on("start", () => { d3.select('#marker1').classed("dragging", true); d3.event.on("end", () =>{d3.select("#marker1").attr("x",d3.event.x).attr("y",d3.event.y);})}));//))
 		});
-
-		
-		//dragElement1(document.getElementsByClassName("dist_label"));
 
 		let key = d3.select("#scale").append("g").attr("class", "key");
 		
