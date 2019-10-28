@@ -37,8 +37,8 @@ function updateState(newState){
 		d3.json('http://localhost:5000/evaluate', {
       	method:"POST",
       	body: JSON.stringify({
-		  "blocks": State.blocks,
-		  "packet_count": State.packetCount
+		  "blocks": newState.blocks,
+		  "packet_count": newState.packetCount
       	}),
       	headers: {
         "Content-type": "application/json; charset=UTF-8"
@@ -64,9 +64,9 @@ function initState(){
 			6: [[818,26]],
 			7: [[823,135]]
 			},
-			"packetCount": 0,
-			"metricFocus": "population"
-			}
+		"packetCount": 0,
+		"metricFocus": "population"
+		}
 	);
 }
 
