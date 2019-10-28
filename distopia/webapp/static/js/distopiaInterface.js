@@ -28,7 +28,6 @@ var State = {
  	"metricFocus": "population"
 }
 
-
 function updateState(newState){
 	if (State.metricFocus != newState.metricFocus){
 		// do something 
@@ -51,6 +50,24 @@ function updateState(newState){
 		})
 	}
 	State = newState;
+}
+
+function initState(){
+	updateState({
+		"blocks": {
+			0: [[263,678],[261,330]],
+			1: [[603,206],[708,188]],
+			2: [[765,385],[588,430],[488,530]],
+			3: [[473,185],[383,530],[375,640],[505,356]],
+			4: [[755,576],[838,371]],
+			5: [[733,113],[483,46]],
+			6: [[818,26]],
+			7: [[823,135]]
+			},
+			"packetCount": 0,
+			"metricFocus": "population"
+			}
+	);
 }
 
 // used for autobinding
@@ -138,6 +155,9 @@ export class DistopiaInterface{
 	initInteractive(){
 		const updateButton = document.getElementById("test_button");
 		updateButton.onclick = () => this.listener();
+
+		const centroidAddButton = document.getElementById("add_centroid");
+		centroidAddButton.onclick = () => addCentroid();
 
 		const metricSelector = document.getElementById("metric_selector");
 		metricSelector.onchange = () => {
@@ -281,7 +301,7 @@ export class DistopiaInterface{
 			4: [[755,576],[838,371]],
 			5: [[733,113],[483,46]],
 			6: [[818,26]],
-			7: [[823,135]]
+			7: [[823,135]],
 			},
 			"packetCount": 0,
 			"metricFocus": "population"
@@ -319,7 +339,7 @@ export class DistopiaInterface{
 			return this.counties[id];
 		}
 		else { return false; }
-	}
+}
 
 	getView(){
 		return this.currentView;
@@ -334,4 +354,65 @@ export class DistopiaInterface{
 		return this.counties;
 	}
 }
+
+// centroid logic:
+function addCentroid(){
+	console.log('adding centroid');
+	const state = document.getElementById("state-view");
+	var centroid = document.createElement("div");
+	const text = document.createTextNode("This is a paragraph.");
+	centroid.appendChild(text);
+	document.body.appendChild(centroid);
+	centroid.setAttribute("id","centroid");
+
+
+
+	// dragElement(centroid);
+}
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id)) {
+    // if present, the header is where you move the DIV from:
+    document.getElementById(elmnt.id).onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+}
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+
+
+
+
 export var distopia = new DistopiaInterface();
+

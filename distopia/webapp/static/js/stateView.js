@@ -115,14 +115,12 @@ export class StateView {
 		d3.selectAll(".label").remove();
 		d3.selectAll(".key").remove();
 		//update the viz. Note that the
-		console.log(metric);
 		if(metric != undefined){
 			if(metric != this.metric){
 				this.setMetricFocus(metric);
 			}
 		}
 		if(data.length < 8){ return; }
-		
 		let bounds = [];
 
 		data.forEach((district) => {
@@ -141,6 +139,7 @@ export class StateView {
 				this.histograms.push(new Histogram("#" + "dist" + (i+1), districtData[i].data, districtData[i].labels, {colors: UI_CONSTANTS[this.metricFocus].colors}, max));
 			}
 		}
+
 		if(!this.drawn){ this.drawStatePolygons(); }
 
 		const labelText = UI_CONSTANTS[this.metricFocus].labelText;
@@ -170,6 +169,7 @@ export class StateView {
 				if(distY_min > this.counties[precinct].y[0]){ distY_min = this.counties[precinct].y[0]; }
 				if(distY_max < this.counties[precinct].y[1]){ distY_max = this.counties[precinct].y[1]; }
 			});
+			// district labels - not to be confused with centroids
 			this.stateDiv.append("text").attr("class", "dist_label")
 				.attr("x", this.xScale(distX_min + (distX_max-distX_min)/2))
 				.attr("y", this.yScale(distY_min + (distY_max-distY_min)/2))
