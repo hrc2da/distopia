@@ -10,6 +10,7 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*		blocks: {Number: Array<Array<Number>>},
 	*		packetCount: Number,
 	*		metricFocus: string,
+	*       selectedDistrict: Number,
 	*       centroids: {"id": Number}
 	*	}}
 	*/
@@ -18,6 +19,7 @@ var State = {
 	"packetCount": null,
 	// TODO - figure out why this cannot be set to empty string
 	 "metricFocus": "population",
+	 "selectedDistrict": 1,
 	 "centroids": {},
 }
 
@@ -55,14 +57,13 @@ function initInteractive(){
 
     const metricSelector = document.getElementById("metric_selector");
     metricSelector.onchange = () => {
-        console.log('selector changed');
-        const newSelectedMetric = document.getElementById("metric_selector").value;
-        console.log(newSelectedMetric);
+        const newSelectedMetric = metricSelector.value;
         updateState({
             "blocks": State.blocks,
             "packetCount": State.packetCount,
 			"metricFocus": newSelectedMetric,
 			"centroids": State.centroids,
+			"selectedDistrict": State.selectedDistrict
         });
 	}
 	// add options for the metric filter
@@ -71,7 +72,30 @@ function initInteractive(){
         option.text = METRICS[i];
         metricSelector.options.add(option, i);
     }
-    metricSelector.value = "population";
+	metricSelector.value = State.metricFocus;
+	
+	// set up district selector
+	const districtSelector = document.getElementById("district_selector");
+	districtSelector.onchange = () =>
+	{
+		const newSelectedDistrict = districtSelector.value;
+		updateState({
+			"blocks": State.blocks,
+			"packetCount": State.packetCount,
+			"metricFocus": State.metricFocus,
+			"centroids": State.centroids,
+			"selectedDistrict": newSelectedDistrict,
+		})
+	}
+
+	// add options for the metric filter
+	for (let i = 1; i < 9; i++){
+		const option = document.createElement("option");
+		option.text = i;
+		districtSelector.options.add(option, i);
+	}
+	districtSelector.value = State.selectedDistrict;
+
 }
 
 function initState(){
@@ -89,6 +113,7 @@ function initState(){
 			},
 		"packetCount": 0,
 		"metricFocus": "population",
+		"selectedDistrict": 1,
 		"centroids": {}
 		}
 	);
@@ -98,21 +123,24 @@ function initState(){
 function addCentroid(){
 	const stateDiv = d3.select("#state");
 	const {height,width, xScale, yScale} = distopia.stateView;
-	// if there is one object inside --> new object will have id marker2:
+
 	const id = "marker" + Object.keys(State.centroids).length;
-	console.log(id);
+	const idSelector = "#"+id;
 
 	stateDiv.append("text").attr("class", "dist_label")
 	.attr("x", xScale(height/2))
 	.attr("y", yScale(width/2))
 	.attr("id", id)
-	.text(1)
+	.text(State.selectedDistrict)
 	.call(d3.drag().on("start", () => { 
-		d3.select("#"+id).classed("dragging", true); 
+		d3.select(idSelector).classed("dragging", true); 
+		d3.event.on("drag", () =>{
+			d3.select(idSelector).attr("x",d3.event.x).attr("y",d3.event.y);
+		});
 		d3.event.on("end", () =>{
-			d3.select("#"+id).attr("x",d3.event.x).attr("y",d3.event.y);
+			d3.select(idSelector).attr("x",d3.event.x).attr("y",d3.event.y);
 		});
 	}
 	));
-	State.centroids[id] = 1;
+	State.centroids[id] = State.selectedDistrict;
 }

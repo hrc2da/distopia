@@ -169,13 +169,15 @@ export class StateView {
 				if(distY_min > this.counties[precinct].y[0]){ distY_min = this.counties[precinct].y[0]; }
 				if(distY_max < this.counties[precinct].y[1]){ distY_max = this.counties[precinct].y[1]; }
 			});
+			// this code was used to indicate the number of the districts previously
+			// may be confusing with the centroids also on the screen
+
 			// district labels - not to be confused with centroids
 			// this.stateDiv.append("text").attr("class", "dist_label")
 			// 	.attr("x", this.xScale(distX_min + (distX_max-distX_min)/2))
 			// 	.attr("y", this.yScale(distY_min + (distY_max-distY_min)/2))
 			// 	.attr("id", "marker"+(i+1))
 			// 	.text(i+1)
-			// 	.call(d3.drag().on("start", () => { d3.select('#marker1').classed("dragging", true); d3.event.on("end", () =>{d3.select("#marker1").attr("x",d3.event.x).attr("y",d3.event.y);})}));//))
 		});
 
 		let key = d3.select("#scale").append("g").attr("class", "key");
