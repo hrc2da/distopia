@@ -127,6 +127,16 @@ function addCentroid(){
 	const id = "marker" + Object.keys(State.centroids).length;
 	const idSelector = "#"+id;
 
+
+	const endDrag = () => {
+		d3.select(idSelector).attr("x",d3.event.x).attr("y",d3.event.y);
+		// check if min 8 centroids are present and if so call agent
+		if (Object.keys(State.centroids).length >= 8){
+			createBlocksFromCentroids();
+			// console.log('has 8 centroids');
+		}
+	}
+
 	stateDiv.append("text").attr("class", "dist_label")
 	.attr("x", xScale(height/2))
 	.attr("y", yScale(width/2))
@@ -137,10 +147,29 @@ function addCentroid(){
 		d3.event.on("drag", () =>{
 			d3.select(idSelector).attr("x",d3.event.x).attr("y",d3.event.y);
 		});
-		d3.event.on("end", () =>{
-			d3.select(idSelector).attr("x",d3.event.x).attr("y",d3.event.y);
-		});
+		d3.event.on("end", endDrag);
 	}
 	));
 	State.centroids[id] = State.selectedDistrict;
+}
+
+function createBlocksFromCentroids(){
+	const{centroids} = State;
+
+	const basicBlocks = {0: [], 1: [], 2:[], 3:[], 4:[], 5:[], 6: [], 7: []};
+	// map centroids into the blocks
+	const centroidKeys = Object.keys(centroids);
+	console.log(centroidKeys);
+	centroidKeys.forEach(element => {
+		const centroidDistrict = centroids[element]-1;
+		const centroid = document.getElementById(element);
+		basicBlocks[centroidDistrict].push([centroid.left, centroid.top])
+	});
+	updateState({
+		"blocks": basicBlocks,
+		"packetCount": State.packetCount,
+		"metricFocus": State.metricFocus,
+		"selectedDistrict": State.selectedDistrict,
+		"centroids": State.centroids,
+	});
 }
