@@ -5,11 +5,26 @@ import json
 import roslibpy
 import time
 
-filename = "/home/dev/research/distopia/logs/logs/-1.0,0.0,0.0,0.0,0.0,0.0,0.0_log"
+# filename = "/home/dev/research/distopia/logs/logs/-1.0,0.0,0.0,0.0,0.0,0.0,0.0_log"
+filename = "/<PUT THE PATH HERE>/logfile.json"
 
 ros = roslibpy.Ros(host="localhost", port=9090)
 ros.run()
 publisher = roslibpy.Topic(ros, '/fiducial_layout', 'std_msgs/String')
+
+
+
+
+
+# with open(filename) as logfile:
+#     i = 0
+#     for row in logfile:
+#         i += 1
+#         if i % 20 == 0:
+#             design = eval(row)[3]
+#             publisher.publish(roslibpy.Message({'data':json.dumps(design)}))
+#             print("publishing {}".format(i))
+#         time.sleep(0.01)
 
 
 with open(filename) as logfile:
@@ -17,7 +32,13 @@ with open(filename) as logfile:
     for row in logfile:
         i += 1
         if i % 20 == 0:
-            design = eval(row)[3]
+            design = {i:[] for i in range(8)}
+            row_fiducials = row["fiducials"]["fiducials"]
+            if len(row_fiducials) == 0:
+                continue
+            for rf in row_fiducials:
+                fid = rf["fid"]
+                design[fid].append([rf[x],rf[y]])
             publisher.publish(roslibpy.Message({'data':json.dumps(design)}))
             print("publishing {}".format(i))
         time.sleep(0.01)
