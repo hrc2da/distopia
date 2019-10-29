@@ -21,6 +21,7 @@ var State = {
 
 var distopia = new DistopiaInterface({initialView: "state", "metricFocus": State.metricFocus});
 initInteractive();
+initState();
 
 function updateState(newState){
 	if (State.metricFocus != newState.metricFocus){
@@ -46,9 +47,6 @@ function updateState(newState){
 }
 
 function initInteractive(){
-    const updateButton = document.getElementById("test_button");
-    updateButton.onclick = () => listener();
-
     const centroidAddButton = document.getElementById("add_centroid");
     centroidAddButton.onclick = () => addCentroid();
 
