@@ -115,7 +115,9 @@ export class DistopiaInterface{
 		SELF.districts = messageData.districts;
 		if(SELF.getView() == "state"){
 			if(SELF.stateView == null){ SELF.stateView = new StateView(SELF.districts); }
-			else{ SELF.stateView.update(SELF.districts); }
+			else{ 
+				console.log('update districts');
+				SELF.stateView.update(SELF.districts); }
 		}
 		else{
 			if(SELF.districtView == null){ SELF.districtView = new DistrictView(SELF.districts); }
