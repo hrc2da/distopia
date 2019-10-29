@@ -11,7 +11,7 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*		packetCount: Number,
 	*		metricFocus: string,
 	*       selectedDistrict: Number,
-	*       centroids: {"id": Number}
+	*       centroids: {"id": {"district": Number, "coordinates": [Number,Number]}},
 	*	}}
 	*/
 var State = {
@@ -34,6 +34,7 @@ function updateState(newState){
 		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
 	}
 	if (State.blocks != newState.blocks){
+		console.log('backend req');
 		d3.json('http://localhost:5000/evaluate', {
       	method:"POST",
       	body: JSON.stringify({
@@ -129,7 +130,8 @@ function addCentroid(){
 
 
 	const endDrag = () => {
-		d3.select(idSelector).attr("x",d3.event.x).attr("y",d3.event.y);
+		d3.select(idSelector).attr("x", d3.event.x).attr("y", d3.event.y);
+		State.centroids[id]["coordinates"] = [d3.event.x, d3.event.y];
 		// check if min 8 centroids are present and if so call agent
 		if (Object.keys(State.centroids).length >= 8){
 			createBlocksFromCentroids();
@@ -150,7 +152,9 @@ function addCentroid(){
 		d3.event.on("end", endDrag);
 	}
 	));
-	State.centroids[id] = State.selectedDistrict;
+	// need to init the object before goign one level deeper
+	State.centroids[id] = {};
+	State.centroids[id]["district"] = State.selectedDistrict;
 }
 
 function createBlocksFromCentroids(){
@@ -159,12 +163,14 @@ function createBlocksFromCentroids(){
 	const basicBlocks = {0: [], 1: [], 2:[], 3:[], 4:[], 5:[], 6: [], 7: []};
 	// map centroids into the blocks
 	const centroidKeys = Object.keys(centroids);
-	console.log(centroidKeys);
 	centroidKeys.forEach(element => {
-		const centroidDistrict = centroids[element]-1;
-		const centroid = document.getElementById(element);
-		basicBlocks[centroidDistrict].push([centroid.left, centroid.top])
+		const centroidDistrict = centroids[element].district-1;
+		const centroidLeft = centroids[element].coordinates[0];
+		const centroidRight = centroids[element].coordinates[1];
+		console.log(centroidLeft,centroidRight);
+		basicBlocks[centroidDistrict].push([centroidLeft, centroidRight])
 	});
+	console.log(basicBlocks);
 	updateState({
 		"blocks": basicBlocks,
 		"packetCount": State.packetCount,
