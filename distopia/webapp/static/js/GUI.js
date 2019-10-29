@@ -10,13 +10,15 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*		blocks: {Number: Array<Array<Number>>},
 	*		packetCount: Number,
 	*		metricFocus: string,
+	*       centroids: {"id": Number}
 	*	}}
 	*/
 var State = {
 	"blocks": {},
 	"packetCount": null,
 	// TODO - figure out why this cannot be set to empty string
- 	"metricFocus": "population"
+	 "metricFocus": "population",
+	 "centroids": {},
 }
 
 // initializations
@@ -59,9 +61,11 @@ function initInteractive(){
         updateState({
             "blocks": State.blocks,
             "packetCount": State.packetCount,
-            "metricFocus": newSelectedMetric,
+			"metricFocus": newSelectedMetric,
+			"centroids": State.centroids,
         });
-    }
+	}
+	// add options for the metric filter
     for (let i = 0; i < METRICS.length; i++){
         const option = document.createElement("option");
         option.text = METRICS[i];
@@ -71,6 +75,7 @@ function initInteractive(){
 }
 
 function initState(){
+	// currently set with a hardcoded state
 	updateState({
 		"blocks": {
 			0: [[263,678],[261,330]],
@@ -83,18 +88,20 @@ function initState(){
 			7: [[823,135]]
 			},
 		"packetCount": 0,
-		"metricFocus": "population"
+		"metricFocus": "population",
+		"centroids": {}
 		}
 	);
 }
 
 // centroid logic:
 function addCentroid(){
-	console.log('adding centroid');
-	const state = document.getElementById("state-view");
-	var centroid = document.createElement("div");
-	const text = document.createTextNode("This is a paragraph.");
-	centroid.appendChild(text);
-	document.body.appendChild(centroid);
-	centroid.setAttribute("id","centroid");
+	const stateDiv = d3.select("#state");
+	const {height,width, xScale, yScale} = distopia.stateView;
+	stateDiv.append("text").attr("class", "dist_label")
+	.attr("x", xScale(height/2))
+	.attr("y", yScale(width/2))
+	.attr("id", "marker1")
+	.text(1)
+	.call(d3.drag().on("start", () => { d3.select('#marker1').classed("dragging", true); d3.event.on("end", () =>{d3.select("#marker1").attr("x",d3.event.x).attr("y",d3.event.y);})}));//))
 }
