@@ -108,7 +108,7 @@ export class DistopiaInterface{
 	handleData(message){
 		//check the counter
 		const messageData = JSON.parse(message.data);
-		if(messageData.count <= SELF.counter){
+		if(messageData.count <= SELF.counter && !isWebApp){
 			return;
 		}
 		SELF.counter = messageData.count;
