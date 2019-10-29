@@ -98,10 +98,21 @@ function initState(){
 function addCentroid(){
 	const stateDiv = d3.select("#state");
 	const {height,width, xScale, yScale} = distopia.stateView;
+	// if there is one object inside --> new object will have id marker2:
+	const id = "marker" + Object.keys(State.centroids).length;
+	console.log(id);
+
 	stateDiv.append("text").attr("class", "dist_label")
 	.attr("x", xScale(height/2))
 	.attr("y", yScale(width/2))
-	.attr("id", "marker1")
+	.attr("id", id)
 	.text(1)
-	.call(d3.drag().on("start", () => { d3.select('#marker1').classed("dragging", true); d3.event.on("end", () =>{d3.select("#marker1").attr("x",d3.event.x).attr("y",d3.event.y);})}));//))
+	.call(d3.drag().on("start", () => { 
+		d3.select("#"+id).classed("dragging", true); 
+		d3.event.on("end", () =>{
+			d3.select("#"+id).attr("x",d3.event.x).attr("y",d3.event.y);
+		});
+	}
+	));
+	State.centroids[id] = 1;
 }
