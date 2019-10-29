@@ -19,6 +19,7 @@ var State = {
  	"metricFocus": "population"
 }
 
+// initializations
 var distopia = new DistopiaInterface({initialView: "state", "metricFocus": State.metricFocus});
 initInteractive();
 initState();
@@ -68,26 +69,6 @@ function initInteractive(){
     }
     metricSelector.value = "population";
 }
-
-	// callback function for interactive events
-function listener(){
-		// currently a hard-coded state update
-		const newState = {
-			"blocks": {
-			0: [[263,678],[261,330]],
-			1: [[603,206],[708,188]],
-			2: [[765,385],[588,430],[488,530]],
-			3: [[473,185],[383,530],[375,640],[505,356]],
-			4: [[755,576],[838,371]],
-			5: [[733,113],[483,46]],
-			6: [[818,26]],
-			7: [[823,135]],
-			},
-			"packetCount": 0,
-			"metricFocus": "population"
-			};
-		updateState(newState);
-	}
 
 function initState(){
 	updateState({
