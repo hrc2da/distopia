@@ -111,7 +111,7 @@ export class StateView {
 
 	update(data,metric){
 		console.log("updating");
-		d3.selectAll(".dist_label").remove();
+		//d3.selectAll(".dist_label").remove();
 		d3.selectAll(".label").remove();
 		d3.selectAll(".key").remove();
 		//update the viz. Note that the
