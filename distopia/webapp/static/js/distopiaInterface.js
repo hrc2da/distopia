@@ -6,69 +6,8 @@
 
 import {DistrictView} from "./districtView.js";
 import {StateView} from "./stateView.js";
-import {UI_CONSTANTS} from "./distopiaElements.js";
-
-const METRICS = Object.keys(UI_CONSTANTS);
 
 var MIN_X, MIN_Y, MAX_X, MAX_Y;
-
-// current State of the data - not to be confused with the state ex: Wisconsin
-// for metric Focus instead of string we want to type it as a union instead of any string
-/** 
-* @typedef {{
-	*		blocks: {Number: Array<Array<Number>>},
-	*		packetCount: Number,
-	*		metricFocus: string,
-	*	}}
-	*/
-var State = {
-	"blocks": {},
-	"packetCount": null,
-	// TODO - figure out why this cannot be set to empty string
- 	"metricFocus": "population"
-}
-
-function updateState(newState){
-	if (State.metricFocus != newState.metricFocus){
-		// do something 
-		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
-	}
-	if (State.blocks != newState.blocks){
-		d3.json('http://localhost:5000/evaluate', {
-      	method:"POST",
-      	body: JSON.stringify({
-		  "blocks": newState.blocks,
-		  "packet_count": newState.packetCount
-      	}),
-      	headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      	}
-		})
-		.then((data) =>{
-			distopia.handleData({data: JSON.stringify(data)});
-			// distopia.stateView.update(data,State.metricFocus);
-		})
-	}
-	State = newState;
-}
-
-function initState(){
-	updateState({
-		"blocks": {
-			0: [[263,678],[261,330]],
-			1: [[603,206],[708,188]],
-			2: [[765,385],[588,430],[488,530]],
-			3: [[473,185],[383,530],[375,640],[505,356]],
-			4: [[755,576],[838,371]],
-			5: [[733,113],[483,46]],
-			6: [[818,26]],
-			7: [[823,135]]
-			},
-		"packetCount": 0,
-		"metricFocus": "population"
-		}
-	);
-}
 
 // used for autobinding
 var SELF;
@@ -81,7 +20,9 @@ export class DistopiaInterface{
 		It contains the ROS initialization and listener callbacks
 		It also initializes the state and district views.						
 	*/
-	constructor(initialView = "state"){
+	constructor(arg = {initialView: "state", metricFocus: "population"}){
+		var initialView = arg.initialView
+		var metricFocus = arg.metricFocus
 		this.districtIDs = [0, 1, 2, 3, 4, 5, 6, 7];
 		this.counter = 0;
 		this.districts = [];
@@ -92,13 +33,12 @@ export class DistopiaInterface{
 			this.initControlListener();
 		}
 		this.setupCounties();
-		this.initInteractive();
 
 		SELF = this;
 
 		//initializes stateView and districtView classes as null variables
 		//(easy way to check if they need to be initialized)
-		this.stateView = new StateView(null, State.metricFocus, this.counties);
+		this.stateView = new StateView(null, metricFocus, this.counties);
 		//this.districtView = new DistrictView(null);
 
 		this.currentView = initialView;
@@ -150,32 +90,6 @@ export class DistopiaInterface{
 			messageType : 'std_msgs/String'
 		});
 		this.controlListener.subscribe(this.handleCommand);
-	}
-
-	initInteractive(){
-		const updateButton = document.getElementById("test_button");
-		updateButton.onclick = () => this.listener();
-
-		const centroidAddButton = document.getElementById("add_centroid");
-		centroidAddButton.onclick = () => addCentroid();
-
-		const metricSelector = document.getElementById("metric_selector");
-		metricSelector.onchange = () => {
-			console.log('selector changed');
-			const newSelectedMetric = document.getElementById("metric_selector").value;
-			console.log(newSelectedMetric);
-			updateState({
-				"blocks": State.blocks,
-				"packetCount": State.packetCount,
-				"metricFocus": newSelectedMetric,
-			});
-		}
-		for (let i = 0; i < METRICS.length; i++){
-			const option = document.createElement("option");
-			option.text = METRICS[i];
-			metricSelector.options.add(option, i);
-		}
-		metricSelector.value = "population";
 	}
 
 	updateView(data){
@@ -289,26 +203,6 @@ export class DistopiaInterface{
 		});
 	}
 
-	// callback function for interactive events
-	listener(){
-		// currently a hard-coded state update
-		const newState = {
-			"blocks": {
-			0: [[263,678],[261,330]],
-			1: [[603,206],[708,188]],
-			2: [[765,385],[588,430],[488,530]],
-			3: [[473,185],[383,530],[375,640],[505,356]],
-			4: [[755,576],[838,371]],
-			5: [[733,113],[483,46]],
-			6: [[818,26]],
-			7: [[823,135]],
-			},
-			"packetCount": 0,
-			"metricFocus": "population"
-			};
-		updateState(newState);
-	}
-
 	toggleView(){
 		if(this.currentView == "state"){
 			$("#district-view").hide();
@@ -355,16 +249,6 @@ export class DistopiaInterface{
 	}
 }
 
-// centroid logic:
-function addCentroid(){
-	console.log('adding centroid');
-	const state = document.getElementById("state-view");
-	var centroid = document.createElement("div");
-	const text = document.createTextNode("This is a paragraph.");
-	centroid.appendChild(text);
-	document.body.appendChild(centroid);
-	centroid.setAttribute("id","centroid");
-}
 
-export var distopia = new DistopiaInterface();
+
 
