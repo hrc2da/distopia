@@ -35,6 +35,7 @@ function updateState(newState){
 	}
 	if (State.blocks != newState.blocks){
 		console.log('backend req');
+		console.log(newState.blocks);
 		d3.json('http://localhost:5000/evaluate', {
       	method:"POST",
       	body: JSON.stringify({
@@ -46,6 +47,7 @@ function updateState(newState){
       	}
 		})
 		.then((data) =>{
+			console.log(data);
 			distopia.handleData({data: JSON.stringify(data)});
 		})
 	}
@@ -135,7 +137,6 @@ function addCentroid(){
 		// check if min 8 centroids are present and if so call agent
 		if (Object.keys(State.centroids).length >= 8){
 			createBlocksFromCentroids();
-			// console.log('has 8 centroids');
 		}
 	}
 
@@ -144,6 +145,7 @@ function addCentroid(){
 	.attr("y", yScale(width/2))
 	.attr("id", id)
 	.text(State.selectedDistrict)
+	.style("cursor", "pointer")
 	.call(d3.drag().on("start", () => { 
 		d3.select(idSelector).classed("dragging", true); 
 		d3.event.on("drag", () =>{
@@ -151,7 +153,7 @@ function addCentroid(){
 		});
 		d3.event.on("end", endDrag);
 	}
-	));
+	))
 	// need to init the object before goign one level deeper
 	State.centroids[id] = {};
 	State.centroids[id]["district"] = State.selectedDistrict;
@@ -167,10 +169,8 @@ function createBlocksFromCentroids(){
 		const centroidDistrict = centroids[element].district-1;
 		const centroidLeft = centroids[element].coordinates[0];
 		const centroidRight = centroids[element].coordinates[1];
-		console.log(centroidLeft,centroidRight);
 		basicBlocks[centroidDistrict].push([centroidLeft, centroidRight])
 	});
-	console.log(basicBlocks);
 	updateState({
 		"blocks": basicBlocks,
 		"packetCount": State.packetCount,
