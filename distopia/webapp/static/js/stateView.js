@@ -268,7 +268,7 @@ export class StateView {
 
 		correctBounds.forEach((bounds) => {
 			this.stateDiv.append("path").attr("class", "bounds")
-				.attr("d", lineGenerator(bounds)).attr("fill", "transparent").attr("stroke", "white").attr("stroke-width", "1px");
+				.attr("d", lineGenerator(bounds)).attr("fill", "transparent").attr("stroke", "black").attr("stroke-width", "4px");
 		});
 	}
 }
