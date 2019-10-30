@@ -135,17 +135,11 @@ function addCentroid(){
 		d3.select(idSelector).attr("x", d3.event.x).attr("y", d3.event.y);
 		State.centroids[id]["coordinates"] = [d3.event.x, d3.event.y];
 		// check if min 8 centroids are present and if so call agent
-		const placedDistricts = new Set([]);
-		Object.keys(State.centroids).forEach((element)=> {
-			const district = State.centroids[id].district;
-			if (!placedDistricts.has(district)) {
-				placedDistricts.add(district);
-			}
-		});
-		if(placedDistricts.size > 4){
+		if (Object.keys(State.centroids).length >= 8){
 			createBlocksFromCentroids();
 		}
 	}
+
 
 	stateDiv.append("text").attr("class", "dist_label")
 	.attr("x", xScale(height/2))
