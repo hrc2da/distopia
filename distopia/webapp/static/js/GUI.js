@@ -130,7 +130,7 @@ function addCentroid(e){
 
 	const endDrag = () => {
 		d3.select(idSelector).attr("x", d3.event.x).attr("y", d3.event.y);
-		State.centroids[id]["coordinates"] = [d3.event.x, d3.event.y];
+		State.centroids[id]["coordinates"] = [xScale.invert(d3.event.x), yScale.invert(d3.event.y)];
 		// check if min 8 centroids are present and if so call agent
 		const districtSet = new Set([]);
 		(Object.keys(State.centroids)).forEach(key => {
@@ -163,7 +163,7 @@ function addCentroid(e){
 	// need to init the object before goign one level deeper
 	State.centroids[id] = {};
 	State.centroids[id]["district"] = State.selectedDistrict;
-	State.centroids[id]["coordinates"] = [e.x,e.y]
+	State.centroids[id]["coordinates"] = [xScale.invert(e.offsetX),yScale.invert(e.offsetY)]
 
 
 
