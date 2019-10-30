@@ -8,7 +8,6 @@ const METRICS = Object.keys(UI_CONSTANTS);
 /** 
 * @typedef {{
 	*		blocks: {Number: Array<Array<Number>>},
-	*		packetCount: Number,
 	*		metricFocus: string,
 	*       selectedDistrict: Number,
 	*       centroids: {"id": {"district": Number, "coordinates": [Number,Number]}},
@@ -16,7 +15,6 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*/
 var State = {
 	"blocks": {},
-	"packetCount": null,
 	// TODO - figure out why this cannot be set to empty string
 	 "metricFocus": "population",
 	 "selectedDistrict": 1,
@@ -41,7 +39,7 @@ function updateState(newState){
       	method:"POST",
       	body: JSON.stringify({
 		  "blocks": newState.blocks,
-		  "packet_count": newState.packetCount
+		  "packet_count": 0,
       	}),
       	headers: {
         "Content-type": "application/json; charset=UTF-8"
@@ -65,7 +63,6 @@ function initInteractive(){
         const newSelectedMetric = metricSelector.value;
         updateState({
             "blocks": State.blocks,
-            "packetCount": State.packetCount,
 			"metricFocus": newSelectedMetric,
 			"centroids": State.centroids,
 			"selectedDistrict": State.selectedDistrict
@@ -86,7 +83,6 @@ function initInteractive(){
 		const newSelectedDistrict = districtSelector.value;
 		updateState({
 			"blocks": State.blocks,
-			"packetCount": State.packetCount,
 			"metricFocus": State.metricFocus,
 			"centroids": State.centroids,
 			"selectedDistrict": newSelectedDistrict,
@@ -116,7 +112,6 @@ function initState(){
 			6: [[818,26]],
 			7: [[823,135]]
 			},
-		"packetCount": 0,
 		"metricFocus": "population",
 		"selectedDistrict": 1,
 		"centroids": {}
@@ -185,7 +180,6 @@ function createBlocksFromCentroids(){
 	});
 	updateState({
 		"blocks": basicBlocks,
-		"packetCount": State.packetCount,
 		"metricFocus": State.metricFocus,
 		"selectedDistrict": State.selectedDistrict,
 		"centroids": State.centroids,
