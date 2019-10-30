@@ -164,6 +164,19 @@ function addCentroid(e){
 	State.centroids[id] = {};
 	State.centroids[id]["district"] = State.selectedDistrict;
 	State.centroids[id]["coordinates"] = [e.x,e.y]
+
+
+
+	const districtSet = new Set([]);
+		(Object.keys(State.centroids)).forEach(key => {
+			const district = State.centroids[key].district;
+			if (!districtSet.has(district)){
+				districtSet.add(district);
+			}
+		})
+	if (districtSet.size >= 8){
+		createBlocksFromCentroids();
+	}
 }
 
 function createBlocksFromCentroids(){
