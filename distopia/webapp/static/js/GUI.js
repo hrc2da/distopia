@@ -32,6 +32,7 @@ function updateState(newState){
 	if (State.metricFocus != newState.metricFocus){
 		// do something 
 		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
+		d3.selectAll(".dist_label").raise();
 	}
 	if (State.blocks != newState.blocks){
 		console.log('backend req');
@@ -49,6 +50,7 @@ function updateState(newState){
 		.then((data) =>{
 			console.log(data);
 			distopia.handleData({data: JSON.stringify(data)});
+			d3.selectAll(".dist_label").raise();
 		})
 	}
 	State = newState;
@@ -135,7 +137,15 @@ function addCentroid(e){
 		d3.select(idSelector).attr("x", d3.event.x).attr("y", d3.event.y);
 		State.centroids[id]["coordinates"] = [d3.event.x, d3.event.y];
 		// check if min 8 centroids are present and if so call agent
-		if (Object.keys(State.centroids).length >= 8){
+		const districtSet = new Set([]);
+		(Object.keys(State.centroids)).forEach(key => {
+			const district = State.centroids[key].district;
+			if (!districtSet.has(district)){
+				districtSet.add(district);
+			}
+		})
+		// if there are at least 8 districts with centroids
+		if (districtSet.size >= 8){
 			createBlocksFromCentroids();
 		}
 	}
