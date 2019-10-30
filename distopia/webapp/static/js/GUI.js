@@ -147,8 +147,8 @@ function addCentroid(e){
 
 
 	stateDiv.append("text").attr("class", "dist_label")
-	.attr("x", e.x)
-	.attr("y", e.y)
+	.attr("x", e.offsetX)
+	.attr("y", e.offsetY)
 	.attr("id", id)
 	.text(State.selectedDistrict)
 	.style("cursor", "pointer")
