@@ -57,8 +57,8 @@ function updateState(newState){
 }
 
 function initInteractive(){
-    const centroidAddButton = document.getElementById("add_centroid");
-    centroidAddButton.onclick = () => addCentroid();
+    const centroidAddButton = document.getElementById("state");
+    centroidAddButton.onclick = (e) => addCentroid(e);
 
     const metricSelector = document.getElementById("metric_selector");
     metricSelector.onchange = () => {
@@ -125,7 +125,7 @@ function initState(){
 }
 
 // centroid logic:
-function addCentroid(){
+function addCentroid(e){
 	const stateDiv = d3.select("#state");
 	const {height,width, xScale, yScale} = distopia.stateView;
 
@@ -152,8 +152,8 @@ function addCentroid(){
 
 
 	stateDiv.append("text").attr("class", "dist_label")
-	.attr("x", xScale(height/2))
-	.attr("y", yScale(width/2))
+	.attr("x", e.x)
+	.attr("y", e.y)
 	.attr("id", id)
 	.text(State.selectedDistrict)
 	.style("cursor", "pointer")
@@ -168,6 +168,7 @@ function addCentroid(){
 	// need to init the object before goign one level deeper
 	State.centroids[id] = {};
 	State.centroids[id]["district"] = State.selectedDistrict;
+	State.centroids[id]["coordinates"] = [e.x,e.y]
 }
 
 function createBlocksFromCentroids(){
