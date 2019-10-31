@@ -88,6 +88,22 @@ function initInteractive(){
 			"selectedDistrict": newSelectedDistrict,
 		})
 	}
+	// keyboard shortcuts to select district
+	document.onkeyup = (e) => {
+		if(e.which >=49 && e.which <=56){
+			let key = e.which - 48;	
+			districtSelector.value = key;
+			updateState({
+				"blocks": State.blocks,
+				"metricFocus": State.metricFocus,
+				"centroids": State.centroids,
+				"selectedDistrict": key,
+			})	
+		}
+		else{
+			return;
+		}
+	}
 
 	// add options for the metric filter
 	for (let i = 1; i < 9; i++){
