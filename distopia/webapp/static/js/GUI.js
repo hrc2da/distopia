@@ -119,8 +119,15 @@ function initState(){
 	);
 }
 
+const removeCentroid = (id) => {
+	console.log("removing centroid ",id)
+	d3.select("#"+id).remove();
+	delete State.centroids[id];
+}
+
 // centroid logic:
 function addCentroid(e){
+	console.log("adding centroid");
 	const stateDiv = d3.select("#state");
 	const {height,width, xScale, yScale} = distopia.stateView;
 
@@ -128,7 +135,13 @@ function addCentroid(e){
 	const idSelector = "#"+id;
 
 
-	const endDrag = () => {
+	const endDrag = (d) => {
+		console.log("dragging");
+		console.log(d);
+		if(d3.event.x-d.startX < 10 && d3.event.y-d.startY < 10){
+			console.log("no drag");
+			return;
+		}
 		d3.select(idSelector).attr("x", d3.event.x).attr("y", d3.event.y);
 		State.centroids[id]["coordinates"] = [xScale.invert(d3.event.x), yScale.invert(d3.event.y)];
 		// check if min 8 centroids are present and if so call agent
@@ -152,12 +165,16 @@ function addCentroid(e){
 	.attr("id", id)
 	.text(State.selectedDistrict)
 	.style("cursor", "pointer")
+	.on("click", () => { d3.event.stopPropagation(); removeCentroid(id);})
 	.call(d3.drag().on("start", () => { 
+		var d = {};
+		d.startX = d3.event.x;
+		d.startY = d3.event.y;
 		d3.select(idSelector).classed("dragging", true); 
 		d3.event.on("drag", () =>{
 			d3.select(idSelector).attr("x",d3.event.x).attr("y",d3.event.y);
 		});
-		d3.event.on("end", endDrag);
+		d3.event.on("end", () => endDrag(d));
 	}
 	))
 	// need to init the object before goign one level deeper
