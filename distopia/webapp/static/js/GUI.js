@@ -3,6 +3,9 @@ import {UI_CONSTANTS} from "./distopiaElements.js";
 
 const METRICS = Object.keys(UI_CONSTANTS);
 
+// toggle this when swtiching between the intentions and the the original flask
+const ISTEMPLATE = false;
+
 // current State of the data - not to be confused with the state ex: Wisconsin
 // for metric Focus instead of string we want to type it as a union instead of any string
 /** 
@@ -49,7 +52,7 @@ function updateState(newState){
       	body: JSON.stringify({
 		  "blocks": newState.blocks,
 		  "packet_count": counter,
-		  "session_id": session_id
+		  "session_id": ISTEMPLATE ? session_id: null,
       	}),
       	headers: {
         "Content-type": "application/json; charset=UTF-8"
