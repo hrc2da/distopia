@@ -11,6 +11,8 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*		metricFocus: string,
 	*       selectedDistrict: Number,
 	*       centroids: {"id": {"district": Number, "coordinates": [Number,Number]}},
+	*		counter: Number,
+	*		centroid_counter: Number
 	*	}}
 	*/
 var State = {
@@ -19,6 +21,8 @@ var State = {
 	 "metricFocus": "population",
 	 "selectedDistrict": 1,
 	 "centroids": {},
+	 "counter": 0,
+	 "centroid_counter": 0
 }
 
 // initializations
@@ -27,31 +31,43 @@ initInteractive();
 initState();
 
 function updateState(newState){
-	if (State.metricFocus != newState.metricFocus){
+	if (newState.metricFocus && State.metricFocus != newState.metricFocus){
 		// do something 
 		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
 		d3.selectAll(".dist_label").raise();
 	}
-	if (State.blocks != newState.blocks){
+	if (newState.blocks && State.blocks != newState.blocks){
 		console.log('backend req');
 		console.log(newState.blocks);
+		let counter = State.counter;
+		if (typeof(counter) == 'undefined'){
+			counter = 0;
+		}
+		console.log(counter);
 		d3.json('http://localhost:5000/evaluate', {
       	method:"POST",
       	body: JSON.stringify({
 		  "blocks": newState.blocks,
-		  "packet_count": 0,
+		  "packet_count": counter,
+		  "session_id": session_id
       	}),
       	headers: {
         "Content-type": "application/json; charset=UTF-8"
       	}
 		})
 		.then((data) =>{
+			console.log("OK");
 			console.log(data);
+			newState.counter = data['count'];
 			distopia.handleData({data: JSON.stringify(data)});
 			d3.selectAll(".dist_label").raise();
+			console.log(State);
 		})
+		.catch((error)=>{
+			console.log(error);
+		});
 	}
-	State = newState;
+	State = {...State,...newState};
 }
 
 function initInteractive(){
@@ -130,7 +146,9 @@ function initState(){
 			},
 		"metricFocus": "population",
 		"selectedDistrict": 1,
-		"centroids": {}
+		"centroids": {},
+		"counter": 0,
+		"centroid_counter": 0
 		}
 	);
 }
@@ -139,6 +157,18 @@ const removeCentroid = (id) => {
 	console.log("removing centroid ",id)
 	d3.select("#"+id).remove();
 	delete State.centroids[id];
+	
+	// if there are at least 8 districts with centroids
+	const districtSet = new Set([]);
+		(Object.keys(State.centroids)).forEach(key => {
+			const district = State.centroids[key].district;
+			if (!districtSet.has(district)){
+				districtSet.add(district);
+			}
+		})
+	if (districtSet.size >= 8){
+		createBlocksFromCentroids();
+	}
 }
 
 // centroid logic:
@@ -146,15 +176,15 @@ function addCentroid(e){
 	console.log("adding centroid");
 	const stateDiv = d3.select("#state");
 	const {height,width, xScale, yScale} = distopia.stateView;
-
-	const id = "marker" + Object.keys(State.centroids).length;
+	State.centroid_counter += 1;
+	const id = "marker" + State.centroid_counter;
 	const idSelector = "#"+id;
 
 
 	const endDrag = (d) => {
 		console.log("dragging");
 		console.log(d);
-		if(d3.event.x-d.startX < 10 && d3.event.y-d.startY < 10){
+		if(d3.event.x-d.startX < 2 && d3.event.y-d.startY < 2){
 			console.log("no drag");
 			return;
 		}

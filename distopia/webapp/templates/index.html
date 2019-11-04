@@ -16,7 +16,7 @@
 
 		<!-- FONT -->
 		<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-
+		<link href="https://fonts.googleapis.com/css?family=Bad+Script|Dancing+Script|Nothing+You+Could+Do|Permanent+Marker|Rock+Salt&display=swap" rel="stylesheet">
 		<!-- CSS -->
 		<link rel="stylesheet" href="static/css/normalize.css">
 		<link rel="stylesheet" href="static/css/skeleton.css">
@@ -25,6 +25,7 @@
 		<link rel="stylesheet" type="text/css" href="static/css/style.css">
 	</head>
 	<body>
+		<span class="header"></div>DisTopia: Redistricting Design</span>
 		<div class="screen" id = "screen">
 			<div class="container" style="min-width: 98%">
 				<div class="row">
@@ -47,49 +48,24 @@
 						</div>
 					</div>
 					<div class="one-half column" style="height: 90vh">
-						<div class="row" style="height: 8vh; margin-bottom: 1%;">
-							<svg id="hist_label"></svg>
+						<div class="row" style="height: 70vh; margin-bottom: 1%; margin-top: 1%;">
+							<svg id="radar"></svg>
 						</div>
-						<div class="row" style="height: 20vh; margin-bottom: 1%;">
-							<div class="one-half column">
-								<svg id="dist1"></svg>
-							</div>
-							<div class="one-half column">
-								<svg id="dist2"></svg>
-							</div>
+						<div class="row" style="height: 22vh; margin-bottom: 1%;">
+							<div class="one-half column"><svg id="task_dialog"></svg></div>
+							<div class="one-half column"><svg id="intent_dialog"></svg>
+							
 						</div>
-						<div class="row" style="height: 20vh; margin-bottom: 1%;">
-							<div class="one-half column">
-								<svg id="dist3"></svg>
-							</div>
-							<div class="one-half column">
-								<svg id="dist4"></svg>
-							</div>
-						</div>
-						<div class="row" style="height: 20vh; margin-bottom: 1%;">
-							<div class="one-half column">
-								<svg id="dist5"></svg>
-							</div>
-							<div class="one-half column">
-								<svg id="dist6"></svg>
-							</div>
-						</div>
-						<div class="row" style="height: 20vh; margin-bottom: 1%;">
-							<div class="one-half column">
-								<svg id="dist7"></svg>
-							</div>
-							<div class="one-half column">
-								<svg id="dist8"></svg>
-							</div>
-						</div>
+						
 					</div>
 				</div>
 			</div>
 		</div>
-
+		
 		<script type="module" src="static/js/GUI.js"></script>
 		<!-- <script type="module" src="static/js/districtView.js"></script> -->
 		<script type="module" src="static/js/stateView.js"></script>
+		<script type="module" src="static/js/viz/radarchart.js"></script>
 		<script type="module" src="static/js/viz/histogram.js"></script>
 		<!--<script type="script" src="main.js"></script>-->
 	</body>

@@ -5,6 +5,7 @@
 */
 import {UI_CONSTANTS} from './distopiaElements.js'
 import Histogram from "./viz/histogram.js";
+import RadarChart from "./viz/radarchart.js";
 
 var SELF;
 
@@ -34,15 +35,7 @@ export class StateView {
 
 		let max = 1;
 		if(this.metricFocus == "population"){ max = 3000000; }
-
-		this.histograms = [];
-		if(initData != null){
-			const focusedData = this.filterByFocusMetric(initData);
-			for(var i = 0; i < 8; i++){
-				d3.select("#" + "dist" + (i+1)).append("text").attr("x", 10).attr("y", 10).text("District " + i);
-				this.histograms.push(new Histogram("#" + "dist" + (i+1), focusedData[i].data, focusedData[i].labels, {colors: UI_CONSTANTS[this.metricFocus].colors}, max));
-			}
-		}
+		this.paintRadar([0.1,0.1,0.1]);
 	}
 
 	filterByFocusMetric(data){
@@ -108,8 +101,99 @@ export class StateView {
 			this.histograms[i].update(data[i].data, data[i].labels, {colors:UI_CONSTANTS[this.metricFocus].colors}, max);
 		}
 	}
+	paintDashboard(data,precalculated_stats){
+		if(precalculated_stats == undefined){ 
+			return;
+		}
+		if(precalculated_stats.standardized_metrics != undefined){
+			let standardized_metrics = precalculated_stats.standardized_metrics
+			this.paintRadar(standardized_metrics);
+		}
+		if(precalculated_stats.prediction != undefined && precalculated_stats.prediction != null){
+			let prediction = precalculated_stats.prediction;
+			this.paintIntent(prediction);
+		}
 
-	update(data,metric){
+
+	}
+
+	paintIntent(prediction){
+		console.log("painting intent");
+		let svg = d3.select("#intent_dialog");
+		let width = 400;//svg.attr("width");
+		let height = 200;//svg.attr("height");
+		let bar_width = width/3;
+		let xpadding = 20;
+		let ypadding = 20;
+		svg.selectAll("rect").remove();
+		svg.selectAll("text").remove();
+		svg.selectAll(".bar").data(prediction)
+			.enter().append("rect")
+			.attr("x", (d,i) => xpadding + i*bar_width)
+			.attr("y", (d) => {
+				if(d > 0){
+					return ypadding + height/2-d*height*0.5;
+				}
+				else{
+					return ypadding + height/2;
+				}
+			})
+			.attr("width",bar_width)
+			.attr("height",(d)=> Math.abs(d)*height*0.5);
+		//labels
+		svg.append("text").text("Population Std")
+				.attr("fill",prediction[0] > 0 ? "black" : "white")
+				.attr("x",40)
+				.attr("y",110);
+		svg.append("text").text("Wasted Votes")
+				.attr("fill",prediction[1] > 0 ? "black" : "white")
+				.attr("x",170)
+				.attr("y",110);
+		svg.append("text").text("Compactness")
+				.attr("fill",prediction[2] > 0 ? "black" : "white")
+				.attr("x",300)
+				.attr("y",110);
+		//svg.append("text").text("Population2").attr("fill","black").attr("x",x_padding + 2*width/3).attr("y",y_padding + height/2);
+		//svg.append("text").text("Population3").attr("fill","black").attr("x",x_padding + 3*width/3).attr("y",y_padding + height/2);
+	}
+	paintRadar(data){
+		var radarChartOptions = {
+			w: this.width*0.8,
+			h: this.height*0.7,
+			margin:{top: 100, right: 20, bottom: 20, left: 100}, 
+			unit: '',
+			format: '0.00f',
+			maxValue: 100,
+			levels: 5,
+			labelFactor: 1.3, 
+		}
+		console.log("radar");
+		console.log(data);
+		let radarData = [
+			{
+				name: '',
+				axes: [
+					{
+						axis:"Population Balance",value:this.rescale_standardized(-data[0])
+					},
+					{
+						axis: "Voter Efficiency", value:this.rescale_standardized(-data[1])
+					},
+					{
+						axis: "Shape Regularity", value:this.rescale_standardized(data[2])
+					}
+				]	
+			}
+		]
+		RadarChart("#radar",radarData,radarChartOptions);
+	}
+	rescale_standardized(val){
+		//rescale a z-standardized value to between 0 and 100, with 50 being the mean and the boundaries being 3 std's away
+		let truncated = Math.min(val,3);
+		truncated = Math.max(truncated,-3);
+		return truncated*50/3 + 50;
+	}
+	update(data,metric,precalculated_stats){
 		console.log("updating");
 		//d3.selectAll(".dist_label").remove();
 		d3.selectAll(".label").remove();
@@ -133,12 +217,7 @@ export class StateView {
 		let max = 1;
 		if(this.metricFocus == "population"){ max = 3000000; }
 		const districtData = this.filterByFocusMetric(data);
-		if(this.histograms.length == 0){
-			for(var i = 0; i < 8; i++){
-				d3.select("#" + "dist" + (i+1)).append("text").attr("x", 10).attr("y", 15).text("District " + i);
-				this.histograms.push(new Histogram("#" + "dist" + (i+1), districtData[i].data, districtData[i].labels, {colors: UI_CONSTANTS[this.metricFocus].colors}, max));
-			}
-		}
+
 
 		if(!this.drawn){ this.drawStatePolygons(); }
 
@@ -152,12 +231,24 @@ export class StateView {
 			.style("text-anchor", "middle").style("alignment-baseline", "middle")
 			.style("font-size", "2em");
 
-		d3.select("#hist_label").append("text").text(histLabel).attr("class", "label")
-			.attr("x", parseFloat(d3.select("#hist_label").style("width"))/2)
-			.attr("y", parseFloat(d3.select("#hist_label").style("height"))/2)
+		d3.select("#task_dialog").append("text").text("Currrent Task:").attr("class", "label")
+			.attr("x", parseFloat(d3.select("#task_dialog").style("width"))/10)
+			.attr("y", parseFloat(d3.select("#task_dialog").style("height"))/5)
+			.style("text-anchor", "left").style("alignment-baseline", "middle")
+			.style("font-size", "1.25em")
+			.append("tspan").text("(1) Balance Population.")
+			.attr("dy","3em")
+			.attr("x",parseFloat(d3.select("#task_dialog").style("width"))/2)
 			.style("text-anchor", "middle").style("alignment-baseline", "middle")
-			.style("font-size", "2em");
+			.append("tspan").text("(2) Regularize Shapes.")
+			.attr("dy","2em")
+			.attr("x",parseFloat(d3.select("#task_dialog").style("width"))/2)
+			.style("text-anchor", "middle").style("alignment-baseline", "middle");
 
+		d3.select("#intent_dialog").append("text").text("Predicted Task Weights:").attr("class","label")
+			.attr("x", parseFloat(d3.select("#intent_dialog").style("width"))/10)
+			.attr("y", parseFloat(d3.select("#intent_dialog").style("height"))/5)
+			.style("font-size", "1.25em");
 		districtData.forEach((district, i) => {
 			let distX_min = 1000000, distX_max = 0, distY_min = 1000000, distY_max = 0;
 			let scale = UI_CONSTANTS[this.metricFocus].scale;
@@ -229,7 +320,7 @@ export class StateView {
 		key.attr("transform", "translate(" + (key_width - (6 * (key_height - 40)))/2 + ",0)")
 
 		this.paintStateViz();
-		this.paintHistograms(districtData);	
+		this.paintDashboard(data,precalculated_stats);
 	}
 
 	drawStatePolygons(){

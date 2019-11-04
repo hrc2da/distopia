@@ -113,11 +113,13 @@ export class DistopiaInterface{
 		}
 		SELF.counter = messageData.count;
 		SELF.districts = messageData.districts;
+		SELF.precalculated_stats = {standardized_metrics: messageData.standardized_metrics,
+									prediction: messageData.prediction}
 		if(SELF.getView() == "state"){
 			if(SELF.stateView == null){ SELF.stateView = new StateView(SELF.districts); }
 			else{ 
 				console.log('update districts');
-				SELF.stateView.update(SELF.districts); }
+				SELF.stateView.update(SELF.districts,undefined,SELF.precalculated_stats); }
 		}
 		else{
 			if(SELF.districtView == null){ SELF.districtView = new DistrictView(SELF.districts); }

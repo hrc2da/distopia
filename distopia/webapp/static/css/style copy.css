@@ -23,7 +23,7 @@
 .screen {
 	width: 100%;
 	height: 100%;
-	background-color: #333;
+	background-color: #e7e5f2;
 }
 
 .panels {
@@ -154,7 +154,6 @@
 body{
 	overflow-x: hidden;
 	overflow-y: hidden;
-	background-color: #9c3b3b;
 }
 
 .subtitle {
@@ -179,18 +178,11 @@ body{
 	background-color: white;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
-
-
-#radar{
-	background-color: black;
-	fill: white;
-}
 #label_area{
 	height: 100%;
 	width: 100%;
-	background-color: #3f5e86;
+	background-color: white;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-	fill: white;
 }
 
 #hist_label{
@@ -200,34 +192,14 @@ body{
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
-#task_dialog{
-	background-color: #3f5e86;
-	fill: white;
-}
-
-#intent_dialog{
-	background-color: #3f5e86;
-	fill: white;
-}
-
-select {
-	background-color: #3f5e86;
-	color: white;
-	margin-left: 10px;
-	margin-top: 10px;
-}
-
 .left #scale{
 	height: 100%;
 	width: 100%;
 	margin: 1% 1% 1% 1% ;
+	background-color: white;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
-#scale{
-	background-color: #3f5e86;
-	fill: white;
-}
 .right{
 	height: 85%;
 	width: 22%;
@@ -245,12 +217,7 @@ select {
 	background-color: white;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
-.header {
-	color: white;
-	font-family: 'Rock Salt', cursive;
-	font-size: 1.5em;
-	margin-left: 500px;
-}
+
 
 #centroid {
 	position: absolute;
