@@ -109,10 +109,12 @@ export class StateView {
 			let standardized_metrics = precalculated_stats.standardized_metrics
 			this.paintRadar(standardized_metrics);
 		}
-		if(precalculated_stats.prediction != undefined && precalculated_stats.prediction != null){
-			let prediction = precalculated_stats.prediction;
-			this.paintIntent(prediction);
-		}
+
+		// USE WHEN WE ARE INCLUDING INTENT IN THE CODE
+		// if(precalculated_stats.prediction != undefined && precalculated_stats.prediction != null){
+		// 	let prediction = precalculated_stats.prediction;
+		// 	this.paintIntent(prediction);
+		// }
 
 
 	}
@@ -156,6 +158,7 @@ export class StateView {
 		//svg.append("text").text("Population2").attr("fill","black").attr("x",x_padding + 2*width/3).attr("y",y_padding + height/2);
 		//svg.append("text").text("Population3").attr("fill","black").attr("x",x_padding + 3*width/3).attr("y",y_padding + height/2);
 	}
+	
 	paintRadar(data){
 		var radarChartOptions = {
 			w: this.width*0.8,
@@ -245,10 +248,13 @@ export class StateView {
 			.attr("x",parseFloat(d3.select("#task_dialog").style("width"))/2)
 			.style("text-anchor", "middle").style("alignment-baseline", "middle");
 
-		d3.select("#intent_dialog").append("text").text("Predicted Task Weights:").attr("class","label")
-			.attr("x", parseFloat(d3.select("#intent_dialog").style("width"))/10)
-			.attr("y", parseFloat(d3.select("#intent_dialog").style("height"))/5)
-			.style("font-size", "1.25em");
+		// INTENT DIALOGUE CODE
+		// d3.select("#intent_dialog").append("text").text("Predicted Task Weights:").attr("class","label")
+		// 	.attr("x", parseFloat(d3.select("#intent_dialog").style("width"))/10)
+		// 	.attr("y", parseFloat(d3.select("#intent_dialog").style("height"))/5)
+		// 	.style("font-size", "1.25em");
+
+
 		districtData.forEach((district, i) => {
 			let distX_min = 1000000, distX_max = 0, distY_min = 1000000, distY_max = 0;
 			let scale = UI_CONSTANTS[this.metricFocus].scale;
