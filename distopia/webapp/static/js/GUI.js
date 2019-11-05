@@ -32,7 +32,6 @@ initState();
 
 function updateState(newState){
 	if (newState.metricFocus && State.metricFocus != newState.metricFocus){
-		// do something 
 		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
 		d3.selectAll(".dist_label").raise();
 	}
@@ -43,20 +42,19 @@ function updateState(newState){
 		if (typeof(counter) == 'undefined'){
 			counter = 0;
 		}
-		console.log(counter);
+		console.log("counter  =" + counter);
 		d3.json('http://localhost:5000/evaluate', {
       	method:"POST",
       	body: JSON.stringify({
 		  "blocks": newState.blocks,
 		  "packet_count": counter,
-		  "session_id": session_id
+		  "session_id": session_id,
       	}),
       	headers: {
         "Content-type": "application/json; charset=UTF-8"
       	}
 		})
 		.then((data) =>{
-			console.log("OK");
 			console.log(data);
 			newState.counter = data['count'];
 			distopia.handleData({data: JSON.stringify(data)});
@@ -78,10 +76,7 @@ function initInteractive(){
     metricSelector.onchange = () => {
         const newSelectedMetric = metricSelector.value;
         updateState({
-            "blocks": State.blocks,
 			"metricFocus": newSelectedMetric,
-			"centroids": State.centroids,
-			"selectedDistrict": State.selectedDistrict
         });
 	}
 	// add options for the metric filter
@@ -98,9 +93,6 @@ function initInteractive(){
 	{
 		const newSelectedDistrict = districtSelector.value;
 		updateState({
-			"blocks": State.blocks,
-			"metricFocus": State.metricFocus,
-			"centroids": State.centroids,
 			"selectedDistrict": newSelectedDistrict,
 		})
 	}
@@ -110,9 +102,6 @@ function initInteractive(){
 			let key = e.which - 48;	
 			districtSelector.value = key;
 			updateState({
-				"blocks": State.blocks,
-				"metricFocus": State.metricFocus,
-				"centroids": State.centroids,
 				"selectedDistrict": key,
 			})	
 		}
@@ -257,8 +246,5 @@ function createBlocksFromCentroids(){
 	});
 	updateState({
 		"blocks": basicBlocks,
-		"metricFocus": State.metricFocus,
-		"selectedDistrict": State.selectedDistrict,
-		"centroids": State.centroids,
 	});
 }
