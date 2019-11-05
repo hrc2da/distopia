@@ -238,16 +238,8 @@ export class StateView {
 			.attr("x", parseFloat(d3.select("#task_dialog").style("width"))/10)
 			.attr("y", parseFloat(d3.select("#task_dialog").style("height"))/5)
 			.style("text-anchor", "left").style("alignment-baseline", "middle")
-			.style("font-size", "1.25em")
-			.append("tspan").text("(1) Balance Population.")
-			.attr("dy","3em")
-			.attr("x",parseFloat(d3.select("#task_dialog").style("width"))/2)
-			.style("text-anchor", "middle").style("alignment-baseline", "middle")
-			.append("tspan").text("(2) Regularize Shapes.")
-			.attr("dy","2em")
-			.attr("x",parseFloat(d3.select("#task_dialog").style("width"))/2)
-			.style("text-anchor", "middle").style("alignment-baseline", "middle");
-
+			.style("font-size", "1.25em");
+			
 		// INTENT DIALOGUE CODE
 		// d3.select("#intent_dialog").append("text").text("Predicted Task Weights:").attr("class","label")
 		// 	.attr("x", parseFloat(d3.select("#intent_dialog").style("width"))/10)
