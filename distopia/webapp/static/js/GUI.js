@@ -184,7 +184,8 @@ function addCentroid(e){
 	const endDrag = (d) => {
 		console.log("dragging");
 		console.log(d);
-		if(d3.event.x-d.startX < 2 && d3.event.y-d.startY < 2){
+		console.log(d3.event);
+		if(Math.abs(d3.event.x-d.startX) < 2 && Math.abs(d3.event.y-d.startY < 2)){
 			console.log("no drag");
 			return;
 		}
