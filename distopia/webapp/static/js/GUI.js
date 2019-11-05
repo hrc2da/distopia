@@ -165,7 +165,7 @@ function addCentroid(e){
 	console.log("adding centroid");
 	const stateDiv = d3.select("#state");
 	const {height,width, xScale, yScale} = distopia.stateView;
-	State.centroid_counter += 1;
+	updateState({"centroid_counter": State.centroid_counter +1});
 	const id = "marker" + State.centroid_counter;
 	const idSelector = "#"+id;
 
