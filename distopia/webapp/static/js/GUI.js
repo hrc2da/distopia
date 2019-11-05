@@ -1,5 +1,5 @@
 import {DistopiaInterface} from"./distopiaInterface.js";
-import {UI_CONSTANTS} from "./distopiaElements.js";
+import {UI_CONSTANTS, TASK_DESCRIPTIONS} from "./distopiaElements.js";
 
 const METRICS = Object.keys(UI_CONSTANTS);
 
@@ -12,7 +12,8 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*       selectedDistrict: Number,
 	*       centroids: {"id": {"district": Number, "coordinates": [Number,Number]}},
 	*		counter: Number,
-	*		centroid_counter: Number
+	*		centroid_counter: Number,
+	*		current_task: string
 	*	}}
 	*/
 var State = {
@@ -22,7 +23,8 @@ var State = {
 	 "selectedDistrict": 1,
 	 "centroids": {},
 	 "counter": 0,
-	 "centroid_counter": 0
+	 "centroid_counter": 0,
+	 "current_task": "",
 }
 
 // initializations
@@ -118,6 +120,20 @@ function initInteractive(){
 	}
 	districtSelector.value = State.selectedDistrict;
 
+	// set up the task dialogue
+	let randomTask = () => TASK_DESCRIPTIONS[Math.floor(Math.random() * TASK_DESCRIPTIONS.length)];
+	let taskTimer = () => setTimeout(() => {
+		d3.select("#task_text").text(randomTask());
+		taskTimer();
+	}, 4000);
+
+	const taskDiv = d3.select("#task_dialog");
+	taskDiv.append("text").attr("id", "task_text")
+	.attr("x", 100)
+	.attr("y", 50)
+	.text(randomTask());
+	
+	taskTimer();
 }
 
 function initState(){
@@ -212,11 +228,11 @@ function addCentroid(e){
 		});
 		d3.event.on("end", () => endDrag(d));
 	}
-	))
+	));
 	// need to init the object before goign one level deeper
 	State.centroids[id] = {};
 	State.centroids[id]["district"] = State.selectedDistrict;
-	State.centroids[id]["coordinates"] = [xScale.invert(e.offsetX),yScale.invert(e.offsetY)]
+	State.centroids[id]["coordinates"] = [xScale.invert(e.offsetX),yScale.invert(e.offsetY)];
 
 
 
