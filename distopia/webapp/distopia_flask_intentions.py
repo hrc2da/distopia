@@ -7,7 +7,7 @@ from distopia.app.ros import RosBridge
 import os
 import json
 import numpy as np
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 from keras.backend import set_session
 import tensorflow as tf
 import pickle as pkl
@@ -87,7 +87,7 @@ def predict_intent(session_id):
 def root():
     global sessions
     sessions += 1
-    return render_template("index.html", session_id = sessions)
+    return render_template("intentions.html", session_id = sessions)
 
 
 @app.route("/evaluate", methods=['POST'])
