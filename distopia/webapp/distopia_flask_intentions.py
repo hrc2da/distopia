@@ -94,20 +94,19 @@ def root():
 def evaluate():
     global trajectories
     global intent_classifier
-    # only support POST
+
     if request.method == 'POST':
-        # this is pseudo-code, it may (likeley will) not run without some tweaks
+
         d_agent = VoronoiAgent()
         d_agent.load_data()
         blocks = request.json["blocks"]
         counter = request.json["packet_count"]
+
         session = request.json["session_id"]
         if session not in trajectories:
             trajectories[session] = []
-        
-        #return jsonify("This is sparta!")
-        districts = d_agent.get_voronoi_districts(blocks)
 
+        districts = d_agent.get_voronoi_districts(blocks)
 
         f_locs = [block for district in blocks.values() for block in district]
         f_ids = [k for k,v in blocks.items() for _ in range(len(v))]

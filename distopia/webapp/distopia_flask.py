@@ -1,21 +1,19 @@
-from flask import Flask
-from flask import request, jsonify, render_template, abort
 import sys
 sys.path.append("../..")
-from distopia.app.agent import VoronoiAgent
-from distopia.app.ros import RosBridge
-import os
 import json
 import numpy as np
 import pickle as pkl
-app = Flask(__name__)
 
+from flask import Flask, request, jsonify, render_template, abort
+from distopia.app.agent import VoronoiAgent
+from distopia.app.ros import RosBridge
 
 with open("team_standardization_params.pkl", 'rb') as infile:
     st_mean,st_std = pkl.load(infile)
 
 #globals:
 sessions = 0
+app = Flask(__name__)
 
 json_metric_extractors = {
 
