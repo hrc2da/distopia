@@ -120,20 +120,37 @@ function initInteractive(){
 	}
 	districtSelector.value = State.selectedDistrict;
 
-	// set up the task dialogue
+	// set up the task dialogue and task timer
 	let randomTask = () => TASK_DESCRIPTIONS[Math.floor(Math.random() * TASK_DESCRIPTIONS.length)];
-	let taskTimer = () => setTimeout(() => {
-		d3.select("#task_text").text(randomTask());
-		taskTimer();
-	}, 4000);
 
 	const taskDiv = d3.select("#task_dialog");
 	taskDiv.append("text").attr("id", "task_text")
 	.attr("x", 100)
 	.attr("y", 50)
 	.text(randomTask());
+
+	const taskTimeLimit = 20;
+	let currentTime = taskTimeLimit;
+
+	taskDiv.append("text").attr("id", "task_time")
+	.attr("x", 100)
+	.attr("y", 70)
+	.text(currentTime);
+
+	let taskTime = () => setInterval(() => {
+		if (currentTime == 0){
+			d3.select("#task_text").text(randomTask());
+			currentTime = taskTimeLimit;
+		}
+		else{
+			currentTime = currentTime -1;
+		}
+		d3.select("#task_time").text(currentTime);
+	}, 1000);
 	
-	taskTimer();
+	taskTime();
+
+	
 }
 
 function initState(){
