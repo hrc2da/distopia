@@ -229,11 +229,18 @@ function addCentroid(e){
 	})
 	.call(d3.drag().on("start", () => { 
 		var d = {};
+		// TODO - live dragging
+		var updateCounter = 0;
 		d.startX = d3.event.x;
 		d.startY = d3.event.y;
 		d3.select(idSelector).classed("dragging", true); 
 		d3.event.on("drag", () =>{
 			d3.select(idSelector).attr("x",d3.event.x).attr("y",d3.event.y);
+			// TODO - live dragging
+			// updateCounter = (updateCounter+1) % 500;
+			// if (updateCounter == 0){
+			// 	endDrag(d);
+			// }
 		});
 		d3.event.on("end", () => endDrag(d));
 	}
