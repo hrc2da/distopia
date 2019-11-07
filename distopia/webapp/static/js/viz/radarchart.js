@@ -45,11 +45,11 @@ export default function RadarChart(parent_selector, data, options) {
 	 levels: 3,				//How many levels or inner circles should there be drawn
 	 maxValue: 0, 			//What is the value that the biggest circle will represent
 	 labelFactor: 1.25, 	//How much farther than the radius of the outer circle should the labels be placed
-	 wrapWidth: 60, 		//The number of pixels after which a label needs to be given a new line
-	 opacityArea: 0.35, 	//The opacity of the area of the blob
-	 dotRadius: 4, 			//The size of the colored circles of each blog
-	 opacityCircles: 0.1, 	//The opacity of the circles of each blob
-	 strokeWidth: 2, 		//The width of the stroke around each blob
+	 wrapWidth: 200, 		//The number of pixels after which a label needs to be given a new line
+	 opacityArea: 0.8, 	//The opacity of the area of the blob
+	 dotRadius: 8, 			//The size of the colored circles of each blog
+	 opacityCircles: 0.03, 	//The opacity of the circles of each blob
+	 strokeWidth: 4, 		//The width of the stroke around each blob
 	 roundStrokes: false,	//If true the area and stroke will follow a round path (cardinal-closed)
 	 color: d3.scaleOrdinal(d3.schemeCategory10),	//Color function,
 	 format: '.2%',
@@ -206,22 +206,23 @@ export default function RadarChart(parent_selector, data, options) {
 		.attr("d", d => radarLine(d.axes))
 		.style("fill", (d,i) => cfg.color(i))
 		.style("fill-opacity", cfg.opacityArea)
-		.on('mouseover', function(d, i) {
-			//Dim all blobs
-			parent.selectAll(".radarArea")
-				.transition().duration(200)
-				.style("fill-opacity", 0.1);
-			//Bring back the hovered over blob
-			d3.select(this)
-				.transition().duration(200)
-				.style("fill-opacity", 0.7);
-		})
-		.on('mouseout', () => {
-			//Bring back all blobs
-			parent.selectAll(".radarArea")
-				.transition().duration(200)
-				.style("fill-opacity", cfg.opacityArea);
-		});
+		// removed hover behavior
+		// .on('mouseover', function(d, i) {
+		// 	//Dim all blobs
+		// 	parent.selectAll(".radarArea")
+		// 		.transition().duration(200)
+		// 		.style("fill-opacity", 0.1);
+		// 	//Bring back the hovered over blob
+		// 	d3.select(this)
+		// 		.transition().duration(200)
+		// 		.style("fill-opacity", 0.7);
+		// })
+		// .on('mouseout', () => {
+		// 	//Bring back all blobs
+		// 	parent.selectAll(".radarArea")
+		// 		.transition().duration(200)
+		// 		.style("fill-opacity", cfg.opacityArea);
+		// });
 
 	//Create the outlines
 	blobWrapper.append("path")
