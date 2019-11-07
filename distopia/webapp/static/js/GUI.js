@@ -13,21 +13,21 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*       centroids: {"id": {"district": Number, "coordinates": [Number,Number]}},
 	*		counter: Number,
 	*		centroid_counter: Number,
-	*	}}
+	*		currentTask: string,
 	*/
 var State = {
 	"blocks": {},
-	// TODO - figure out why this cannot be set to empty string
 	 "metricFocus": "population",
 	 "selectedDistrict": 1,
 	 "centroids": {},
 	 "counter": 0,
 	 "centroid_counter": 0,
+	 "currentTask": "",
 }
 
 // Not including this instate because want to prevent entire state update code from running every 1 second
 window.taskTimeLimit = 30;
-window.currentTime = window.taskTimeLimit;
+window.currentTime = 0;
 
 // initializations
 var distopia = new DistopiaInterface({initialView: "state", "metricFocus": State.metricFocus});
@@ -122,14 +122,15 @@ function initTasksAndTimers(){
 	taskDiv.append("text").attr("id", "task_text")
 	.attr("x", 80)
 	.attr("y", 60)
-	.text(randomTask());
+	.text(State.currentTask);
 	taskDiv.append("text").attr("id", "task_time")
 	.attr("x", 80)
 	.attr("y", 80);
 
 	let taskTime = () => setInterval(() => {
 		if (window.currentTime == 0){
-			d3.select("#task_text").text(randomTask());
+			updateState({currentTask: randomTask()});
+			d3.select("#task_text").text(State.currentTask);
 			window.currentTime = window.taskTimeLimit;
 		}
 		else{
