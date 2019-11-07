@@ -13,7 +13,6 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*       centroids: {"id": {"district": Number, "coordinates": [Number,Number]}},
 	*		counter: Number,
 	*		centroid_counter: Number,
-	*		current_task: string
 	*	}}
 	*/
 var State = {
@@ -24,7 +23,6 @@ var State = {
 	 "centroids": {},
 	 "counter": 0,
 	 "centroid_counter": 0,
-	 "current_task": "",
 }
 
 // initializations
@@ -125,17 +123,17 @@ function initInteractive(){
 
 	const taskDiv = d3.select("#task_dialog");
 	taskDiv.append("text").attr("id", "task_text")
-	.attr("x", 100)
-	.attr("y", 50)
+	.attr("x", 80)
+	.attr("y", 60)
 	.text(randomTask());
 
-	const taskTimeLimit = 20;
+	// sets the length you get on a particular task.
+	const taskTimeLimit = 30;
 	let currentTime = taskTimeLimit;
 
 	taskDiv.append("text").attr("id", "task_time")
-	.attr("x", 100)
-	.attr("y", 70)
-	.text(currentTime);
+	.attr("x", 80)
+	.attr("y", 80);
 
 	let taskTime = () => setInterval(() => {
 		if (currentTime == 0){
@@ -145,7 +143,7 @@ function initInteractive(){
 		else{
 			currentTime = currentTime -1;
 		}
-		d3.select("#task_time").text(currentTime);
+		d3.select("#task_time").text("Time Remaining: " + currentTime);
 	}, 1000);
 	
 	taskTime();
