@@ -60,9 +60,12 @@ function updateState(newState){
 			distopia.handleData({data: JSON.stringify(data)});
 			d3.selectAll(".dist_label").raise();
 			console.log(State);
-		})
-		.catch((error)=>{
-			console.log(error);
+		},(error)=>{
+			if (error.message){
+				console.log(error.custom);
+				// TODO - figure out how to better communicate this error
+				window.alert("Centroids cannot provide valid districts.");
+			}
 		});
 	}
 	State = {...State,...newState};
