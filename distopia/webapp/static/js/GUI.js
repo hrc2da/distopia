@@ -25,18 +25,22 @@ var State = {
 	 "centroid_counter": 0,
 }
 
+// Not including this instate because want to prevent entire state update code from running every 1 second
+window.taskTimeLimit = 30;
+window.currentTime = window.taskTimeLimit;
+
 // initializations
 var distopia = new DistopiaInterface({initialView: "state", "metricFocus": State.metricFocus});
 initInteractive();
 initState();
+initTasksAndTimers();
 
 function updateState(newState){
 	if (newState.metricFocus && State.metricFocus != newState.metricFocus){
-		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
+		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus}).then()
 		d3.selectAll(".dist_label").raise();
 	}
 	if (newState.blocks && State.blocks != newState.blocks){
-		console.log('backend req');
 		console.log(newState.blocks);
 		let counter = State.counter;
 		if (typeof(counter) == 'undefined'){
@@ -48,21 +52,18 @@ function updateState(newState){
       	body: JSON.stringify({
 		  "blocks": newState.blocks,
 		  "packet_count": counter,
-		  "session_id": session_id,
+		  "session_id": window.session_id,
       	}),
       	headers: {
         "Content-type": "application/json; charset=UTF-8"
       	}
 		})
 		.then((data) =>{
-			console.log(data);
 			newState.counter = data['count'];
 			distopia.handleData({data: JSON.stringify(data)});
 			d3.selectAll(".dist_label").raise();
-			console.log(State);
 		},(error)=>{
 			if (error.message){
-				console.log(error.custom);
 				// TODO - figure out how to better communicate this error
 				window.alert("Centroids cannot provide valid districts.");
 			}
@@ -76,12 +77,7 @@ function initInteractive(){
     centroidAddButton.onclick = (e) => addCentroid(e);
 
     const metricSelector = document.getElementById("metric_selector");
-    metricSelector.onchange = () => {
-        const newSelectedMetric = metricSelector.value;
-        updateState({
-			"metricFocus": newSelectedMetric,
-        });
-	}
+    metricSelector.onchange = () => updateState({"metricFocus": metricSelector.value});
 	// add options for the metric filter
     for (let i = 0; i < METRICS.length; i++){
         const option = document.createElement("option");
@@ -92,13 +88,7 @@ function initInteractive(){
 	
 	// set up district selector
 	const districtSelector = document.getElementById("district_selector");
-	districtSelector.onchange = () =>
-	{
-		const newSelectedDistrict = districtSelector.value;
-		updateState({
-			"selectedDistrict": newSelectedDistrict,
-		})
-	}
+	districtSelector.onchange = () => updateState({"selectedDistrict": districtSelector.value});
 	// keyboard shortcuts to select district
 	document.onkeyup = (e) => {
 		if(e.which >=49 && e.which <=56){
@@ -120,42 +110,39 @@ function initInteractive(){
 		districtSelector.options.add(option, i);
 	}
 	districtSelector.value = State.selectedDistrict;
+}
 
-	// set up the task dialogue and task timer
+
+// Renders the tasks and the timer. Kicks of the timer counting down as well
+function initTasksAndTimers(){
 	let randomTask = () => TASK_DESCRIPTIONS[Math.floor(Math.random() * TASK_DESCRIPTIONS.length)];
 
 	const taskDiv = d3.select("#task_dialog");
+
 	taskDiv.append("text").attr("id", "task_text")
 	.attr("x", 80)
 	.attr("y", 60)
 	.text(randomTask());
-
-	// sets the length you get on a particular task.
-	const taskTimeLimit = 30;
-	let currentTime = taskTimeLimit;
-
 	taskDiv.append("text").attr("id", "task_time")
 	.attr("x", 80)
 	.attr("y", 80);
 
 	let taskTime = () => setInterval(() => {
-		if (currentTime == 0){
+		if (window.currentTime == 0){
 			d3.select("#task_text").text(randomTask());
-			currentTime = taskTimeLimit;
+			window.currentTime = window.taskTimeLimit;
 		}
 		else{
-			currentTime = currentTime -1;
+			window.currentTime --;
 		}
-		d3.select("#task_time").text("Time Remaining: " + currentTime);
+		d3.select("#task_time").text("Time Remaining: " + window.currentTime);
 	}, 1000);
 	
-	taskTime();
-
-	
+	taskTime();		
 }
 
+
 function initState(){
-	// currently set with a hardcoded state
 	updateState({
 		"blocks": {
 			0: [[263,678],[261,330]],
@@ -176,7 +163,8 @@ function initState(){
 	);
 }
 
-const removeCentroid = (id) => {
+
+function removeCentroid(id){
 	console.log("removing centroid ",id)
 	d3.select("#"+id).remove();
 	delete State.centroids[id];
@@ -194,22 +182,22 @@ const removeCentroid = (id) => {
 	}
 }
 
-// centroid logic:
+
 function addCentroid(e){
-	console.log("adding centroid");
+	// console.log("adding centroid");
 	const stateDiv = d3.select("#state");
-	const {height,width, xScale, yScale} = distopia.stateView;
+	const {xScale, yScale} = distopia.stateView;
 	updateState({"centroid_counter": State.centroid_counter +1});
 	const id = "marker" + State.centroid_counter;
 	const idSelector = "#"+id;
 
 
 	const endDrag = (d) => {
-		console.log("dragging");
-		console.log(d);
-		console.log(d3.event);
+		// console.log("dragging");
+		// console.log(d);
+		// console.log(d3.event);
 		if(Math.abs(d3.event.x-d.startX) < 2 && Math.abs(d3.event.y-d.startY < 2)){
-			console.log("no drag");
+			// console.log("no drag");
 			return;
 		}
 		d3.select(idSelector).attr("x", d3.event.x).attr("y", d3.event.y);
@@ -222,7 +210,6 @@ function addCentroid(e){
 				districtSet.add(district);
 			}
 		})
-		// if there are at least 8 districts with centroids
 		if (districtSet.size >= 8){
 			createBlocksFromCentroids();
 		}
@@ -235,7 +222,10 @@ function addCentroid(e){
 	.attr("id", id)
 	.text(State.selectedDistrict)
 	.style("cursor", "pointer")
-	.on("click", () => { d3.event.stopPropagation(); removeCentroid(id);})
+	.on("click", () => { 
+		d3.event.stopPropagation(); 
+		removeCentroid(id);
+	})
 	.call(d3.drag().on("start", () => { 
 		var d = {};
 		d.startX = d3.event.x;
@@ -247,12 +237,10 @@ function addCentroid(e){
 		d3.event.on("end", () => endDrag(d));
 	}
 	));
-	// need to init the object before goign one level deeper
+
 	State.centroids[id] = {};
 	State.centroids[id]["district"] = State.selectedDistrict;
 	State.centroids[id]["coordinates"] = [xScale.invert(e.offsetX),yScale.invert(e.offsetY)];
-
-
 
 	const districtSet = new Set([]);
 		(Object.keys(State.centroids)).forEach(key => {
@@ -278,7 +266,5 @@ function createBlocksFromCentroids(){
 		const centroidRight = centroids[element].coordinates[1];
 		basicBlocks[centroidDistrict].push([centroidLeft, centroidRight])
 	});
-	updateState({
-		"blocks": basicBlocks,
-	});
+	updateState({"blocks": basicBlocks});
 }
