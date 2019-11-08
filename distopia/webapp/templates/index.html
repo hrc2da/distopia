@@ -27,6 +27,46 @@
 		<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
 		<script type="text/javascript">var session_id = {{ session_id }} </script>
 		<link rel="stylesheet" type="text/css" href="static/css/style.css">
+		<style>
+				.tooltip {
+				  position: relative;
+				  display: inline-block;
+				  border-bottom: 1px dotted black;
+				}
+				
+				.tooltip .tooltiptext {
+				  visibility: hidden;
+				  width: 120px;
+				  background-color: #555;
+				  color: #fff;
+				  text-align: center;
+				  border-radius: 6px;
+				  padding: 5px 0;
+				  position: absolute;
+				  z-index: 1;
+				  bottom: 125%;
+				  left: 50%;
+				  margin-left: -60px;
+				  opacity: 0;
+				  transition: opacity 0.3s;
+				}
+				
+				.tooltip .tooltiptext::after {
+				  content: "";
+				  position: absolute;
+				  top: 100%;
+				  left: 50%;
+				  margin-left: -5px;
+				  border-width: 5px;
+				  border-style: solid;
+				  border-color: #555 transparent transparent transparent;
+				}
+				
+				.tooltip:hover .tooltiptext {
+				  visibility: visible;
+				  opacity: 1;
+				}
+				</style>
 	</head>
 	<body>
 		<span class="header"></div>DisTopia: Redistricting Design</span>
@@ -46,6 +86,9 @@
 						</div>
 						<div class="row" style="height: 70vh; margin-bottom: 1%;">
 							<svg id="state"></svg>
+							<div class="tooltip">i
+									<span class="tooltiptext">Drag and drop,<br>Don't make make sparse centroid placements.</span>
+								  </div>
 						</div>
 						<div class="row" style="height: 13vh">
 							<svg id="scale"></svg>
