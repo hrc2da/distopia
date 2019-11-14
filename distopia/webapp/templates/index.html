@@ -6,13 +6,6 @@
 		<!-- Basic Page Needs -->
 		<meta charset="utf-8">
 		<title>Distopia Interface</title>
-		<span>		
-			<label id="metric_selector_label" for="metric_selector" style="display:inline-flex">Metric:</label>
-			<select id= "metric_selector""></select>
-			<label id="district_selector_label" for="district_selector" style="display:inline-flex">District:</label>
-			<select id= "district_selector""></select>
-			<button id="reset_centroids">Reset Centroids</button>
-		</span>
 		<meta name="description" content="">
 		<meta name="author" content="">
 
@@ -42,8 +35,15 @@
 			<div class="container" id="state-view" style="min-width: 98%;">
 				<div class="row">
 					<div class="one-half column">
-						<div class="row" style="height: 8vh; margin-bottom: 1%;">
-							<svg id="label_area"></svg>
+						<div class="row" style="height: 8vh; margin-bottom: 1%;" id = "label_area">
+								<span>		
+									<label id="metric_selector_label" for="metric_selector" style="display:inline-flex">Metric:</label>
+									<select id= "metric_selector""></select>
+									<label id="district_selector_label" for="district_selector" style="display:inline-flex">District:</label>
+									<select id= "district_selector""></select>
+									<button id="reset_centroids">Reset Centroids</button>
+								</span>
+							<!-- ' <svg id="label_area"></svg> -->
 						</div>
 						<div class="row" style="height: 70vh; margin-bottom: 1%;">
 							<svg id="state"></svg>

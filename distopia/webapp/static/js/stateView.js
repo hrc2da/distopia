@@ -228,11 +228,12 @@ export class StateView {
 		const histLabel = UI_CONSTANTS[this.metricFocus].histLabel;
 		
 
-		d3.select("#label_area").append("text").text(labelText).attr("class", "label")
-			.attr("x", parseFloat(d3.select("#label_area").style("width"))/2)
-			.attr("y", parseFloat(d3.select("#label_area").style("height"))/2)
-			.style("text-anchor", "middle").style("alignment-baseline", "middle")
-			.style("font-size", "2em");
+		// TODO removing label until we decide new text bc it interferes with the buttons
+		// d3.select("#label_area").append("text").text(labelText).attr("class", "label")
+		// 	.attr("x", parseFloat(d3.select("#label_area").style("width"))/2)
+		// 	.attr("y", parseFloat(d3.select("#label_area").style("height"))/2)
+		// 	.style("text-anchor", "middle").style("alignment-baseline", "middle")
+		// 	.style("font-size", "2em");
 
 		d3.select("#task_dialog").append("text").text("Currrent Task:").attr("class", "label")
 			.attr("x", parseFloat(d3.select("#task_dialog").style("width"))/10)
