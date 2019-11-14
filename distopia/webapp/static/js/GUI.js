@@ -14,6 +14,7 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*		counter: Number,
 	*		centroid_counter: Number,
 	*		currentTask: string,
+	*		currentTaskNumber: Number,
 	*/
 var State = {
 	"blocks": {},
@@ -23,6 +24,7 @@ var State = {
 	 "counter": 0,
 	 "centroid_counter": 0,
 	 "currentTask": "",
+	 "currentTaskNumber": 0,
 }
 
 // Not including this instate because want to prevent entire state update code from running every 1 second
@@ -141,10 +143,20 @@ function initTasksAndTimers(){
 	const timerDiv = d3.select("#timer");
 	const taskDiv = d3.select("#task_dialog");
 
+	taskDiv.append("text").attr("id", "task_number")
+	.attr("x", 80)
+	.attr("y", 20)
+	.text("");
+
 	taskDiv.append("text").attr("id", "task_text")
 	.attr("x", 80)
-	.attr("y", 60)
+	.attr("y", 70)
 	.text(State.currentTask);
+
+	timerDiv.append("text").attr("id", "task_time_header")
+	.attr("x", 80)
+	.attr("y", 40)
+	.text("Time remaining to complete task: ");
 
 	timerDiv.append("text").attr("id", "task_time")
 	.attr("x", 80)
@@ -152,14 +164,15 @@ function initTasksAndTimers(){
 
 	let taskTime = () => setInterval(() => {
 		if (window.currentTime == 0){
-			updateState({currentTask: randomTask()});
+			updateState({currentTask: randomTask(), currentTaskNumber: State.currentTaskNumber +1});
+			d3.select("#task_number").text("Task " + State.currentTaskNumber + " of " + TASK_DESCRIPTIONS.length + " :");
 			d3.select("#task_text").text(State.currentTask);
 			window.currentTime = window.taskTimeLimit;
 		}
 		else{
 			window.currentTime --;
 		}
-		d3.select("#task_time").text("Time Remaining: " + window.currentTime);
+		d3.select("#task_time").text(window.currentTime);
 	}, 1000);
 	
 	taskTime();		
