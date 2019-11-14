@@ -144,18 +144,17 @@ export var UI_CONSTANTS = {
 
 export var TASK_DESCRIPTIONS = [
     // population
-    "Try to create districts that have very different population sizes.",
     "Try to evenly balance the number of people each district has.",
     // pvi
-    "Try to create districts that maximize the number of wasted votes.",
     "Try to create districts that minimize the number of wasted votes.",
     // compactness
-    "Try to create districts that are round and regularly shaped.",
-    "Try to create districts that are as oddly shaped as possible.",
-    // projected_votes
-    "Try to create districts that benefit the Democratic Party.",
-    "Try to create districts that benefit the Republican Party.",
-    // race
-    "Try to create a few districts that are largely composed of demographic minorities.",
-    "Try to create districts that evenly distribute demographic minorities between districts."
+	"Try to create districts that are round and regularly shaped.",
+	// TASK PAIRS ///////////////////////////
+	// Pop + PVI
+	"Try to evenly balance the number of people each district has. and \n Try to create districts that minimize the number of wasted votes.",
+	// POP + compactness
+	"Try to evenly balance the number of people each district has. and \n Try to create districts that are round and regularly shaped.",
+	// PVI + compactness
+	"Try to create districts that minimize the number of wasted votes. \n Try to create districts that are round and regularly shaped."
+
 ];
