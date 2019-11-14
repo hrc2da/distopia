@@ -122,6 +122,13 @@ function initInteractive(){
 		initState();
 	}
 
+	// add time button;
+	const addTimeButton = document.getElementById("add_time");
+	addTimeButton.onclick = () => { addTime()};
+
+	// add time button;
+	const nextTaskButton = document.getElementById("next_task");
+	nextTaskButton.onclick = () => { nextTask()};
 }
 
 
@@ -154,6 +161,14 @@ function initTasksAndTimers(){
 	}, 1000);
 	
 	taskTime();		
+}
+
+function addTime(){
+	window.currentTime = 100;
+}
+
+function nextTask(){
+	window.currentTime = 0;
 }
 
 
