@@ -169,6 +169,14 @@ function initTasksAndTimers(){
 			d3.select("#task_text").text(State.currentTask);
 			window.currentTime = window.taskTimeLimit;
 		}
+		else if (State.currentTaskNumber == TASK_DESCRIPTIONS.length){
+			console.log('hello');
+			updateState({currentTask: "No more tasks to be completed"});
+			d3.select("#task_text").text(State.currentTask);
+			clearInterval(taskTime);
+			const nextTaskButton = document.getElementById("next_task");
+			nextTaskButton.onclick = () => {};
+		}
 		else{
 			window.currentTime --;
 		}
