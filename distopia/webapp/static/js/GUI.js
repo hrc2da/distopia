@@ -117,13 +117,15 @@ function initInteractive(){
 function initTasksAndTimers(){
 	let randomTask = () => TASK_DESCRIPTIONS[Math.floor(Math.random() * TASK_DESCRIPTIONS.length)];
 
+	const timerDiv = d3.select("#timer");
 	const taskDiv = d3.select("#task_dialog");
 
 	taskDiv.append("text").attr("id", "task_text")
 	.attr("x", 80)
 	.attr("y", 60)
 	.text(State.currentTask);
-	taskDiv.append("text").attr("id", "task_time")
+
+	timerDiv.append("text").attr("id", "task_time")
 	.attr("x", 80)
 	.attr("y", 80);
 

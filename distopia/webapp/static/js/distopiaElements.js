@@ -155,6 +155,8 @@ export var TASK_DESCRIPTIONS = [
 	// POP + compactness
 	"Try to evenly balance the number of people each district has. and \n Try to create districts that are round and regularly shaped.",
 	// PVI + compactness
-	"Try to create districts that minimize the number of wasted votes. \n Try to create districts that are round and regularly shaped."
+	"Try to create districts that minimize the number of wasted votes. \n Try to create districts that are round and regularly shaped.",
+	// ALL 3
+	"Try to evenly balance the number of people each district has. and \n Try to create districts that minimize the number of wasted votes. \n Try to create districts that are round and regularly shaped."
 
 ];
