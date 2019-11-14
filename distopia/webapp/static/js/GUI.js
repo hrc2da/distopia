@@ -110,6 +110,15 @@ function initInteractive(){
 		districtSelector.options.add(option, i);
 	}
 	districtSelector.value = State.selectedDistrict;
+
+	// reset centroids button
+	const resetCentroidsButton = document.getElementById("reset_centroids");
+	resetCentroidsButton.onclick = () => {
+		(Object.keys(State.centroids)).forEach(
+			(key) => removeCentroid(key));
+		initState();
+	}
+
 }
 
 
