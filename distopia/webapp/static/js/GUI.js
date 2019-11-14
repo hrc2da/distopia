@@ -134,7 +134,9 @@ function initInteractive(){
 
 // Renders the tasks and the timer. Kicks of the timer counting down as well
 function initTasksAndTimers(){
-	let randomTask = () => TASK_DESCRIPTIONS[Math.floor(Math.random() * TASK_DESCRIPTIONS.length)];
+	const tasks = [...TASK_DESCRIPTIONS];
+	let randomTask = () => tasks.splice(Math.floor(Math.random() * tasks.length), 1);
+
 
 	const timerDiv = d3.select("#timer");
 	const taskDiv = d3.select("#task_dialog");
