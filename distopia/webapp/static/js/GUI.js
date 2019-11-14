@@ -33,6 +33,9 @@ window.currentTime = 0;
 var distopia = new DistopiaInterface({initialView: "state", "metricFocus": State.metricFocus});
 initInteractive();
 initState();
+// called twice just to get the boundries to draw properly - this is a bug that needs to be fixed
+initState();
+
 initTasksAndTimers();
 
 function updateState(newState){
