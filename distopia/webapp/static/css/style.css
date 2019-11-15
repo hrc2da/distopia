@@ -23,7 +23,7 @@
 .screen {
 	width: 100%;
 	height: 100%;
-	background-color: #333;
+	background-color: #707070;
 }
 
 .panels {
@@ -154,7 +154,7 @@
 body{
 	overflow-x: hidden;
 	overflow-y: hidden;
-	background-color: #9c3b3b;
+	background-color: #302A2A;
 }
 
 .subtitle {
@@ -249,7 +249,8 @@ select {
 	color: white;
 	font-family: 'Rock Salt', cursive;
 	font-size: 1.5em;
-	margin-left: 500px;
+	padding: 15px 10px;
+	text-align: center;
 }
 
 #centroid {
