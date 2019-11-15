@@ -182,13 +182,13 @@ body{
 
 
 #radar{
-	background-color: black;
+	background-color: #3B5175;
 	fill: white;
 }
 #label_area{
 	height: 100%;
 	width: 100%;
-	background-color: #3f5e86;
+	background-color: #3B5175;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 	fill: white;
 }
@@ -201,20 +201,28 @@ body{
 }
 
 #task_dialog{
-	background-color: #3f5e86;
+	background-color: #3B5175;
 	fill: white;
+	overflow-wrap: break-word;
 }
 
+#timer{
+	background-color: #3B5175;
+	fill: white;
+}
 #intent_dialog{
-	background-color: #3f5e86;
+	background-color: #3B5175;
 	fill: white;
 }
 
 select {
-	background-color: #3f5e86;
+	background-color: #707070;
 	color: white;
 	margin-left: 10px;
 	margin-top: 10px;
+	margin-right: 20px;
+	border: 3px solid #ffffff;
+
 }
 
 .left #scale{
@@ -225,7 +233,8 @@ select {
 }
 
 #scale{
-	background-color: #3f5e86;
+	background-color: #3B5175;
+
 	fill: white;
 }
 .right{
@@ -242,7 +251,8 @@ select {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: white;
+	background-color: #3B5175;
+	color: white;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 .header {

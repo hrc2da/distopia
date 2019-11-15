@@ -236,8 +236,8 @@ export class StateView {
 		// 	.style("font-size", "2em");
 
 		d3.select("#task_dialog").append("text").text("Currrent Task:").attr("class", "label")
-			.attr("x", parseFloat(d3.select("#task_dialog").style("width"))/10)
-			.attr("y", parseFloat(d3.select("#task_dialog").style("height"))/4)
+			.attr("x", 80)
+			.attr("y", 50)
 			.style("text-anchor", "left").style("alignment-baseline", "middle")
 			.style("font-size", "1.5em");
 			

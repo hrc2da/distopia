@@ -125,8 +125,9 @@ body {
   line-height: 3;
   text-align: center;
   font-weight: 400;
+  color: white;
   font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #222; }
+   }
 
 
 /* Typography
@@ -174,7 +175,7 @@ input[type="button"] {
   display: inline-block;
   height: 38px;
   padding: 0 30px;
-  color: #555;
+  color: #ffffff;
   text-align: center;
   font-size: 11px;
   font-weight: 600;
@@ -185,7 +186,7 @@ input[type="button"] {
   white-space: nowrap;
   background-color: transparent;
   border-radius: 4px;
-  border: 1px solid #bbb;
+  border: 3px solid #ffffff;
   cursor: pointer;
   box-sizing: border-box; }
 .button:hover,
@@ -198,8 +199,9 @@ button:focus,
 input[type="submit"]:focus,
 input[type="reset"]:focus,
 input[type="button"]:focus {
-  color: #333;
-  border-color: #888;
+  color: #707070;
+  background-color: #ffffff;
+  border-color: #ffffff;
   outline: 0; }
 .button.button-primary,
 button.button-primary,
