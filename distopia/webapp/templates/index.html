@@ -21,6 +21,48 @@
 		<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
 		<script type="text/javascript">var session_id = {{ session_id }} </script>
 		<link rel="stylesheet" type="text/css" href="static/css/style.css">
+		<style>
+				.tooltip {
+				  position: relative;
+				  right : 1;
+				  display: inline-block;
+				  border-bottom: 1px dotted black;
+				}
+				
+				.tooltip .tooltiptext {
+				  visibility: hidden;
+				  width: 120px;
+				  background-color: #555;
+				  color: #fff;
+				  text-align: center;
+				  border-radius: 6px;
+				  padding: 5px 0;
+				  position: absolute;
+				  z-index: 1;
+				  bottom: 125%;
+				  left: 50%;
+				  margin-left: -60px;
+				  opacity: 0;
+				  transition: opacity 0.3s;
+				}
+				
+				.tooltip .tooltiptext::after {
+				  content: "";
+				  position: absolute;
+				  top: 100%;
+				  left: 50%;
+				  margin-left: -5px;
+				  border-width: 5px;
+				  border-style: solid;
+				  border-color: #555 transparent transparent transparent;
+				}
+				
+				.tooltip:hover .tooltiptext {
+				  visibility: visible;
+				  opacity: 1;
+				}
+
+				</style>
 	</head>
 	<body>
 		<span class="header"></div>DisTopia: Redistricting Design</span>
@@ -38,9 +80,9 @@
 						<div class="row" style="height: 8vh; margin-bottom: 1%;" id = "label_area">
 								<span>		
 									<label id="metric_selector_label" for="metric_selector" style="display:inline-flex">Metric:</label>
-									<select id= "metric_selector""></select>
+									<select id= "metric_selector"></select>
 									<label id="district_selector_label" for="district_selector" style="display:inline-flex">District:</label>
-									<select id= "district_selector""></select>
+									<select id= "district_selector"></select>
 									<button id="reset_centroids">Reset Centroids</button>
 								</span>
 							<!-- ' <svg id="label_area"></svg> -->
@@ -62,8 +104,8 @@
 								<svg id="timer"></svg>
 							</div>
 							<div class="row" style="margin-bottom: 1%;">
-								<button id = "add_time"/> Add Time </button>
-								<button id = "next_task"/> Next Task </button>
+								<button id = "add_time"> Add Time </button>
+								<button id = "next_task"> Next Task </button>
 							</div>
 						</div>
 						</div>
