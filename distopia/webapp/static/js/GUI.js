@@ -14,6 +14,7 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*		counter: Number,
 	*		centroid_counter: Number,
 	*		currentTask: string,
+	*		currentTaskNumber: Number,
 	*/
 var State = {
 	"blocks": {},
@@ -23,6 +24,7 @@ var State = {
 	 "counter": 0,
 	 "centroid_counter": 0,
 	 "currentTask": "",
+	 "currentTaskNumber": 0,
 }
 
 // Not including this instate because want to prevent entire state update code from running every 1 second
@@ -33,6 +35,9 @@ window.currentTime = 0;
 var distopia = new DistopiaInterface({initialView: "state", "metricFocus": State.metricFocus});
 initInteractive();
 initState();
+// called twice just to get the boundries to draw properly - this is a bug that needs to be fixed
+initState();
+
 initTasksAndTimers();
 
 function updateState(newState){
@@ -110,36 +115,83 @@ function initInteractive(){
 		districtSelector.options.add(option, i);
 	}
 	districtSelector.value = State.selectedDistrict;
+
+	// reset centroids button
+	const resetCentroidsButton = document.getElementById("reset_centroids");
+	resetCentroidsButton.onclick = () => {
+		(Object.keys(State.centroids)).forEach(
+			(key) => removeCentroid(key));
+		initState();
+	}
+
+	// add time button;
+	const addTimeButton = document.getElementById("add_time");
+	addTimeButton.onclick = () => { addTime()};
+
+	// add time button;
+	const nextTaskButton = document.getElementById("next_task");
+	nextTaskButton.onclick = () => { nextTask()};
 }
 
 
 // Renders the tasks and the timer. Kicks of the timer counting down as well
 function initTasksAndTimers(){
-	let randomTask = () => TASK_DESCRIPTIONS[Math.floor(Math.random() * TASK_DESCRIPTIONS.length)];
+	const tasks = [...TASK_DESCRIPTIONS];
+	let randomTask = () => tasks.splice(Math.floor(Math.random() * tasks.length), 1);
 
+
+	const timerDiv = d3.select("#timer");
 	const taskDiv = d3.select("#task_dialog");
+
+	taskDiv.append("text").attr("id", "task_number")
+	.attr("x", 80)
+	.attr("y", 20)
+	.text("");
 
 	taskDiv.append("text").attr("id", "task_text")
 	.attr("x", 80)
-	.attr("y", 60)
+	.attr("y", 70)
 	.text(State.currentTask);
-	taskDiv.append("text").attr("id", "task_time")
+
+	timerDiv.append("text").attr("id", "task_time_header")
+	.attr("x", 80)
+	.attr("y", 40)
+	.text("Time remaining to complete task: ");
+
+	timerDiv.append("text").attr("id", "task_time")
 	.attr("x", 80)
 	.attr("y", 80);
 
 	let taskTime = () => setInterval(() => {
 		if (window.currentTime == 0){
-			updateState({currentTask: randomTask()});
+			updateState({currentTask: randomTask(), currentTaskNumber: State.currentTaskNumber +1});
+			d3.select("#task_number").text("Task " + State.currentTaskNumber + " of " + TASK_DESCRIPTIONS.length + " :");
 			d3.select("#task_text").text(State.currentTask);
 			window.currentTime = window.taskTimeLimit;
+		}
+		else if (State.currentTaskNumber == TASK_DESCRIPTIONS.length){
+			console.log('hello');
+			updateState({currentTask: "No more tasks to be completed"});
+			d3.select("#task_text").text(State.currentTask);
+			clearInterval(taskTime);
+			const nextTaskButton = document.getElementById("next_task");
+			nextTaskButton.onclick = () => {};
 		}
 		else{
 			window.currentTime --;
 		}
-		d3.select("#task_time").text("Time Remaining: " + window.currentTime);
+		d3.select("#task_time").text(window.currentTime);
 	}, 1000);
 	
 	taskTime();		
+}
+
+function addTime(){
+	window.currentTime = 100;
+}
+
+function nextTask(){
+	window.currentTime = 0;
 }
 
 
