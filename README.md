@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/hrc2da/distopia.svg?branch=master)](https://travis-ci.com/hrc2da/distopia)
+[![Github Build Status](https://github.com/hrc2da/distopia/workflows/Distopia%20Python%20application/badge.svg)](https://github.com/hrc2da/distopia/actions)
 
 Distopia
 =========
