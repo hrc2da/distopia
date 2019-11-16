@@ -56,7 +56,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cp -r doc/build/html ~/docs_temp
+        cp -r docs/build/html ~/docs_temp
 
         git config --global user.email "mvl24@cornell.edu"
         git config --global user.name "Matt Law"
