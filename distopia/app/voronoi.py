@@ -17,6 +17,7 @@ import csv
 import math
 from functools import cmp_to_key
 
+from kivy.core.window import Window
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
@@ -43,6 +44,7 @@ from distopia.app.voronoi_data import GeoDataCounty, GeoDataPrecinct2017
 from distopia.precinct import Precinct
 from distopia.mapping.voronoi import VoronoiMapping
 from distopia.app.ros import RosBridge
+from distopia.app.visualizer import Visualizer
 
 __all__ = ('VoronoiWidget', 'VoronoiApp')
 
@@ -113,6 +115,12 @@ class VoronoiWidget(Widget):
 
     visualize_metric_data = True
 
+    current_step = 0
+
+    visualizer = None
+
+    current_file = 0
+
     def __init__(
         self, voronoi_mapping=None, table_mode=False, align_mat=None,
         screen_offset=(0, 0), ros_bridge=None, district_blocks_fid=None,
@@ -154,6 +162,17 @@ class VoronoiWidget(Widget):
         self.state_metrics_fn = state_metrics_fn
         self.screen_offset = screen_offset
         self.touches = {}
+
+        self.keyboard = Window.request_keyboard(self.keyboard_closed, self)
+        self.keyboard.bind(on_key_down=self.on_keyboard_down)
+
+        self.step_label = Label(text=str(self.current_step), center=(1350,400), font_size='60dp')
+        self.add_widget(self.step_label)
+
+        self.visualizer = Visualizer()
+
+        self.file_label = Label(text=self.visualizer.retrieve_file(self.current_file), center=(1250,950), font_size='20dp')
+        self.add_widget(self.file_label)
 
         with self.canvas.before:
             PushMatrix()
@@ -219,7 +238,6 @@ class VoronoiWidget(Widget):
                         self.add_widget(label)
                 
                 self.voronoi_mapping.request_reassignment(self.voronoi_callback)
-
 
     def show_district_selection(self):
         if not self.table_mode:
@@ -312,6 +330,112 @@ class VoronoiWidget(Widget):
             return self.gui_touch_down(touch)
         return self.fiducial_down(touch)
 
+    def keyboard_closed(self):
+        self.keyboard.unbind(on_key_down=self.on_keyboard_down)
+        self.keyboard = None
+
+    def on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        key = keycode[1]
+        if key == 'enter':
+            if self.step_label.text == "":
+                return True
+            self.current_step = int(self.step_label.text)
+            self.step_label.text = str(self.current_step)
+        elif key == 'backspace':
+            self.step_label.text = self.step_label.text[:-1]
+        elif key == 'd':
+            # TODO check if at max step
+            self.current_step += 1
+            self.step_label.text = str(self.current_step)
+        elif key == 'a': 
+            if(self.current_step == 0):
+                return True # no negative steps
+            self.current_step -= 1
+            self.step_label.text = str(self.current_step)
+        elif key == 'up':
+            if(self.current_file == 0):
+                return True # can't go before the first file
+            self.current_file -= 1
+            self.file_label.text = self.visualizer.retrieve_file(self.current_file)
+        elif key == 'down':
+            if(self.current_file == len(self.visualizer.files) - 1):
+                return True
+            # TODO check if at final file in directory
+            self.current_file += 1
+            self.file_label.text = self.visualizer.retrieve_file(self.current_file)
+        else:
+            try: 
+                int(keycode[1])
+                self.step_label.text += keycode[1]
+            except ValueError:
+                return True
+            return True
+        design = self.visualizer.visualize_design(self.current_step)
+        print("STEP: ", self.current_step)
+        print("DESIGN: ", design)
+        self.visualize(design)
+        return True
+
+    def visualize(self, design):
+        self.reset_map()
+        if design != None:
+            uid = 0
+            for fid_id in range(8):
+                for loc in design[fid_id]:
+                    self.artificial_fiducial_down(loc, fid_id, uid)
+                    uid += 1
+    
+    def reset_map(self):
+        from copy import deepcopy
+        fiducials = deepcopy(self.voronoi_mapping.get_fiducials())
+        for fid in fiducials:
+            self.remove_fiducial(fid, None)
+        self.clear_voronoi()
+        fid_graphics = list(self.fiducial_graphics.values())
+        for fg in fid_graphics:
+            self.remove_widget(fg)
+        self.fiducial_graphics = {'focus': self.fiducial_graphics['focus']}
+        #for key in self.fiducial_graphics.keys():
+        #    if key != 'focus': del self.fiducial_graphics[key]
+
+    def artificial_fiducial_down(self, loc, fid_id, uid):
+        focus_id = self.focus_block_logical_id
+        blocks_fid = self.district_blocks_fid
+
+        x, y = pos = self.align_touch(loc)
+        pos = x, y = (x+self.focus_region_width,y)
+        '''
+        # handle focus block
+        if fid_id == focus_id:
+            return self.artificial_focus_block_down(fid_id)
+        if x < self.focus_region_width:
+            return True
+        
+        with self.canvas:
+            color = Color(rgba=(1, 1, 1, 1))
+            point = Point(points=pos, pointsize=7)
+        '''
+        logical_id = blocks_fid.index(fid_id)
+        key = self.add_fiducial((x - self.focus_region_width, y), logical_id)
+        #self.fiducial_graphics[key] = color, point
+        '''
+        info = {'fid': fid_id, 'fiducial_key': key, 'last_pos': pos,
+        'graphics': (color, point), 'logical_id': logical_id}
+        self.touches[uid] = info
+        '''
+        label = self.fiducial_graphics[key] = Label(
+            text=str(fid_id + 1),
+            center=tuple(map(float, pos)),
+            font_size='20dp')
+        self.add_widget(label)
+        
+        #print(self.touches[uid])
+        #print(self.fiducial_graphics)
+        #print(self.fiducial_graphics[key])
+        #print("\n\n")
+        self.voronoi_mapping.request_reassignment(self.voronoi_callback)
+        return True
+
     def on_touch_move(self, touch):
         if not self.table_mode and \
                 self.gui_touch_focus_buttons.collide_point(*touch.pos):
@@ -335,7 +459,7 @@ class VoronoiWidget(Widget):
         if self.table_mode:
             return self.fiducial_up(touch)
         return self.gui_touch_up(touch)
-
+    
     def align_touch(self, pos):
         if self.align_mat is not None:
             pos = tuple(
@@ -484,7 +608,6 @@ class VoronoiWidget(Widget):
             return False
 
         x, y = pos = self.align_touch(touch.pos)
-
         # handle focus block
         if touch.fid == focus_id:
             return self.focus_block_down(touch, pos)
@@ -497,11 +620,11 @@ class VoronoiWidget(Widget):
 
         logical_id = blocks_fid.index(touch.fid)
         key = self.add_fiducial((x - self.focus_region_width, y), logical_id)
-
+        
         info = {'fid': touch.fid, 'fiducial_key': key, 'last_pos': pos,
                 'graphics': (color, point), 'logical_id': logical_id}
         self.touches[touch.uid] = info
-
+        
         self.voronoi_mapping.request_reassignment(self.voronoi_callback)
         return True
 
@@ -544,7 +667,6 @@ class VoronoiWidget(Widget):
     def gui_touch_down(self, touch):
         x, y = pos = self.align_touch(touch.pos)
         info = {'moved': False, 'fiducial_key': None}
-
         # are we near a voronoi touch?
         x_ = (x - self.focus_region_width) / Metrics.density
         y_ = y / Metrics.density
@@ -620,7 +742,7 @@ class VoronoiWidget(Widget):
         if 'focus' in info:
             if self.focus_gui_pos != pos:
                 self.handle_focus_block(pos)
-            self.focus_gui_pos = self.fiducial_graphics['focus'][1].points = pos
+            self.focus_gui_pos = self.fiducial_graphics['focus'][1].points = pos #THISAONE
             return True
 
         key = info['fiducial_key']
@@ -816,7 +938,7 @@ class VoronoiApp(App):
 
     metrics = ['demographics', ]
 
-    ros_host = 'localhost'
+    ros_host = '192.168.99.100'
 
     ros_port = 9090
 
