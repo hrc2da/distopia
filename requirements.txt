@@ -1,5 +1,4 @@
 absl-py==0.8.0
-actionlib==1.12.0
 angles==1.9.11
 asn1crypto==0.24.0
 astor==0.8.0
