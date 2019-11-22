@@ -39,7 +39,7 @@ initTasksAndTimers();
 
 function updateState(newState){
 	if (newState.metricFocus && State.metricFocus != newState.metricFocus){
-		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus}).then()
+		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
 		d3.selectAll(".dist_label").raise();
 	}
 	if (newState.blocks && State.blocks != newState.blocks){
@@ -204,7 +204,6 @@ function initState(){
 			6: [[818,26]],
 			7: [[823,135]]
 			},
-		"metricFocus": "population",
 		"selectedDistrict": 1,
 		"centroids": {},
 		"counter": 0,
