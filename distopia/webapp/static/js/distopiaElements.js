@@ -127,7 +127,7 @@ export var UI_CONSTANTS = {
 	// 	}
 	// },
 	"pvi": {
-		"scale": ([wasted_votes,_]) => simplifiedScale([0,20000],["white","red"], wasted_votes),
+		"scale": ([wasted_votes,_]) => simplifiedScale([0,200000],["white","red"], wasted_votes),
 		"domain":[0,200000],
 		"label": "Wasted Votes",
 		"labelText": "# Wasted Votes",
