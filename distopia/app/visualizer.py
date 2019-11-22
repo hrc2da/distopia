@@ -4,9 +4,6 @@
 from os import listdir
 from os.path import isfile, join
 import json
-#import roslibpy
-import time
-#import voronoi
 
 class Visualizer:
 
@@ -94,20 +91,5 @@ class Visualizer:
                 for rf in row_fiducials:
                     fid = rf["fid_id"]
                     design[fid].append([rf["x"],rf["y"]])
-                #publisher.publish(roslibpy.Message({'data':json.dumps(design)}))
-                #print("publishing {}".format(i))
                 return design
-                
-            #time.sleep(0.01)
-
-# filename = "/home/dev/research/distopia/logs/logs/-1.0,0.0,0.0,0.0,0.0,0.0,0.0_log"
-# filename = "gonzalo_42_[-1,-1,-1].json"
-# filename = "test_viz.json"
-# filename = "test_viz_fullscale.json"
-# filename = "coords_test.json"
-# filename = "agent_sarsa_episodes_100_episodelen_1000_subsample_50_alpha_0.9_disc_0.2_optimistic_[-1.0.0.].json"
-
-#ros = roslibpy.Ros(host="localhost", port=9090)
-#ros.run()
-#publisher = roslibpy.Topic(ros, '/fiducial_layout', 'std_msgs/String')
 
