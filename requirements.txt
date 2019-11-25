@@ -14,7 +14,6 @@ chardet==3.0.4
 Click==7.0
 constantly==15.1.0
 cryptography==2.7
-cv-bridge==1.13.0
 cycler==0.10.0
 Cython==0.29.13
 decorator==4.4.0
