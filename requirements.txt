@@ -18,9 +18,6 @@ cycler==0.10.0
 Cython==0.29.13
 decorator==4.4.0
 defusedxml==0.6.0
-diagnostic-analysis==1.9.3
-diagnostic-common-diagnostics==1.9.3
-diagnostic-updater==1.9.3
 -e git+https://github.com/hrc2da/distopia@51a7998d83117204a6a100ef34164062f456548f#egg=Distopia
 docutils==0.15.2
 dynamic-reconfigure==1.6.0
