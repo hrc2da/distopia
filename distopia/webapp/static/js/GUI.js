@@ -28,7 +28,7 @@ var State = {
 }
 
 // Not including this instate because want to prevent entire state update code from running every 1 second
-window.taskTimeLimit = 30;
+window.taskTimeLimit = 90;
 window.currentTime = 0;
 
 // initializations
@@ -39,7 +39,7 @@ initTasksAndTimers();
 
 function updateState(newState){
 	if (newState.metricFocus && State.metricFocus != newState.metricFocus){
-		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus}).then()
+		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
 		d3.selectAll(".dist_label").raise();
 	}
 	if (newState.blocks && State.blocks != newState.blocks){
@@ -177,14 +177,20 @@ function initTasksAndTimers(){
 		else{
 			window.currentTime --;
 		}
-		d3.select("#task_time").text(window.currentTime);
+		// compute current time in minutes:
+		const minutes = Math.floor(window.currentTime / 60);
+		var seconds = String(window.currentTime % 60);
+		if(seconds.length == 1){
+			seconds = "0" + seconds;
+		}
+		d3.select("#task_time").text(minutes + " : " + seconds);
 	}, 1000);
 	
 	taskTime();		
 }
 
 function addTime(){
-	window.currentTime = 100;
+	window.currentTime = window.currentTime + 180;
 }
 
 function nextTask(){
@@ -204,7 +210,6 @@ function initState(){
 			6: [[818,26]],
 			7: [[823,135]]
 			},
-		"metricFocus": "population",
 		"selectedDistrict": 1,
 		"centroids": {},
 		"counter": 0,
