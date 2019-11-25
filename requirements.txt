@@ -13,8 +13,6 @@ cffi==1.12.3
 chardet==3.0.4
 Click==7.0
 constantly==15.1.0
-controller-manager==0.15.1
-controller-manager-msgs==0.15.1
 cryptography==2.7
 cv-bridge==1.13.0
 cycler==0.10.0
