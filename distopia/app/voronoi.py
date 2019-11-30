@@ -119,7 +119,7 @@ class VoronoiWidget(Widget):
 
     visualizer = None
 
-    current_file = 0
+    current_log = 0
 
     def __init__(
         self, voronoi_mapping=None, table_mode=False, align_mat=None,
@@ -171,7 +171,7 @@ class VoronoiWidget(Widget):
 
         self.visualizer = Visualizer()
 
-        self.file_label = Label(text=self.visualizer.retrieve_file(self.current_file), center=(1250,950), font_size='20dp')
+        self.file_label = Label(text=self.visualizer.prepare_log(self.current_log), center=(1250,950), font_size='20dp')
         self.add_widget(self.file_label)
 
         with self.canvas.before:
@@ -183,6 +183,10 @@ class VoronoiWidget(Widget):
         self.artificial_focus_block_down(1)
         Clock.schedule_interval(self.check_ros_focus,2)
         Clock.schedule_interval(self.check_ros_fiducials,2)
+        
+        # Startup with visualization
+        first_design = self.visualizer.visualize_design(0)
+        self.visualize(first_design)
 
     def rotate_focus(self,dt):
         if not hasattr(self, "rotator"):
@@ -336,43 +340,56 @@ class VoronoiWidget(Widget):
 
     def on_keyboard_down(self, keyboard, keycode, text, modifiers):
         key = keycode[1]
-        if key == 'enter':
+        if key == 'enter': # going to an inputted step
             if self.step_label.text == "":
                 return True
-            self.current_step = int(self.step_label.text)
-            self.step_label.text = str(self.current_step)
-        elif key == 'backspace':
+            inputted_step = int(self.step_label.text)
+            if(inputted_step >= self.visualizer.get_max_steps()-1):
+                self.current_step = self.visualizer.get_max_steps()-1
+                self.step_label.text = str(self.current_step) # no steps beyond the end of a log
+            else:
+                self.current_step = inputted_step
+        
+        elif key == 'backspace': # removing the last digit of the inputted step
             self.step_label.text = self.step_label.text[:-1]
-        elif key == 'd':
-            # TODO check if at max step
-            self.current_step += 1
-            self.step_label.text = str(self.current_step)
-        elif key == 'a': 
-            if(self.current_step == 0):
+        
+        elif key == 'a': # going back a single step
+            if(self.current_step <= 0):
                 return True # no negative steps
             self.current_step -= 1
             self.step_label.text = str(self.current_step)
-        elif key == 'up':
-            if(self.current_file == 0):
-                return True # can't go before the first file
-            self.current_file -= 1
-            self.file_label.text = self.visualizer.retrieve_file(self.current_file)
-        elif key == 'down':
-            if(self.current_file == len(self.visualizer.files) - 1):
-                return True
-            # TODO check if at final file in directory
-            self.current_file += 1
-            self.file_label.text = self.visualizer.retrieve_file(self.current_file)
-        else:
+        
+        elif key == 'd': # going forward a single step
+            if(self.current_step >= self.visualizer.get_max_steps()-1):
+                self.current_step = self.visualizer.get_max_steps()-1
+                self.step_label.text = str(self.current_step) # no steps beyond the end of a log
+            else:
+                self.current_step += 1
+                self.step_label.text = str(self.current_step)
+        
+        elif key == 'up': # accessing the log directly above in the log directory
+            if(self.current_log <= 0):
+                return True # can't go before the first log
+            self.current_log -= 1
+            self.file_label.text = self.visualizer.prepare_log(self.current_log)
+        
+        elif key == 'down': # accessing the log directly below in the log directory
+            if(self.current_log >= self.visualizer.get_log_count() - 1):
+                return True # can't go beyond the last log
+            self.current_log += 1
+            self.file_label.text = self.visualizer.prepare_log(self.current_log)
+        
+        else: # appends a digit to the inputted step - ignores all other keyboard inputs
             try: 
                 int(keycode[1])
                 self.step_label.text += keycode[1]
             except ValueError:
                 return True
             return True
+
         design = self.visualizer.visualize_design(self.current_step)
-        print("STEP: ", self.current_step)
-        print("DESIGN: ", design)
+        #print("STEP: ", self.current_step)
+        #print("DESIGN: ", design)
         self.visualize(design)
         return True
 
@@ -399,40 +416,21 @@ class VoronoiWidget(Widget):
         #    if key != 'focus': del self.fiducial_graphics[key]
 
     def artificial_fiducial_down(self, loc, fid_id, uid):
-        focus_id = self.focus_block_logical_id
+        
         blocks_fid = self.district_blocks_fid
 
         x, y = pos = self.align_touch(loc)
         pos = x, y = (x+self.focus_region_width,y)
-        '''
-        # handle focus block
-        if fid_id == focus_id:
-            return self.artificial_focus_block_down(fid_id)
-        if x < self.focus_region_width:
-            return True
-        
-        with self.canvas:
-            color = Color(rgba=(1, 1, 1, 1))
-            point = Point(points=pos, pointsize=7)
-        '''
+
         logical_id = blocks_fid.index(fid_id)
         key = self.add_fiducial((x - self.focus_region_width, y), logical_id)
-        #self.fiducial_graphics[key] = color, point
-        '''
-        info = {'fid': fid_id, 'fiducial_key': key, 'last_pos': pos,
-        'graphics': (color, point), 'logical_id': logical_id}
-        self.touches[uid] = info
-        '''
+
         label = self.fiducial_graphics[key] = Label(
             text=str(fid_id + 1),
             center=tuple(map(float, pos)),
             font_size='20dp')
         self.add_widget(label)
-        
-        #print(self.touches[uid])
-        #print(self.fiducial_graphics)
-        #print(self.fiducial_graphics[key])
-        #print("\n\n")
+
         self.voronoi_mapping.request_reassignment(self.voronoi_callback)
         return True
 
