@@ -59,7 +59,8 @@ def standardize(sequence):
 def root():
     global sessions
     sessions += 1
-    return render_template("index.html", session_id = sessions)
+    #"http://localhost:5000"
+    return render_template("index.html", session_id = sessions, host_uri = "https://distopia.ngrok.io")
 
 
 @app.route("/evaluate", methods=['POST'])
