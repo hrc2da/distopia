@@ -49,7 +49,7 @@ function updateState(newState){
 			counter = 0;
 		}
 		console.log("counter  =" + counter);
-		d3.json('http://localhost:5000/evaluate', {
+		d3.json(host_uri + '/evaluate', {
       	method:"POST",
       	body: JSON.stringify({
 		  "blocks": newState.blocks,
