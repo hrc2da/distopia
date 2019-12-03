@@ -283,6 +283,7 @@ function addCentroid(e){
 	.attr("id", id)
 	.text(State.selectedDistrict)
 	.style("cursor", "pointer")
+	.style("font", "20px helvetica")
 	.on("click", () => { 
 		d3.event.stopPropagation(); 
 		removeCentroid(id);
