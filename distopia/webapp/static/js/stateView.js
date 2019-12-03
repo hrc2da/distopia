@@ -237,7 +237,6 @@ export class StateView {
 		// 	.attr("x", parseFloat(d3.select("#intent_dialog").style("width"))/10)
 		// 	.attr("y", parseFloat(d3.select("#intent_dialog").style("height"))/5)
 		// 	.style("font-size", "1.25em");
-		console.log("Reset Colors is :" + isReset);
 		districtData.forEach((district, i) => {
 			let distX_min = 1000000, distX_max = 0, distY_min = 1000000, distY_max = 0;
 			let scale = isReset ? UI_CONSTANTS["init"].scale : UI_CONSTANTS[this.metricFocus].scale;
@@ -245,7 +244,6 @@ export class StateView {
 			let f = scale([district.scalar_value, district.scalar_maximum]);
 			district.precincts.forEach((precinct) => {
 				this.counties[precinct].fill = f;
-				console.log('filled precinct');
 				if(distX_min > this.counties[precinct].x[0]){ distX_min = this.counties[precinct].x[0]; }
 				if(distX_max < this.counties[precinct].x[1]){ distX_max = this.counties[precinct].x[1]; }
 				if(distY_min > this.counties[precinct].y[0]){ distY_min = this.counties[precinct].y[0]; }

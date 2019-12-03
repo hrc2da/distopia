@@ -1,8 +1,8 @@
 import {DistopiaInterface} from"./distopiaInterface.js";
-import {UI_CONSTANTS, TASK_DESCRIPTIONS} from "./distopiaElements.js";
+import {UI_CONSTANTS,friendlyNamestoMetrics, TASK_DESCRIPTIONS} from "./distopiaElements.js";
 
 const METRICS = Object.keys(UI_CONSTANTS);
-
+const FRIENDLYNAMES = Object.keys(friendlyNamestoMetrics);
 // current State of the data - not to be confused with the state ex: Wisconsin
 // for metric Focus instead of string we want to type it as a union instead of any string
 /** 
@@ -41,7 +41,6 @@ initTasksAndTimers();
 
 function updateState(newState){
 	if (newState.metricFocus && State.metricFocus != newState.metricFocus){
-		console.log(State.isReset);
 		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus, isReset: State.isReset});
 		d3.selectAll(".dist_label").raise();
 	}
@@ -51,7 +50,6 @@ function updateState(newState){
 		if (typeof(counter) == 'undefined'){
 			counter = 0;
 		}
-		console.log("counter  =" + counter);
 		d3.json(host_uri + '/evaluate', {
       	method:"POST",
       	body: JSON.stringify({
@@ -75,7 +73,6 @@ function updateState(newState){
 		});
 	}
 	State = {...State,...newState};
-	console.log("State has been updated to the new state with isReset = " + State.isReset);
 }
 
 function initInteractive(){
@@ -83,11 +80,11 @@ function initInteractive(){
     centroidAddButton.onclick = (e) => addCentroid(e);
 
     const metricSelector = document.getElementById("metric_selector");
-    metricSelector.onchange = () => updateState({"metricFocus": metricSelector.value});
+    metricSelector.onchange = () => updateState({"metricFocus": friendlyNamestoMetrics[metricSelector.value]});
 	// add options for the metric filter
-    for (let i = 0; i < METRICS.length; i++){
+    for (let i = 0; i < FRIENDLYNAMES.length; i++){
         const option = document.createElement("option");
-        option.text = METRICS[i];
+        option.text = FRIENDLYNAMES[i]
         metricSelector.options.add(option, i);
     }
 	metricSelector.value = State.metricFocus;
@@ -164,34 +161,38 @@ function initTasksAndTimers(){
 	.attr("x", 80)
 	.attr("y", 80);
 
-	let taskTime = () => setInterval(() => {
-		if (window.currentTime == 0){
-			updateState({currentTask: randomTask(), currentTaskNumber: State.currentTaskNumber +1});
-			d3.select("#task_number").text("Task " + State.currentTaskNumber + " of " + TASK_DESCRIPTIONS.length + " :");
-			d3.select("#task_text").text(State.currentTask);
-			window.currentTime = window.taskTimeLimit;
-		}
-		else if (State.currentTaskNumber == TASK_DESCRIPTIONS.length){
-			console.log('hello');
-			updateState({currentTask: "No more tasks to be completed"});
-			d3.select("#task_text").text(State.currentTask);
-			clearInterval(taskTime);
-			const nextTaskButton = document.getElementById("next_task");
-			nextTaskButton.onclick = () => {};
-		}
-		else{
-			window.currentTime --;
-		}
-		// compute current time in minutes:
-		const minutes = Math.floor(window.currentTime / 60);
-		var seconds = String(window.currentTime % 60);
-		if(seconds.length == 1){
-			seconds = "0" + seconds;
-		}
-		d3.select("#task_time").text(minutes + " : " + seconds);
-	}, 1000);
+	let taskTime = null;
+	let setTaskTime = () => {
+		let taskTime = setInterval(() => {
+			if (window.currentTime == 0){
+				updateState({currentTask: randomTask(), currentTaskNumber: State.currentTaskNumber +1});
+				d3.select("#task_number").text("Task " + State.currentTaskNumber + " of " + TASK_DESCRIPTIONS.length + " :");
+				d3.select("#task_text").text(State.currentTask);
+				window.currentTime = window.taskTimeLimit;
+			}
+			else if (State.currentTaskNumber >= TASK_DESCRIPTIONS.length){
+				updateState({currentTask: "No more tasks to be completed"});
+				d3.select("#task_text").text(State.currentTask);
+				const nextTaskButton = document.getElementById("next_task");
+				nextTaskButton.onclick = () => {};
+				nextTaskButton.disabled = true;
+				clearInterval(taskTime);
+			}
+			else{
+				window.currentTime --;
+			}
+			// compute current time in minutes:
+			const minutes = Math.floor(window.currentTime / 60);
+			var seconds = String(window.currentTime % 60);
+			if(seconds.length == 1){
+				seconds = "0" + seconds;
+			}
+			d3.select("#task_time").text(minutes + " : " + seconds);
+		}, 1000);
+	}
+
 	
-	taskTime();		
+	setTaskTime();		
 }
 
 function addTime(){

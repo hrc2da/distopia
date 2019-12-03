@@ -90,7 +90,8 @@ export var UI_CONSTANTS = {
 		"colors": {
 			"Total Population": "#CCCCCC",
 			"Voting Population": "#82E0E6"
-		}
+		},
+		"friendlyName": "population",
 	},
 	"projected_votes": {
 		//lean to either republican or democrat
@@ -106,7 +107,8 @@ export var UI_CONSTANTS = {
 		"colors": {
 			"Democrat": "#4A90E2",
 			"Republican": "#D0021B"
-		}
+		},
+		"friendlyName": "projected_votes",
 	},
 	// "race": {
 	// 	//number nonwhite divided by total population
@@ -132,20 +134,29 @@ export var UI_CONSTANTS = {
 		"label": "Wasted Votes",
 		"labelText": "# Wasted Votes",
 		"histLabel": "This Plot is Under Construction",
+		"friendlyName": "voter_efficiency",
 	},
 	"compactness": {
 		"scale": ([compactness,_]) => simplifiedScale([0,1],["white","green"], compactness),
 		"domain": [0,1],
 		"label": "Compactness",
 		"labelText": "How Regular Shapes Are",
-		"histLabel": "This Plot is Under Construction"
+		"histLabel": "This Plot is Under Construction",
+		"friendlyName": "compactness",
 	},
 	"init":{
 		"scale": ([compactness,_]) => simplifiedScale([0,1],["grey","grey"], compactness),
 	}	
 }
 
-export var TASK_DESCRIPTIONS = [
+export const friendlyNamestoMetrics = {
+	"population": "population",
+	"projected_votes": "projected_votes",
+	"voter_efficiency": "pvi",
+	"compactness": "compactness"
+}
+
+export const TASK_DESCRIPTIONS = [
     // population
     "Try to evenly balance the number of people each district has.",
     // pvi
