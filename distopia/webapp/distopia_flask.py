@@ -3,10 +3,19 @@ sys.path.append("../..")
 import json
 import numpy as np
 import pickle as pkl
+import argparse
 
 from flask import Flask, request, jsonify, render_template, abort
 from distopia.app.agent import VoronoiAgent
 from distopia.app.ros import RosBridge
+
+
+
+# argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--local", help="run the server locally", action="store_true")
+args = parser.parse_args()
+host_uri = "http://localhost:5000" if (args.local) else "https://distopia.ngrok.io"
 
 with open("team_standardization_params.pkl", 'rb') as infile:
     st_mean,st_std = pkl.load(infile)
@@ -59,8 +68,7 @@ def standardize(sequence):
 def root():
     global sessions
     sessions += 1
-    #"http://localhost:5000"
-    return render_template("index.html", session_id = sessions, host_uri = "https://distopia.ngrok.io")
+    return render_template("index.html", session_id = sessions, host_uri = host_uri)
 
 
 @app.route("/evaluate", methods=['POST'])
