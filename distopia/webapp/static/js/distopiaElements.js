@@ -139,6 +139,9 @@ export var UI_CONSTANTS = {
 		"label": "Compactness",
 		"labelText": "How Regular Shapes Are",
 		"histLabel": "This Plot is Under Construction"
+	},
+	"init":{
+		"scale": ([compactness,_]) => simplifiedScale([0,1],["grey","grey"], compactness),
 	}	
 }
 

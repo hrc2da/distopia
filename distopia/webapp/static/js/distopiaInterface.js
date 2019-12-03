@@ -118,8 +118,8 @@ export class DistopiaInterface{
 		if(SELF.getView() == "state"){
 			if(SELF.stateView == null){ SELF.stateView = new StateView(SELF.districts); }
 			else{ 
-				console.log('update districts');
-				SELF.stateView.update(SELF.districts,undefined,SELF.precalculated_stats); }
+					SELF.stateView.update(SELF.districts,undefined,SELF.precalculated_stats, message.isReset);
+			}
 		}
 		else{
 			if(SELF.districtView == null){ SELF.districtView = new DistrictView(SELF.districts); }

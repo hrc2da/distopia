@@ -196,9 +196,8 @@ export class StateView {
 		truncated = Math.max(truncated,-3);
 		return truncated*50/3 + 50;
 	}
-	update(data,metric,precalculated_stats){
-		console.log("updating");
-		//d3.selectAll(".dist_label").remove();
+
+	update(data,metric,precalculated_stats, isReset = false){
 		d3.selectAll(".label").remove();
 		d3.selectAll(".key").remove();
 		//update the viz. Note that the
@@ -210,11 +209,17 @@ export class StateView {
 		if(data.length < 8){ return; }
 		let bounds = [];
 
-		data.forEach((district) => {
-			bounds.push(district.boundary);
-		});
+		if (!isReset){
+			data.forEach((district) => {
+				bounds.push(district.boundary);
+			});
+			this.drawDistrictBounds(bounds);
+		}
+		else{
+			d3.selectAll(".bounds").remove();
+		}
 
-		this.drawDistrictBounds(bounds);
+
 
 		//pull the metric wanted for each district
 		let max = 1;
@@ -227,41 +232,25 @@ export class StateView {
 		const labelText = UI_CONSTANTS[this.metricFocus].labelText;
 		const histLabel = UI_CONSTANTS[this.metricFocus].histLabel;
 		
-
-		// TODO removing label until we decide new text bc it interferes with the buttons
-		// d3.select("#label_area").append("text").text(labelText).attr("class", "label")
-		// 	.attr("x", parseFloat(d3.select("#label_area").style("width"))/2)
-		// 	.attr("y", parseFloat(d3.select("#label_area").style("height"))/2)
-		// 	.style("text-anchor", "middle").style("alignment-baseline", "middle")
-		// 	.style("font-size", "2em");
-		
 		// INTENT DIALOGUE CODE
 		// d3.select("#intent_dialog").append("text").text("Predicted Task Weights:").attr("class","label")
 		// 	.attr("x", parseFloat(d3.select("#intent_dialog").style("width"))/10)
 		// 	.attr("y", parseFloat(d3.select("#intent_dialog").style("height"))/5)
 		// 	.style("font-size", "1.25em");
-
-
+		console.log("Reset Colors is :" + isReset);
 		districtData.forEach((district, i) => {
 			let distX_min = 1000000, distX_max = 0, distY_min = 1000000, distY_max = 0;
-			let scale = UI_CONSTANTS[this.metricFocus].scale;
+			let scale = isReset ? UI_CONSTANTS["init"].scale : UI_CONSTANTS[this.metricFocus].scale;
+			// let scale = UI_CONSTANTS[this.metricFocus].scale;
 			let f = scale([district.scalar_value, district.scalar_maximum]);
 			district.precincts.forEach((precinct) => {
 				this.counties[precinct].fill = f;
+				console.log('filled precinct');
 				if(distX_min > this.counties[precinct].x[0]){ distX_min = this.counties[precinct].x[0]; }
 				if(distX_max < this.counties[precinct].x[1]){ distX_max = this.counties[precinct].x[1]; }
 				if(distY_min > this.counties[precinct].y[0]){ distY_min = this.counties[precinct].y[0]; }
 				if(distY_max < this.counties[precinct].y[1]){ distY_max = this.counties[precinct].y[1]; }
 			});
-			// this code was used to indicate the number of the districts previously
-			// may be confusing with the centroids also on the screen
-
-			// district labels - not to be confused with centroids
-			// this.stateDiv.append("text").attr("class", "dist_label")
-			// 	.attr("x", this.xScale(distX_min + (distX_max-distX_min)/2))
-			// 	.attr("y", this.yScale(distY_min + (distY_max-distY_min)/2))
-			// 	.attr("id", "marker"+(i+1))
-			// 	.text(i+1)
 		});
 
 		let key = d3.select("#scale").append("g").attr("class", "key");

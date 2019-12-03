@@ -15,6 +15,7 @@ const METRICS = Object.keys(UI_CONSTANTS);
 	*		centroid_counter: Number,
 	*		currentTask: string,
 	*		currentTaskNumber: Number,
+	*		isReset: boolean,
 	*/
 var State = {
 	"blocks": {},
@@ -25,6 +26,7 @@ var State = {
 	 "centroid_counter": 0,
 	 "currentTask": "",
 	 "currentTaskNumber": 0,
+	 "isReset": false,
 }
 
 // Not including this instate because want to prevent entire state update code from running every 1 second
@@ -62,7 +64,7 @@ function updateState(newState){
 		})
 		.then((data) =>{
 			newState.counter = data['count'];
-			distopia.handleData({data: JSON.stringify(data)});
+				distopia.handleData({data: JSON.stringify(data), isReset: newState.isReset});
 			d3.selectAll(".dist_label").raise();
 		},(error)=>{
 			if (error.message){
@@ -213,7 +215,8 @@ function initState(){
 		"selectedDistrict": 1,
 		"centroids": {},
 		"counter": 0,
-		"centroid_counter": 0
+		"centroid_counter": 0,
+		"isReset": true,
 		}
 	);
 }
