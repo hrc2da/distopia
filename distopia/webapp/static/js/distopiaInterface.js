@@ -137,7 +137,9 @@ export class DistopiaInterface{
 		}
 		if(messageData.cmd == "focus_state"){
 			if(SELF.stateView.getMetricFocus() != messageData.param){
-				SELF.stateView.update(SELF.districts,messageData.param);	
+				console.log('changing metric focus');
+				console.log('reset message value in handleCommand' + message.isReset);
+				SELF.stateView.update(SELF.districts,messageData.param,null, message.isReset);	
 			}
 			if(SELF.getView() != "state"){
 				SELF.toggleView();

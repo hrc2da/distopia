@@ -41,7 +41,8 @@ initTasksAndTimers();
 
 function updateState(newState){
 	if (newState.metricFocus && State.metricFocus != newState.metricFocus){
-		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus});
+		console.log(State.isReset);
+		distopia.handleCommand({"cmd": "focus_state", "param": newState.metricFocus, isReset: State.isReset});
 		d3.selectAll(".dist_label").raise();
 	}
 	if (newState.blocks && State.blocks != newState.blocks){
@@ -74,6 +75,7 @@ function updateState(newState){
 		});
 	}
 	State = {...State,...newState};
+	console.log("State has been updated to the new state with isReset = " + State.isReset);
 }
 
 function initInteractive(){
@@ -92,7 +94,7 @@ function initInteractive(){
 	
 	// set up district selector
 	const districtSelector = document.getElementById("district_selector");
-	districtSelector.onchange = () => updateState({"selectedDistrict": districtSelector.value});
+	districtSelector.onchange = () => updateState({"selectedDistrict": districtSelector.value}, );
 	// keyboard shortcuts to select district
 	document.onkeyup = (e) => {
 		if(e.which >=49 && e.which <=56){
@@ -100,6 +102,7 @@ function initInteractive(){
 			districtSelector.value = key;
 			updateState({
 				"selectedDistrict": key,
+				"isReset": false
 			})	
 		}
 		else{
