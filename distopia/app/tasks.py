@@ -9,14 +9,14 @@ provides switcher logic
 task_descriptions_dict = {
     "population": {
         "max": "Try to create districts that have very different population sizes.\n\n",
-        "min": "Try to evenly balance the number of people each district has.\n\n"
+        "min": "Try to balance district populations.\n\n"
     },
     "pvi": {
-        "max": "Try to create districts that maximize the number of wasted votes.\n\n",
-        "min": "Try to create districts that minimize the number of wasted votes.\n\n"
+        "max": "Try to minimize voter efficiency.\n\n",
+        "min": "Try to maximize voter efficiency.\n\n"
     },
     "compactness": {
-        "max": "Try to create districts that are round and regularly shaped.\n\n",
+        "max": "Try to make districts with compact shapes.\n\n",
         "min": "Try to create districts that are as oddly shaped as possible.\n\n"
     },
     "projected_votes": {
