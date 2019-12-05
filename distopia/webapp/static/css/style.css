@@ -178,12 +178,17 @@ body{
 	width: 100%;
 	background-color: white;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	border-radius: 15px; 
 }
 
 
 #radar{
 	background-color: #3B5175;
 	fill: white;
+	border-style: solid; 
+	border-color: white; 
+	border-radius: 15px; 
+	border-width: 3px;
 }
 #label_area{
 	height: 100%;
@@ -191,6 +196,8 @@ body{
 	background-color: #3B5175;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 	fill: white;
+	border-radius: 15px; 
+
 }
 
 #hist_label{
@@ -198,17 +205,26 @@ body{
 	width: 100%;
 	background-color: white;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	border-radius: 15px; 
 }
 
 #task_dialog{
 	background-color: #3B5175;
 	fill: white;
 	overflow-wrap: break-word;
+	border-style: solid; 
+	border-color: white; 
+	border-radius: 15px; 
+	border-width: 3px;
 }
 
 #timer{
 	background-color: #3B5175;
 	fill: white;
+	border-style: solid; 
+	border-color: white; 
+	border-radius: 15px; 
+	border-width: 3px;
 }
 #intent_dialog{
 	background-color: #3B5175;
@@ -234,8 +250,12 @@ select {
 
 #scale{
 	background-color: #3B5175;
-
+	border-radius: 15px; 
 	fill: white;
+	border-style: solid; 
+	border-color: white; 
+	border-radius: 15px; 
+	border-width: 3px;
 }
 .right{
 	height: 85%;
