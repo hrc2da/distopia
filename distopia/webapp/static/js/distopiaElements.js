@@ -158,19 +158,19 @@ export const friendlyNamestoMetrics = {
 
 export const TASK_DESCRIPTIONS = [
     // population
-    "Try to evenly balance the number of people each district has.",
+    "Try to balance district populations.",
     // pvi
-    "Try to create districts that minimize the number of wasted votes.",
+    "Try to maximize voter efficiency.",
     // compactness
-	"Try to create districts that are round and regularly shaped.",
+	"Try to make districts with compact shapes.",
 	// TASK PAIRS ///////////////////////////
 	// Pop + PVI
-	"Try to evenly balance the number of people each district has. and \n Try to create districts that minimize the number of wasted votes.",
+	"Try to balance district populations and maximize voter efficiency",
 	// POP + compactness
-	"Try to evenly balance the number of people each district has. and \n Try to create districts that are round and regularly shaped.",
+	"Try to balance district populations and make districts with compact shapes",
 	// PVI + compactness
-	"Try to create districts that minimize the number of wasted votes. \n Try to create districts that are round and regularly shaped.",
+	"Try to maximize voter efficiency and make districts with compact shapes",
 	// ALL 3
-	"Try to evenly balance the number of people each district has. and \n Try to create districts that minimize the number of wasted votes. \n Try to create districts that are round and regularly shaped."
+	"Try to balance district populations, maximize voter efficiency, and make districts with compact shapes",
 
 ];
