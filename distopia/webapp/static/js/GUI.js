@@ -150,6 +150,7 @@ function initTasksAndTimers(){
 	taskDiv.append("text").attr("id", "task_text")
 	.attr("x", 80)
 	.attr("y", 90)
+	.style("font-size", "20px")
 	.text(State.currentTask);
 
 	timerDiv.append("text").attr("id", "task_time_header")
