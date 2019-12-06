@@ -9,6 +9,7 @@ const max = Math.max;
 const sin = Math.sin;
 const cos = Math.cos;
 const HALF_PI = Math.PI / 2;
+import { updateState } from "../GUI.js";
 
 export default function RadarChart(parent_selector, data, options) {
   //Wraps SVG text - Taken from http://bl.ocks.org/mbostock/7555321
@@ -65,7 +66,8 @@ export default function RadarChart(parent_selector, data, options) {
     strokeWidth: 4, //The width of the stroke around each blob
     roundStrokes: false, //If true the area and stroke will follow a round path (cardinal-closed)
     color: d3.scaleOrdinal(d3.schemeCategory10), //Color function,
-    metricColors: ["#ffdb99", "#FCD0D0", "#D0FCD2"],
+    metrics: ["population", "pvi", "compactness"],
+    metricColors: ["#ffdb99", "#ff9999", "#99cc99"],
     format: ".2%",
     unit: "",
     legend: false
@@ -333,19 +335,22 @@ export default function RadarChart(parent_selector, data, options) {
     .attr("cy", (d, i) => rScale(d.value) * sin(angleSlice * i - HALF_PI))
     .style("fill", "none")
     .style("pointer-events", "all")
-    .on("mouseover", function(d, i) {
-      tooltip
-        .attr("x", this.cx.baseVal.value - 10)
-        .attr("y", this.cy.baseVal.value - 10)
-        .transition()
-        .style("display", "block")
-        .text(Format(d.value) + cfg.unit);
-    })
-    .on("mouseout", function() {
-      tooltip
-        .transition()
-        .style("display", "none")
-        .text("");
+    // .on("mouseover", function(d, i) {
+    //   tooltip
+    //     .attr("x", this.cx.baseVal.value - 10)
+    //     .attr("y", this.cy.baseVal.value - 10)
+    //     .transition()
+    //     .style("display", "block")
+    //     .text(Format(d.value) + cfg.unit);
+    // })
+    // .on("mouseout", function() {
+    //   tooltip
+    //     .transition()
+    //     .style("display", "none")
+    //     .text("");
+    // })
+    .on("click", (d, i) => {
+      updateState({ metricFocus: cfg.metrics[i] });
     });
 
   const tooltip = g
