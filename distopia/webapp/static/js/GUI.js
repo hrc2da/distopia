@@ -95,16 +95,32 @@ function initInteractive() {
   const centroidAddButton = document.getElementById("state");
   centroidAddButton.onclick = e => addCentroid(e);
 
-  const metricSelector = document.getElementById("metric_selector");
-  metricSelector.onchange = () =>
-    updateState({ metricFocus: friendlyNamestoMetrics[metricSelector.value] });
+const metric_select_population = document.getElementById("metric_select_population");
+console.log(metric_select_population);
+metric_select_population.onclick = () =>
+  updateState({ metricFocus: "population" });
+
+const metric_select_voter_efficiency = document.getElementById("metric_select_voter_efficiency");
+metric_select_voter_efficiency.onclick = () =>
+  updateState({ metricFocus: "pvi"});
+
+const metric_select_compactness = document.getElementById("metric_select_compactness");
+metric_select_compactness.onclick = () =>
+updateState({ metricFocus: "compactness"});
+
+
+
+  // const metricSelector = document.getElementById("metric_selector");
+  // metricSelector.onchange = () =>
+  //   updateState({ metricFocus: friendlyNamestoMetrics[metricSelector.value] });
+
   // add options for the metric filter
-  for (let i = 0; i < FRIENDLYNAMES.length; i++) {
-    const option = document.createElement("option");
-    option.text = FRIENDLYNAMES[i];
-    metricSelector.options.add(option, i);
-  }
-  metricSelector.value = State.metricFocus;
+  // for (let i = 0; i < FRIENDLYNAMES.length; i++) {
+  //   const option = document.createElement("option");
+  //   option.text = FRIENDLYNAMES[i];
+  //   metricSelector.options.add(option, i);
+  // }
+  // metricSelector.value = State.metricFocus;
 
   // set up district selector
   const districtSelector = document.getElementById("district_selector");
