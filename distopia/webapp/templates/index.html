@@ -79,23 +79,23 @@
 					<div class="one-half column">
 						<div class="row" style="height: 8vh; margin-bottom: 1%; background-color: #707070; color:white; box-shadow: 0 0px 0px rgba(0,0,0,0.16), 0 0px 0px rgba(0,0,0,0.23);" id = "label_area">
 								<span>		
-									<label id="metric_selector_label" for="metric_selector" style="display:inline-flex">Metric:</label>
-									<select id= "metric_selector"></select>
+									<!-- <label id="metric_selector_label" for="metric_selector" style="display:inline-flex">Metric:</label> -->
+									<select id= "metric_selector" hidden="true"></select>
+									<button class="metric_select" id="metric_select_population">Population</button>
+									<button class="metric_select" id="metric_select_voter_efficiency">Voter Efficiency</button>
+									<button class="metric_select" id="metric_select_compactness">Compactness</button>
 									<label id="district_selector_label" for="district_selector" style="display:inline-flex">District:</label>
 									<select id= "district_selector"></select>
-									<button id="reset_centroids">Reset Centroids</button>
+									<button id="reset_centroids">Reset</button>
 								</span>
 							<!-- ' <svg id="label_area"></svg> -->
 						</div>
-						<div class="row" style="height: 8vh; margin-bottom: 1%; background-color: #707070; color:white; box-shadow: 0 0px 0px rgba(0,0,0,0.16), 0 0px 0px rgba(0,0,0,0.23);">
-									<button>Population</button>
-									<button>Projected Votes</button>
-									<button>Voter</button>
-									<button>Compactness</button>
-						</div>
+						<!-- <div class="row" style="height: 8vh; margin-bottom: 1%; background-color: #707070; color:white; box-shadow: 0 0px 0px rgba(0,0,0,0.16), 0 0px 0px rgba(0,0,0,0.23);">
+									
+						</div> -->
 						<div class="row" style="height: 70vh; margin-bottom: 1%;">
 							<svg id="state" ></svg>
-						</div>
+						</div>tt
 						<div class="row" style="height: 13vh">
 							<svg id="scale"></svg>
 						</div>
