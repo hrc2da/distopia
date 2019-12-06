@@ -91,41 +91,49 @@ export function updateState(newState) {
   State = { ...State, ...newState };
 }
 
-
-function updateAction(activeButton){
-  const buttons = [document.getElementById("metric_select_population"),document.getElementById("metric_select_voter_efficiency"),document.getElementById("metric_select_compactness")];
+function updateAction(activeButton) {
+  console.log(activeButton);
+  const buttons = [
+    document.getElementById("metric_select_population"),
+    document.getElementById("metric_select_voter_efficiency"),
+    document.getElementById("metric_select_compactness")
+  ];
   buttons.forEach(button => {
-    if (button == activeButton){
-      button.className = "active"
-    }
-    else {
+    if (button == activeButton) {
+      button.className = "metric_select active";
+    } else {
       button.className = "metric_select";
     }
-  })
-
+  });
 }
 
 function initInteractive() {
   const centroidAddButton = document.getElementById("state");
   centroidAddButton.onclick = e => addCentroid(e);
 
-const metric_select_population = document.getElementById("metric_select_population");
-console.log(metric_select_population);
-metric_select_population.onclick = () =>
-  updateState({ metricFocus: "population" });
-  updateAction(metric_select_population);
+  const metric_select_population = document.getElementById(
+    "metric_select_population"
+  );
+  metric_select_population.onclick = () => {
+    updateState({ metricFocus: "population" });
+    updateAction(metric_select_population);
+  };
 
-const metric_select_voter_efficiency = document.getElementById("metric_select_voter_efficiency");
-metric_select_voter_efficiency.onclick = () =>
-  updateState({ metricFocus: "pvi"});
-  updateAction(metric_select_voter_efficiency);
+  const metric_select_voter_efficiency = document.getElementById(
+    "metric_select_voter_efficiency"
+  );
+  metric_select_voter_efficiency.onclick = () => {
+    updateState({ metricFocus: "pvi" });
+    updateAction(metric_select_voter_efficiency);
+  };
 
-const metric_select_compactness = document.getElementById("metric_select_compactness");
-metric_select_compactness.onclick = () =>
-updateState({ metricFocus: "compactness"});
-updateAction(metric_select_compactness);
-
-
+  const metric_select_compactness = document.getElementById(
+    "metric_select_compactness"
+  );
+  metric_select_compactness.onclick = () => {
+    updateState({ metricFocus: "compactness" });
+    updateAction(metric_select_compactness);
+  };
 
   // const metricSelector = document.getElementById("metric_selector");
   // metricSelector.onchange = () =>
