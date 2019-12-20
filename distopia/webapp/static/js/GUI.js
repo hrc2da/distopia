@@ -1,4 +1,5 @@
 import { DistopiaInterface } from "./distopiaInterface.js";
+// import { writeLog } from "./firebase.js";
 import {
   UI_CONSTANTS,
   friendlyNamestoMetrics,
@@ -88,6 +89,7 @@ export function updateState(newState) {
       }
     );
   }
+  // writeLog();
   State = { ...State, ...newState };
 }
 
