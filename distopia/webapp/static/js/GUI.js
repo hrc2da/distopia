@@ -21,6 +21,8 @@ const FRIENDLYNAMES = Object.keys(friendlyNamestoMetrics);
  *		currentTask: string,
  *		currentTaskNumber: Number,
  *		isReset: boolean,
+ *    sessionID: string,
+ *    logTime: string,
  */
 var State = {
   blocks: {},
@@ -43,6 +45,7 @@ var distopia = new DistopiaInterface({
   initialView: "state",
   metricFocus: State.metricFocus
 });
+State.sessionID = new Date();
 initInteractive();
 initState();
 initTasksAndTimers();
@@ -89,7 +92,7 @@ export function updateState(newState) {
       }
     );
   }
-  // writeLog();
+  writeLog(State);
   State = { ...State, ...newState };
 }
 
