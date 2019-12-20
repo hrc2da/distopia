@@ -3,9 +3,6 @@ import { CONFIG } from "./config.js";
 // Initialize Firebase
 firebase.initializeApp(CONFIG);
 console.log('initialized firebase');
-firebase.analytics();
-
-var database = firebase.database();
 
 export function writeLog() {
 console.log('calling writE LOG')
