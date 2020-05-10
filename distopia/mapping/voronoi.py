@@ -246,7 +246,94 @@ class VoronoiMapping(object):
             for x, y in collider.get_inside_points():
                 if 0 <= x < w and 0 <= y < h:
                     precinct_values[x - x1, y - y1] = 1
+        
+  
+        # islands = []
+        # for i,row in enumerate(pixel_precinct_map):
+        #     for j,col in enumerate(row):
+        #         if self.check_pixel_hole(pixel_precinct_map,i,j):
+        # #             islands.append((i,j))
+        # import matplotlib.pyplot as plt
+        # plt.imshow(self.pixel_precinct_map)
+        # plt.show()
+        self.fill_holes(pixel_precinct_map)
+        # plt.imshow(self.pixel_precinct_map)
+        # plt.show()
 
+    def fill_holes(self, pixel_map):
+        hole_limit = 35 # how wide a hole can be before we declare it over
+        for row in pixel_map.T: # iterate the 1920-length way
+            start = -1
+            hole_start = -1
+            for i,pixel in enumerate(row):   
+                if start < 0:
+                    if pixel < 255:
+                        start = i
+                else:
+                    # if we've started into the state, and it is empty
+                    if pixel == 255:
+                        # if this is the start of a hole, then set hole_start
+                        if hole_start < 0:
+                            hole_start = i
+                        # if we've started the hole and it's too big, end the row
+                        elif i - hole_start > hole_limit:
+                            print("ending")
+                            # skip the rest of the row
+                            break
+                        # otherwise, we are in the middle of the hole, so do nothing
+                    # now if it's not empty
+                    else:
+                        # if we are coming from an empty, then fill and reset hole_start
+                        if hole_start > 0:
+                            print(f"filling hole with {pixel}")
+                            row[hole_start:i] = pixel
+                            hole_start = -1
+  
+                        # otherwise, do nothing
+ 
+
+
+    def check_pixel_hole(self, pixel_map,px,py):
+        # check if the pixel is empty but all bordering pixels are filled
+        # i'm going to ignore the border of the map for convenience
+        w,h = pixel_map.shape
+        empty_neighbors = 0
+        if px <= 0 or px >= w-1 or py <= 0 or py >= h-1:
+            return False
+        if pixel_map[px,py] < 255:
+            # if the pixel is not empty, it is not a hole
+            return False
+        # now trace around the pixel, checking how many neighbors are not empty (< 255)
+        # if it is an empty pixel surrounded by filled pixels, it is a hole
+        py += 1 # top
+        if pixel_map[px,py] == 255:
+            empty_neighbors += 1# return False
+        px += 1 # top right
+        if pixel_map[px,py] == 255:
+            empty_neighbors += 1# return False
+        py -= 1 # right
+        if pixel_map[px,py] == 255:
+            empty_neighbors += 1# return False
+        py -= 1 # bot right
+        if pixel_map[px,py] == 255:
+            empty_neighbors += 1# return False
+        px -= 1 # bot
+        if pixel_map[px,py] == 255:
+            empty_neighbors += 1# return False
+        px -= 1 #bot left
+        if pixel_map[px,py] == 255:
+            empty_neighbors += 1# return False
+        py += 1 # left
+        if pixel_map[px,py] == 255:
+            empty_neighbors += 1# return False
+        py += 1 #  top left
+        if pixel_map[px,py] == 255:
+            empty_neighbors += 1# return False
+        # if none of the neighbors are empty, then it's a hole
+        if empty_neighbors < 2:
+            return True
+        else:
+            return False
     def add_fiducial(self, location, identity):
         """Adds a new fiducial at ``location``.
 
@@ -363,6 +450,11 @@ class VoronoiMapping(object):
 
             district.boundary = vertices
             district.collider = PolygonCollider(points=vertices, cache=False)
+            
+            if district.collider.get_area() < 20:
+                print("Boundary is not right")
+                #import pdb; pdb.set_trace()
+                raise ValueError('Boundary is not right!')
 
     def assign_precincts_to_districts(self, n_districts, pixel_district_map):
         """Uses the pre-computed precinct and district maps and assigns
