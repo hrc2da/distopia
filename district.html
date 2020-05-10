@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>District &#8212; Distopia  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Mapping" href="mapping.html" />
+    <link rel="prev" title="Precinct Documentation" href="precinct.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-distopia.district">
+<span id="district"></span><h1>District<a class="headerlink" href="#module-distopia.district" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>District<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#distopia.district.District" title="distopia.district.District"><code class="xref py py-class docutils literal notranslate"><span class="pre">District</span></code></a> defines a district and and the precincts it contains.</p>
+<dl class="py class">
+<dt id="distopia.district.District">
+<em class="property">class </em><code class="sig-prename descclassname">distopia.district.</code><code class="sig-name descname">District</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/district.html#District"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.district.District" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a district, its precincts and its metrics.</p>
+<dl class="py method">
+<dt id="distopia.district.District.add_precinct">
+<code class="sig-name descname">add_precinct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">precinct</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/district.html#District.add_precinct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.district.District.add_precinct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a precinct to the district.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>precinct</strong> – <a class="reference internal" href="precinct.html#distopia.precinct.Precinct" title="distopia.precinct.Precinct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Precinct</span></code></a> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.district.District.assign_precincts">
+<code class="sig-name descname">assign_precincts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">precincts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/district.html#District.assign_precincts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.district.District.assign_precincts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the precincts to the district.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>precincts</strong> – Iterable of <a class="reference internal" href="precinct.html#distopia.precinct.Precinct" title="distopia.precinct.Precinct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Precinct</span></code></a>
+instances.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.district.District.boundary">
+<code class="sig-name descname">boundary</code><em class="property"> = []</em><a class="headerlink" href="#distopia.district.District.boundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> coordinates of the polygon that 
+describes the district’s boundary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.district.District.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/district.html#District.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.district.District.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears all the existing precincts from the district.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.district.District.identity">
+<code class="sig-name descname">identity</code><em class="property"> = 0</em><a class="headerlink" href="#distopia.district.District.identity" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the district.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.district.District.metrics">
+<code class="sig-name descname">metrics</code><em class="property"> = {}</em><a class="headerlink" href="#distopia.district.District.metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>A mapping from <a class="reference internal" href="#distopia.district.metrics.DistrictMetric.name" title="distopia.district.metrics.DistrictMetric.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code></a> 
+to the <a class="reference internal" href="#distopia.district.metrics.DistrictMetric" title="distopia.district.metrics.DistrictMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistrictMetric</span></code></a> instance that
+contains the summery metric data for this district.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.district.District.name">
+<code class="sig-name descname">name</code><em class="property"> = ''</em><a class="headerlink" href="#distopia.district.District.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A globally unique name (or number) describing the district.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.district.District.neighbours">
+<code class="sig-name descname">neighbours</code><em class="property"> = []</em><a class="headerlink" href="#distopia.district.District.neighbours" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of other <a class="reference internal" href="#distopia.district.District" title="distopia.district.District"><code class="xref py py-class docutils literal notranslate"><span class="pre">District</span></code></a>’s that are on the boundary of this
+district.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.district.District.precincts">
+<code class="sig-name descname">precincts</code><em class="property"> = []</em><a class="headerlink" href="#distopia.district.District.precincts" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of <a class="reference internal" href="precinct.html#distopia.precinct.Precinct" title="distopia.precinct.Precinct"><code class="xref py py-class docutils literal notranslate"><span class="pre">Precinct</span></code></a> instances that are 
+currently contained within this district.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-distopia.district.metrics"></span><div class="section" id="district-metrics">
+<h2>District Metrics<a class="headerlink" href="#district-metrics" title="Permalink to this headline">¶</a></h2>
+<p>Defines metrics that summarize the district based on the contained precincts
+and other metadata.</p>
+<dl class="py class">
+<dt id="distopia.district.metrics.DistrictMetric">
+<em class="property">class </em><code class="sig-prename descclassname">distopia.district.metrics.</code><code class="sig-name descname">DistrictMetric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/district/metrics.html#DistrictMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.district.metrics.DistrictMetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Metrics used with <a class="reference internal" href="#distopia.district.District" title="distopia.district.District"><code class="xref py py-class docutils literal notranslate"><span class="pre">distopia.district.District</span></code></a>.</p>
+<dl class="py attribute">
+<dt id="distopia.district.metrics.DistrictMetric.name">
+<code class="sig-name descname">name</code><em class="property"> = ''</em><a class="headerlink" href="#distopia.district.metrics.DistrictMetric.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A globally unique metric name that describes the metric.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="distopia.district.metrics.DistrictAggregateMetric">
+<em class="property">class </em><code class="sig-prename descclassname">distopia.district.metrics.</code><code class="sig-name descname">DistrictAggregateMetric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">district</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/district/metrics.html#DistrictAggregateMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.district.metrics.DistrictAggregateMetric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="distopia.district.metrics.DistrictHistogramAggregateMetric">
+<em class="property">class </em><code class="sig-prename descclassname">distopia.district.metrics.</code><code class="sig-name descname">DistrictHistogramAggregateMetric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">district</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/district/metrics.html#DistrictHistogramAggregateMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.district.metrics.DistrictHistogramAggregateMetric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="distopia.district.metrics.DistrictScalarMetric">
+<em class="property">class </em><code class="sig-prename descclassname">distopia.district.metrics.</code><code class="sig-name descname">DistrictScalarMetric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">district</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/district/metrics.html#DistrictScalarMetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.district.metrics.DistrictScalarMetric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Distopia</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="distopia.html">Distopia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="precinct.html">Precinct Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">District</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">District</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#district-metrics">District Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">State Level Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ros.html">ROS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="precinct.html" title="previous chapter">Precinct Documentation</a></li>
+      <li>Next: <a href="mapping.html" title="next chapter">Mapping</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, hrc2da.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/district.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

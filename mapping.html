@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Mapping &#8212; Distopia  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="State Level Metrics" href="metrics.html" />
+    <link rel="prev" title="District" href="district.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-distopia.mapping">
+<span id="mapping"></span><h1>Mapping<a class="headerlink" href="#module-distopia.mapping" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="district-mapping">
+<h2>District Mapping<a class="headerlink" href="#district-mapping" title="Permalink to this headline">¶</a></h2>
+<p>Defines the algorithms that perform the mapping from precincts to districts.</p>
+</div>
+<span class="target" id="module-distopia.mapping.voronoi"></span><div class="section" id="voronoi-mapping">
+<h2>Voronoi Mapping<a class="headerlink" href="#voronoi-mapping" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="distopia.mapping.voronoi.VoronoiMapping">
+<em class="property">class </em><code class="sig-prename descclassname">distopia.mapping.voronoi.</code><code class="sig-name descname">VoronoiMapping</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the Voronoi algorithm to assign precincts to districts.</p>
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.add_fiducial">
+<code class="sig-name descname">add_fiducial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">location</span></em>, <em class="sig-param"><span class="n">identity</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.add_fiducial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.add_fiducial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new fiducial at <code class="docutils literal notranslate"><span class="pre">location</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>location</strong> – The fiducial location <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The (assigned) ID of the fiducial.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.apply_voronoi">
+<code class="sig-name descname">apply_voronoi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.apply_voronoi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.apply_voronoi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not thread safe.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.assign_precincts_to_districts">
+<code class="sig-name descname">assign_precincts_to_districts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_districts</span></em>, <em class="sig-param"><span class="n">pixel_district_map</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.assign_precincts_to_districts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.assign_precincts_to_districts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the pre-computed precinct and district maps and assigns
+all the precincts to districts.</p>
+<p>Returns list of precincts, per district. Indices correspond with the
+district identity index in <cite>unique_ids</cite> as filled into
+pixel_district_map.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.compute_district_pixels">
+<code class="sig-name descname">compute_district_pixels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fiducials</span></em>, <em class="sig-param"><span class="n">fiducials_identity</span></em>, <em class="sig-param"><span class="n">unique_ids</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.compute_district_pixels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.compute_district_pixels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the assignment of pixels to districts and creates the
+associated districts.</p>
+<p>fiducials and fiducials_identity must be sorted such that they
+correspond to each other. All ids must be in unique ids.
+pixel_district_map is filled in with the index of the district
+identity in unique_ids to make it 0-n-1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.districts">
+<code class="sig-name descname">districts</code><em class="property"> = []</em><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.districts" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of all current <a class="reference internal" href="district.html#distopia.district.District" title="distopia.district.District"><code class="xref py py-class docutils literal notranslate"><span class="pre">distopia.district.District</span></code></a> instances.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.fiducial_locations">
+<code class="sig-name descname">fiducial_locations</code><em class="property"> = {}</em><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.fiducial_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict of tuples, each containing the <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> coordinates of the
+fiducial at that key.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.get_fiducials">
+<code class="sig-name descname">get_fiducials</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.get_fiducials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.get_fiducials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict of the fiducials, keys are their ID.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.get_pos_district">
+<code class="sig-name descname">get_pos_district</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pos</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.get_pos_district"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.get_pos_district" title="Permalink to this definition">¶</a></dt>
+<dd><p>The district under the fiducial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pos</strong> – position.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The district under the position, or None if none.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.move_fiducial">
+<code class="sig-name descname">move_fiducial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fiducial</span></em>, <em class="sig-param"><span class="n">location</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.move_fiducial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.move_fiducial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves <code class="docutils literal notranslate"><span class="pre">fiducial</span></code> from its previous location to a new location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fiducial</strong> – <code class="docutils literal notranslate"><span class="pre">fiducial</span></code> ID as returned by <a class="reference internal" href="#distopia.mapping.voronoi.VoronoiMapping.add_fiducial" title="distopia.mapping.voronoi.VoronoiMapping.add_fiducial"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_fiducial()</span></code></a>.</p></li>
+<li><p><strong>location</strong> – The new fiducial location <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.pixel_district_map">
+<code class="sig-name descname">pixel_district_map</code><em class="property"> = None</em><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.pixel_district_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>A width by height matrix, where each item is the district index in
+<a class="reference internal" href="#distopia.mapping.voronoi.VoronoiMapping.districts" title="distopia.mapping.voronoi.VoronoiMapping.districts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">districts</span></code></a> it belongs to. Read_only (used by the thread).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.precincts">
+<code class="sig-name descname">precincts</code><em class="property"> = []</em><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.precincts" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of all the <a class="reference internal" href="precinct.html#distopia.precinct.Precinct" title="distopia.precinct.Precinct"><code class="xref py py-class docutils literal notranslate"><span class="pre">distopia.precinct.Precinct</span></code></a> instances.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.remove_fiducial">
+<code class="sig-name descname">remove_fiducial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fiducial</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.remove_fiducial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.remove_fiducial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes <code class="docutils literal notranslate"><span class="pre">fiducial</span></code> from the diagram.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fiducial</strong> – <code class="docutils literal notranslate"><span class="pre">fiducial</span></code> ID as returned by <a class="reference internal" href="#distopia.mapping.voronoi.VoronoiMapping.add_fiducial" title="distopia.mapping.voronoi.VoronoiMapping.add_fiducial"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_fiducial()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.screen_size">
+<code class="sig-name descname">screen_size</code><em class="property"> = (1920, 1080)</em><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.screen_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the screen, in pixels, on which the districts and
+precincts are drawn, and on which the fiducials are drawn.</p>
+<p>It’s <code class="docutils literal notranslate"><span class="pre">(width,</span> <span class="pre">height)</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.set_precincts">
+<code class="sig-name descname">set_precincts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">precincts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.set_precincts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.set_precincts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the precincts to be used by the mapping.</p>
+<p>Must be called only (or every time) after <a class="reference internal" href="#distopia.mapping.voronoi.VoronoiMapping.screen_size" title="distopia.mapping.voronoi.VoronoiMapping.screen_size"><code class="xref py py-attr docutils literal notranslate"><span class="pre">screen_size</span></code></a> is set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>precincts</strong> – List of <a class="reference internal" href="precinct.html#distopia.precinct.Precinct" title="distopia.precinct.Precinct"><code class="xref py py-class docutils literal notranslate"><span class="pre">distopia.precinct.Precinct</span></code></a>
+instances.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.sites">
+<code class="sig-name descname">sites</code><em class="property"> = []</em><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of tuples describing the <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> coordinates of each of the
+objects placed by the user at that location.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping.voronoi.VoronoiMapping.voronoi_finite_polygons_2d">
+<code class="sig-name descname">voronoi_finite_polygons_2d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vor</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/distopia/mapping/voronoi.html#VoronoiMapping.voronoi_finite_polygons_2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#distopia.mapping.voronoi.VoronoiMapping.voronoi_finite_polygons_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconstruct infinite voronoi regions in a 2D diagram to finite
+regions.</p>
+<p>based on <a class="reference external" href="https://stackoverflow.com/a/20678647">https://stackoverflow.com/a/20678647</a>.</p>
+<dl class="simple">
+<dt>vor<span class="classifier">Voronoi</span></dt><dd><p>Input diagram</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>regions<span class="classifier">list of tuples</span></dt><dd><p>Indices of vertices in each revised Voronoi regions.</p>
+</dd>
+<dt>vertices<span class="classifier">list of tuples</span></dt><dd><p>Coordinates for revised Voronoi vertices. Same as coordinates
+of input vertices, with ‘points at infinity’ appended to the
+end.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-distopia.mapping._voronoi"></span><div class="section" id="collider">
+<h2>Collider<a class="headerlink" href="#collider" title="Permalink to this headline">¶</a></h2>
+<p>The collider module contains classes which can be used to test membership
+of a point in some space. See individual class documentation for details.</p>
+<img alt="_static/Screenshot.png" class="align-right" src="_static/Screenshot.png" />
+<p>To use it you first have to cythonize the code. To do that, cd to the directory
+containing collider.pyx and:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt id="distopia.mapping._voronoi.PolygonCollider">
+<em class="property">class </em><code class="sig-prename descclassname">distopia.mapping._voronoi.</code><code class="sig-name descname">PolygonCollider</code><a class="headerlink" href="#distopia.mapping._voronoi.PolygonCollider" title="Permalink to this definition">¶</a></dt>
+<dd><p>PolygonCollider checks whether a point is within a polygon defined by a
+list of corner points.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rect</span></code> is (x, y, width, height)</p>
+<p>Based on <a class="reference external" href="http://alienryderflex.com/polygon/">http://alienryderflex.com/polygon/</a></p>
+<p>For example, a simple triangle:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collider</span> <span class="o">=</span> <span class="n">PolygonCollider</span><span class="p">([</span><span class="mf">10.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">30.</span><span class="p">,</span> <span class="mf">30.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">],</span>
+<span class="gp">... </span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">in</span> <span class="n">collider</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">)</span> <span class="ow">in</span> <span class="n">collider</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The constructor takes a list of x,y points in the form of [x1,y1,x2,y2…]
+as the points argument. These points define the corners of the
+polygon. The boundary is linearly interpolated between each set of points.
+The x, and y values must be floating points.
+The cache argument, if True, will calculate membership for all the points
+so when collide_point is called it’ll just be a table lookup.</p>
+<dl class="py method">
+<dt id="distopia.mapping._voronoi.PolygonCollider.bounding_box">
+<code class="sig-name descname">bounding_box</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#distopia.mapping._voronoi.PolygonCollider.bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the bounding box containing the polygon as 4 points
+(x1, y1, x2, y2), where x1, y1 is the lower left and x2, y2 is the
+upper right point of the rectangle.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="distopia.mapping._voronoi.PolygonCollider.get_inside_points">
+<code class="sig-name descname">get_inside_points</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#distopia.mapping._voronoi.PolygonCollider.get_inside_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all the points that are within the polygon.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="distopia.mapping._voronoi.ColliderException">
+<em class="property">exception </em><code class="sig-prename descclassname">distopia.mapping._voronoi.</code><code class="sig-name descname">ColliderException</code><a class="headerlink" href="#distopia.mapping._voronoi.ColliderException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Distopia</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="distopia.html">Distopia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="precinct.html">Precinct Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="district.html">District</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Mapping</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#district-mapping">District Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#voronoi-mapping">Voronoi Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#collider">Collider</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">State Level Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ros.html">ROS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="district.html" title="previous chapter">District</a></li>
+      <li>Next: <a href="metrics.html" title="next chapter">State Level Metrics</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, hrc2da.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/mapping.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

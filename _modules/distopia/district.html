@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>distopia.district &#8212; Distopia  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distopia.district</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">District</span>
+<span class="sd">=========</span>
+
+<span class="sd">:class:`District` defines a district and and the precincts it contains.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;District&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+
+<div class="viewcode-block" id="District"><a class="viewcode-back" href="../../district.html#distopia.district.District">[docs]</a><span class="k">class</span> <span class="nc">District</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Describes a district, its precincts and its metrics.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;A globally unique name (or number) describing the district.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">identity</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="sd">&quot;&quot;&quot;The id of the district. &quot;&quot;&quot;</span>
+
+    <span class="n">boundary</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="sd">&quot;&quot;&quot;A list of the ``x``, ``y`` coordinates of the polygon that </span>
+<span class="sd">    describes the district&#39;s boundary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="sd">&quot;&quot;&quot;List of other :class:`District`&#39;s that are on the boundary of this</span>
+<span class="sd">    district.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">precincts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="sd">&quot;&quot;&quot;List of :class:`~distopia.precinct.Precinct` instances that are </span>
+<span class="sd">    currently contained within this district.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">metrics</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="sd">&quot;&quot;&quot;A mapping from :attr:`~distopia.district.metrics.DistrictMetric.name` </span>
+<span class="sd">    to the :class:`~distopia.district.metrics.DistrictMetric` instance that</span>
+<span class="sd">    contains the summery metric data for this district.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">collider</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">District</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<div class="viewcode-block" id="District.clear"><a class="viewcode-back" href="../../district.html#distopia.district.District.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Clears all the existing precincts from the district.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">precinct</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">precincts</span><span class="p">:</span>
+            <span class="n">precinct</span><span class="o">.</span><span class="n">district</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precincts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="District.assign_precincts"><a class="viewcode-back" href="../../district.html#distopia.district.District.assign_precincts">[docs]</a>    <span class="k">def</span> <span class="nf">assign_precincts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precincts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds the precincts to the district.</span>
+
+<span class="sd">        :param precincts: Iterable of :class:`~distopia.precinct.Precinct`</span>
+<span class="sd">            instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precincts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">precincts</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">precinct</span> <span class="ow">in</span> <span class="n">precincts</span><span class="p">:</span>
+            <span class="n">precinct</span><span class="o">.</span><span class="n">district</span> <span class="o">=</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="District.add_precinct"><a class="viewcode-back" href="../../district.html#distopia.district.District.add_precinct">[docs]</a>    <span class="k">def</span> <span class="nf">add_precinct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precinct</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a precinct to the district.</span>
+
+<span class="sd">        :param precinct: :class:`~distopia.precinct.Precinct` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">precinct</span><span class="o">.</span><span class="n">district</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precincts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">precinct</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">metric</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;name=</span><span class="si">{}</span><span class="s1">, id=</span><span class="si">{}</span><span class="s1">, n_precincts=</span><span class="si">{}</span><span class="s1">, &#39;</span>\
+        <span class="s1">&#39;n_metrics=</span><span class="si">{}</span><span class="s1">&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">identity</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precincts</span><span class="p">),</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Distopia</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../distopia.html">Distopia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../precinct.html">Precinct Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../district.html">District</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metrics.html">State Level Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../app.html">Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ros.html">ROS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utilities</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, hrc2da.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
